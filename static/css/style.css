@@ -1,35 +1,38 @@
 body {
-    font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  }
+    color:white;
+}
+.form-group{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.vertical-center {
+    min-height: 93%;  /* Fallback for browsers do NOT support vh unit */
+    min-height: 93vh; /* These two lines are counted as one :-)       */
   
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-weight: 700;
+    display: flex;
+    align-items: center;
   }
+.vertical-center .text-center{
+    line-height: 300%;
+}
 
-header.masthead {
+/* enable absolute positioning */
+.inner-addon{
     position: relative;
-    background-color: #343a40;
-    background-size: cover;
-    padding-top: 8rem;
-    padding-bottom: 8rem;
-  }
-  
-  header.masthead .overlay {
+}
+.inner-addon input {
+    padding-left: 35px;
+}
+.inner-addon i{
     position: absolute;
-    background-color: #212529;
-    height: 100%;
-    width: 100%;
-    top: 0;
     left: 0;
-    opacity: 0.3;
-  }
-  
-  header.masthead h1 {
-    font-size: 2rem;
-  }
+    top: 8px;
+    padding: 5px 8px;
+    color: #aaa;
+    transition: .3s;
+}
+.inner-addon input:focus + i{
+    color: dodgerblue;
+}
+
+
