@@ -34,5 +34,6 @@ body {
 .inner-addon input:focus + i{
     color: dodgerblue;
 }
-
-
+.no-display{
+    display: none;
+}

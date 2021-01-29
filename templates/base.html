@@ -14,14 +14,21 @@
     <script src="https://kit.fontawesome.com/af0ed13c41.js" crossorigin="anonymous"></script>
     <!--My Style-->
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-    <title>eBay Calculator</title>
+    <title>{% block title %}eBay Calculator{% endblock %}</title>
 </head>
-<body class='bg-dark'>
+<body class='bg-dark' {% if open_login %} onLoad="document.getElementById('btn_open_login').click();" {% endif %}>
     <!-- Navigation -->
     <nav class="navbar navbar-light bg-light static-top" style="height: 7vh">
         <div class="container">
-            <a class="navbar-brand" href="#">eBay Calculator</a>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#sign_in_modal">Sign In</button>
+            <a class="navbar-brand" href="{% url 'index' %}">eBay Calculator</a>
+            {% if not user.is_authenticated %}
+            <button id="btn_open_login" type="button" class="btn btn-primary" data-toggle="modal" data-target="#sign_in_modal">Sign In</button>
+            {% else %}
+            <div class="navbar-text row w-25">
+                <span class='col-6 my-auto text-dark'>Hello, {{ request.user }}</span>
+                <span class='col-6'><a class='btn btn-danger text-white' href="{% url 'logout' %}">Logout</a></span>
+            </div>
+            {% endif %}
         </div>
     </nav>
   
@@ -36,8 +43,26 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                ...
-                <button type="button" class="btn btn-primary">Log In</button>
+                    <form method="POST" action="" id='sign-in'>
+                        {% csrf_token %}
+        
+                        <div class="form-group inner-addon">
+                            <input name="txt_login_username" type="text" class="form-control" placeholder="Username" autocomplete="false">
+                            <i class="fa fa-user fa-lg fa-fw" aria-hidden="true"></i>
+                        </div>
+                        <div class="form-group inner-addon">
+                            <input name="txt_login_pass" type="password" class="form-control" placeholder="Password" autocomplete="false">
+                            <i class="fa fa-key fa-lg fa-fw" aria-hidden="true"></i>
+                        </div>
+                        {% for message in messages %}
+                            {% if message.tags == 'error' %}
+                            <p class='alert alert-danger'>{{ message }}</p>
+                            {% elif message.tags == 'success' %}
+                            <p class='alert alert-success'>{{ message }}</p>
+                            {% endif %}
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary" name="btn_login">Log In</button>
+                    </form>
                 </div>
             </div>
         </div>
