@@ -1,60 +1,54 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="vertical-center">
-<div class='container my-auto'>
-    
-    <div class="text-center">
-        <h1>Welcome to eBay Calaulator!</h1>
-        <p>We have many formulas built in to help you improve your marketing experience.</p>
-        <h3>Sign Up Today!</h3>
-        <p>Its quick, easy and free! Just fill in your email and password and you can start using eBay Calculator today!</p>
-    </div>
-    <div class="row my-5">
-        <div class="col-sm-12 col-lg-6 col-xl-4 mx-auto">
-            <form method="POST" action="" id='sign-up'>
-                {% csrf_token %}
-                <div class="form-group inner-addon">
-                    {{ form.username }}
-                    <i class="fa fa-user fa-lg fa-fw" aria-hidden="true"></i>
-                </div>
-                <div class="form-group inner-addon">
-                    {{ form.email }}
-                    <i class="fa fa-envelope fa-lg fa-fw" aria-hidden="true"></i>
-                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-                </div>
-                <div class="form-group">
-                    <div class="inner-addon">
-                        <i class="fa fa-key fa-lg fa-fw" aria-hidden="true"></i>
+    <div class='container my-auto'>
+        <div class="text-center">
+            <h1>Welcome to eBay Calaulator!</h1>
+            <p>We have many formulas built in to help you improve your marketing experience.</p>
+            <h3>Sign Up Today!</h3>
+            <p>Its quick, easy and free! Just fill in your email and password and you can start using eBay Calculator today!</p>
+        </div>
+        <div class="row my-5">
+            <div class="col-sm-12 col-lg-6 col-xl-4 mx-auto">
+                <!--Sign Up-->
+                <form method="POST" action="" id='sign-up'>
+                    {% csrf_token %}
+
+                    <div class="form-group inner-addon">
+                        {{ form.username }}
+                        <i class="fa fa-user fa-lg fa-fw" aria-hidden="true"></i>
+                    </div>
+
+                    <div class="form-group inner-addon">
+                        {{ form.email }}
+                        <i class="fa fa-envelope fa-lg fa-fw" aria-hidden="true"></i>
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    </div>
+                    {% for key, value in form.errors.items %}
+                        {% if key == 'email' %}
+                        <div class="alert alert-danger">{{value | striptags}}</div>
+                        {%endif%}
+                    {% endfor %}
+
+                    <div class="form-group inner-addon">
                         {{ form.password1 }}
-                    </div>
-                    <br style='line-height: 50%;' />
-                    <div class="inner-addon">
                         <i class="fa fa-key fa-lg fa-fw" aria-hidden="true"></i>
-                        {{ form.password2 }}
                     </div>
-                </div>
-                <button type="submit" class="btn btn-success" name="btn_signup">Submit</button>
-              </form>
-              {{ form.errors }}
-              <script>
-                  var form = document.getElementById('sign-up');
-                  var form_fields = form.getElementsByTagName('input');
-                  form_fields[1].placeholder = 'Username'
-
-                  form_fields[2].placeholder = 'youremail@example.com'
-                  form_fields[2].setAttribute('aria-describedby', 'emailHelp')
-
-                  form_fields[3].placeholder = 'Password'
-
-                  form_fields[4].placeholder = 'Verify Password'
-
-                  for (var i in form_fields){
-                      form_fields[i].className += 'form-control';
-                  }
-              </script>
+                    <div class="form-group inner-addon">
+                        {{ form.password2 }}
+                        <i class="fa fa-key fa-lg fa-fw" aria-hidden="true"></i>
+                    </div>
+                    {% for key, value in form.errors.items %}
+                        {% if key == 'password2' %}
+                            {% for v in value %}
+                            <div class="alert alert-danger">{{v | striptags}}</div>
+                            {% endfor %}
+                        {%endif%}
+                    {% endfor %}
+                    <button type="submit" class="btn btn-success" name="btn_signup">Submit</button>
+                </form>
+            </div>
         </div>
     </div>
-    
-</div>
 </div>
 {% endblock %}

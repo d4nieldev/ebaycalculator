@@ -7,9 +7,23 @@ from .models import SaleEntry
 
 
 class SignUpForm(UserCreationForm):
+    password1 = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}),
+    )
+
+    password2 = forms.CharField(
+        label="Confirm password",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password'})
+    )
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email', 'aria-describedby': 'emailHelp'}),
+        }
 
 
 class DateInput(forms.DateInput):
@@ -31,6 +45,9 @@ class SaleEntryForm(ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        '''
+        relate the sale registration form to the user who created it.
+        '''
         user_id = kwargs.pop('user_id')
         super().__init__(*args, **kwargs)
         self.fields['user'] = forms.ModelChoiceField(queryset=User.objects.filter(id=user_id), empty_label=None, initial=User.objects.get(id=user_id))

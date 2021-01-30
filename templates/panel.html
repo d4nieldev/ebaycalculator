@@ -2,6 +2,7 @@
 {% block title %}Panel{% endblock %}
 {% block content %}
 <div class="container-fluid my-3">
+    <!--Filter Sales-->
     <form method="POST" action="">
         {% csrf_token %}
         <div class="row">
@@ -24,8 +25,11 @@
             </div>
         </div>
     </form>
+
+    <!--View Sales-->
     <table class="table table-dark table-striped">
         <thead>
+            <!--Titles-->
           <tr>
             <th scope="col">Date</th>
             <th scope="col">eBay Price</th>
@@ -38,6 +42,7 @@
           </tr>
         </thead>
         <tbody>
+            <!--Data-->
           {% for sale in user_sales %}
           <tr>
             <th>{{ sale.date }}</th>
@@ -50,7 +55,8 @@
             <td id="loop">{{ sale.profit }}</td>
           </tr>
           {% endfor %}
-
+          
+          <!--Register Sale-->
           <form method="POST" action="">
             {% csrf_token %}
             <tr>
@@ -65,20 +71,23 @@
             
           </form>
         </tbody>
-      </table>
+    </table>
+
+    <!--Sale Registered Message-->
     {% for message in messages %}
         {% if message.tags == 'info' %}
             <p class='alert alert-info mt-3'>{{ message }}</p>
         {% endif %}
     {% endfor %}
 
-    <div>
-        
-    </div>
+    <!--Stats-->
     Total Profit: <span id="total"></span>
 </div>
+
 <script>
     function calc_profit() {
+        // This functinon calculates the profit from all the other inputs
+        // outputs to id=f_profit
         ebay_price = document.getElementById('f_ebay_price').value;
         amazon_price = document.getElementById('f_amazon_price').value;
         ebay_tax = document.getElementById('f_ebay_tax').value;
@@ -89,7 +98,8 @@
     }
 
     $(function() {
-
+            // This function calculates all of the profit values and sums it up
+            // outputs to id=total
             var TotalValue = 0;
 
             $("tr #loop").each(function(index,value){

@@ -12,6 +12,10 @@ from .models import SaleEntry
 
 
 def HANDLE_LOGIN_BASE(request, current_page, context):
+    '''
+    This function handles the login form - need to apply to every form we want to sign in from
+    forms that are using this method: index
+    '''
     if request.method == 'POST':
         if "btn_login" in request.POST:
             username = request.POST.get('txt_login_username')
@@ -30,11 +34,19 @@ def HANDLE_LOGIN_BASE(request, current_page, context):
 
 
 def HANDLE_LOGOUT_BASE(request):
+    '''
+    This function handles the logout mechanism. No need to use it anywhere.
+    Already imported from urls
+    '''
     logout(request)
     return redirect('index')
 
 
 def GET_SALES_YEARS_MONTHS(request):
+    '''
+    This function returns a dictionary with all years and months the user has registred sales
+    return example --> {2020: [12, 11], 2021: [1]}
+    '''
     sales = SaleEntry.objects.filter(user=request.user.id)
     years_months = {}
 
@@ -51,7 +63,12 @@ def GET_SALES_YEARS_MONTHS(request):
 
 
 def index(request):
+    '''
+    index view
+    All it does is sign up users and handle the sign in
+    '''
     if request.user.is_authenticated:
+        # logged in users will be automatically redirected to the panel page
         return redirect('panel')
     else:
         form = SignUpForm()
@@ -62,20 +79,25 @@ def index(request):
                 form = SignUpForm(request.POST)
                 if form.is_valid():
                     form.save()
+                    
+                    messages.success(request, "Account was created successfully! you can now login as an existing user.")
 
-                    username = form.cleaned_data.get('username')
-                    messages.success(request, "Account was created for " + username)
+                    # open the login form after successful sign up
                     context['open_login'] = True
                     context['form'] = form
                     return render(request, 'index.html', context)
         
         context['form'] = form
+        # handle login
         login_handle = HANDLE_LOGIN_BASE(request, 'index.html', context)
         return login_handle if login_handle is not None else render(request, 'index.html', context)
 
 
 @login_required(login_url='index')
 def panel(request):
+    '''
+    panel view
+    '''
     context = {}
 
     years_months = GET_SALES_YEARS_MONTHS(request)
@@ -89,6 +111,7 @@ def panel(request):
 
     if request.method == 'POST':
         if "btn_select_date" in request.POST:
+            # filter form
             selected_filter = request.POST.get('s_filter_sales_by_date')
 
             if str(selected_filter) != 'all':
@@ -103,6 +126,7 @@ def panel(request):
             return render(request, 'panel.html', context)
             
         if "btn_register_sale" in request.POST:
+            # register sale form
             form = SaleEntryForm(request.POST, user_id=request.user.id)
             if form.is_valid():
                 form.save()
