@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container-fluid my-3">
     <!--Filter Sales-->
-    <form method="POST" action="">
+    <form method="GET" action="">
         {% csrf_token %}
         <div class="row">
             <div class="col-1">
@@ -27,10 +27,10 @@
     </form>
 
     <!--View Sales-->
-    <table class="table table-dark table-striped">
+    <table id="table_sales" class="table table-dark table-striped table-sticky table-hover">
         <thead>
             <!--Titles-->
-          <tr>
+          <tr class="stickyrow">
             <th scope="col">Date</th>
             <th scope="col">eBay Price</th>
             <th scope="col">Amazon Price</th>
@@ -39,37 +39,49 @@
             <th scope="col">TM Fee</th>
             <th scope="col">Promoted</th>
             <th scope="col">Profit</th>
+            <th scope="col">Discount</th>
+            <th scope="col">Country</th>
+            <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
             <!--Data-->
-          {% for sale in user_sales %}
-          <tr>
-            <th>{{ sale.date }}</th>
-            <td>{{ sale.ebay_price }}</td>
-            <td>{{ sale.amazon_price }}</td>
-            <td>{{ sale.ebay_tax }}</td>
-            <td>{{ sale.paypal_tax }}</td>
-            <td>{{ sale.tm_fee }}</td>
-            <td>{{ sale.promoted }}</td>
-            <td id="loop">{{ sale.profit }}</td>
-          </tr>
-          {% endfor %}
-          
-          <!--Register Sale-->
-          <form method="POST" action="">
-            {% csrf_token %}
+            {% for sale in user_sales %}
             <tr>
-                {% for field in form %}
-                <td>
-                    {{ field }}
+                <th>{{ sale.date }}</th>
+                <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_price">{{ sale.ebay_price|floatformat }}</td>
+                <td class="editable sumtable" data-id="{{ sale.id }}" data-type="amazon_price">{{ sale.amazon_price|floatformat }}</td>
+                <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_tax">{{ sale.ebay_tax|floatformat }}</td>
+                <td class="editable sumtable" data-id="{{ sale.id }}" data-type="paypal_tax">{{ sale.paypal_tax|floatformat }}</td>
+                <td class="editable sumtable" data-id="{{ sale.id }}" data-type="tm_fee">{{ sale.tm_fee|floatformat }}</td>
+                <td class="editable sumtable" data-id="{{ sale.id }}" data-type="promoted">{{ sale.promoted|floatformat }}</td>
+                <td class="sumtable" id="loop" data-id="{{ sale.id }}" data-type="profit">{{ sale.profit|floatformat }}</th>
+                <td class="editable sumtable" data-id="{{ sale.id }}" data-type="discount">{{ sale.discount|floatformat }}</td>
+                <td class="editable" data-id="{{ sale.id }}" data-type="country">{{ sale.country }}</td>
+                <td data-id="{{ sale.id }}" data-type="submit">
+                    <button type="submit" class="btn btn-danger btn-delete-sale">
+                        <i class="fa fa-trash-alt fa-lg"></i>
+                    </button>
                 </td>
-                {% endfor %}
-                <td><input class="btn btn-primary" type="submit" display="inline" name="btn_register_sale"></td>
             </tr>
+            {% endfor %}
             
-            
-          </form>
+            <!--Register Sale-->
+            <form method="POST" action="">
+                {% csrf_token %}
+                <tr>
+                    {% for field in form %}
+                        {% if field is not form.user %}
+                        <td>
+                            {{ field }}
+                        </td>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                    {% endfor %}
+                    <td><input class="btn btn-primary" type="submit" display="inline" name="btn_register_sale"></td>
+                </tr>
+            </form>
         </tbody>
     </table>
 
@@ -79,36 +91,179 @@
             <p class='alert alert-info mt-3'>{{ message }}</p>
         {% endif %}
     {% endfor %}
-
-    <!--Stats-->
-    Total Profit: <span id="total"></span>
 </div>
 
 <script>
-    function calc_profit() {
-        // This functinon calculates the profit from all the other inputs
-        // outputs to id=f_profit
-        ebay_price = document.getElementById('f_ebay_price').value;
-        amazon_price = document.getElementById('f_amazon_price').value;
-        ebay_tax = document.getElementById('f_ebay_tax').value;
-        paypal_tax = document.getElementById('f_paypal_tax').value;
-        tm_fee = document.getElementById('f_tm_fee').value;
-        promoted = document.getElementById('f_promoted').value;
-        document.getElementById('f_profit').value = ebay_price - amazon_price - ebay_tax - paypal_tax - tm_fee - promoted;
-    }
+    $(document).ready(function(){
+        // create total column
+        var result = [];
+        $('table.table-sticky tr').each(function(){
+            $('td.sumtable', this).each(function(index, val){
+                if(!result[index]) result[index] = 0;
+                result[index] += parseFloat($(val).text());
+            });
+        });
 
-    $(function() {
-            // This function calculates all of the profit values and sums it up
-            // outputs to id=total
-            var TotalValue = 0;
+        $('table.table-sticky').find("tr:last").prev().after('<tr id="bootstrap-overrides" class="greenrow"></tr>');
+        $('table.table-sticky').find("tr:last").prev().append('<th>Total</th>')
+        $(result).each(function(){
+            $('table.table-sticky').find("tr:last").prev().append('<th>'+ this.toFixed(2) +'</th>')
+        });
+        $('table.table-sticky').find("tr:last").prev().append('<th></th>')
+        $('table.table-sticky').find("tr:last").prev().append('<th></th>')
 
-            $("tr #loop").each(function(index,value){
-            currentRow = parseFloat($(this).text());
-            TotalValue += currentRow
+        // change data clicked to input
+        $(document).on("dblclick", ".editable", function(){
+            var value = $(this).text();
+            var input = "<input type='text' class='input-data form-control' value='" + value + "'>";
+            if ($(this).attr('data-type') != 'country'){
+                input = "<input type='Number' class='input-data form-control' value='" + value + "'>";
+            }
+            $(this).html(input);
+            $(this).removeClass("editable");
+        });
+
+        // on blur save data
+        $(document).on("blur", ".input-data", function(){
+            var value = $(this).val();
+            var td = $(this).parent("td");
+            var type = td.data("type");
+            $(this).remove();
+            if (type == "country" && !value) {
+                value = "-----"
+            }
+            td.html(value);
+            td.addClass("editable");
+            sendToServer(td.data("id"), value, type);
+        });
+
+        // on key press save data
+        $(document).on("keypress", ".input-data", function(e){
+            var key = e.which;
+            if (key == 13){
+                var value = $(this).val();
+                var td = $(this).parent("td");
+                var type = td.data("type");
+                $(this).remove();
+                if (type == "country" && !value) {
+                    value = "-----"
+                }
+                td.html(value);
+                td.addClass("editable");
+                sendToServer(td.data("id"), value, type);
+            }
+        });
+
+        // on key up update profit
+        $(document).on("keyup", ".input-data", function(){
+            var value = $(this).val();
+            if (value == null){ value = 0; }
+            var td = $(this).parent("td");
+            var type = td.data("type");
+
+            positive_indexes = [0, 7];
+            negative_indexes = [1, 2, 3, 4, 5];
+            profit_index = 6;
+
+            if (type == 'ebay_price'){ positive_indexes.splice(0, 1); }
+            else if (type == 'amazon_price'){ negative_indexes.splice(0, 1); }
+            else if (type == 'ebay_tax'){ negative_indexes.splice(1, 1); }
+            else if (type == 'paypal_tax'){ negative_indexes.splice(2, 1); }
+            else if (type == 'tm_fee'){ negative_indexes.splice(3, 1); }
+            else if (type == 'promoted'){ negative_indexes.splice(4, 1); }
+            else if (type == 'discount'){ positive_indexes.splice(1, 1); }
+
+            var profit = 0.0;
+
+            td.parent("tr").find("td").each(function(i){
+                if (positive_indexes.includes(i)){
+                    alert(i + "+" + parseFloat($(this).html()))
+                    profit += parseFloat($(this).html());
+                }
+                else if (negative_indexes.includes(i)){
+                    alert(i + "-" + parseFloat($(this).html()))
+                    profit -= parseFloat($(this).html());
+                }
+                else if (i != 6 && i != 8 && i != 9){
+                    if (type != 'ebay_price' && type != 'discount'){
+                        alert(i + "-" + parseFloat(value))
+                        profit -= parseFloat(value);
+                    }
+                    else{
+                        alert(i + "+" + parseFloat(value))
+                        profit += parseFloat(value);
+                    }
+                }
             });
 
-            document.getElementById('total').innerHTML = TotalValue;
+            td.parent("tr").find("td").each(function(i){
+                if (i == 6){
+                    $(this).html((profit.toFixed(2)).toString());
+                }
+            });
 
+            
         });
+
+        // update row
+        function sendToServer(id, value, type){
+            console.log(id)
+            console.log(value)
+            console.log(type)
+
+            $.ajax({
+                url:"{% url 'update_sale' %}",
+                type:"POST",
+                data:{id:id, type:type, value:value},
+            })
+            .done(function(response){
+                $("#div_user_balance").load(location.href + " #div_user_balance");
+            })
+            .fail(function(response){
+                console.log(response)
+            })
+        }
+    });
+
+    function calc_profit() {
+        // This functinon calculates the profit from all the other inputs on creation
+        // outputs to id=f_profit
+        ebay_price = $('#f_ebay_price').val();
+        amazon_price = $('#f_amazon_price').val();
+        ebay_tax = $('#f_ebay_tax').val();
+        paypal_tax = $('#f_paypal_tax').val();
+        tm_fee = $('#f_tm_fee').val();
+        promoted = $('#f_promoted').val();
+        discount = $("#f_discount").val();
+
+        $("#f_profit").val(ebay_price - amazon_price - ebay_tax - paypal_tax - tm_fee - promoted + discount);
+    }
+
+    // add gifts or custom to balance
+    function calc_add_to_balance() {
+        gift_money = $('#f_gift_money').val();
+        gift_tax = $('#f_gift_tax').val();
+        $('#txt_balance_add').val(gift_money);
+    }
+
+    // delete sale
+    $(document).on("click", ".btn-delete-sale", function(){
+        id = $(this).parent("td").data("id")
+        if (confirm("Are you sure you want to delete this sale?")){
+            $.ajax({
+                url:"{% url 'delete_sale' %}",
+                type:"POST",
+                data:{id:id}
+            })
+            .done(function(response){
+                $("#table_sales").load(location.href + " #table_sales");
+            })
+            .fail(function(response){
+                console.log("FAILED" + response)
+            })
+        }
+    });
+
+    
 </script>
 {% endblock %}

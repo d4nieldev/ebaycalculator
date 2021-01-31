@@ -18,6 +18,11 @@
                         {{ form.username }}
                         <i class="fa fa-user fa-lg fa-fw" aria-hidden="true"></i>
                     </div>
+                    {% for key, value in form.errors.items %}
+                        {% if key == 'username' %}
+                        <div class="alert alert-danger">{{value | striptags}}</div>
+                        {%endif%}
+                    {% endfor %}
 
                     <div class="form-group inner-addon">
                         {{ form.email }}

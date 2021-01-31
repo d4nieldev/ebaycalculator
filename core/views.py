@@ -1,14 +1,17 @@
+import collections
+
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 from django.shortcuts import render, redirect
 
 from django.contrib import messages
 
-from .forms import SignUpForm, SaleEntryForm
+from .forms import SignUpForm, SaleEntryForm, GiftForm
 
-from .models import SaleEntry
+from .models import SaleEntry, Balance, Gift
 
 
 def HANDLE_LOGIN_BASE(request, current_page, context):
@@ -42,6 +45,16 @@ def HANDLE_LOGOUT_BASE(request):
     return redirect('index')
 
 
+def SORT_DICT(dict_notsorted):
+    lst = dict_notsorted
+    lst = collections.OrderedDict(sorted(lst.items()))
+
+    for item in lst.items():
+        item[1].sort()
+
+    return lst
+
+
 def GET_SALES_YEARS_MONTHS(request):
     '''
     This function returns a dictionary with all years and months the user has registred sales
@@ -58,8 +71,25 @@ def GET_SALES_YEARS_MONTHS(request):
         for sale in SaleEntry.objects.filter(user=request.user.id, date__year=year):
             if sale.date.month not in years_months[year]:
                 years_months[year].append(sale.date.month)
+
     
-    return years_months
+    return SORT_DICT(years_months)
+
+
+def GET_GIFTS_YEARS_MONTHS(request):
+    gifts = Gift.objects.filter(user=request.user.id)
+    years_months = {}
+
+    for gift in gifts:
+        if gift.date.year not in years_months.keys():
+            years_months[gift.date.year] = []
+
+    for year in years_months:
+        for gift in Gift.objects.filter(user=request.user.id, date__year=year):
+            if gift.date.month not in years_months[year]:
+                years_months[year].append(gift.date.month)
+    
+    return SORT_DICT(years_months)
 
 
 def index(request):
@@ -79,6 +109,10 @@ def index(request):
                 form = SignUpForm(request.POST)
                 if form.is_valid():
                     form.save()
+
+                    last_user = User.objects.latest('id')
+                    user_balance = Balance(user=last_user, balance=0)
+                    user_balance.save()
                     
                     messages.success(request, "Account was created successfully! you can now login as an existing user.")
 
@@ -103,16 +137,64 @@ def panel(request):
     years_months = GET_SALES_YEARS_MONTHS(request)
     context['years_months'] = years_months
 
+    gifts_years_months = GET_GIFTS_YEARS_MONTHS(request)
+    context['gifts_years_months'] = gifts_years_months
+
     form = SaleEntryForm(user_id=request.user.id)
     context['form'] = form
+
+    giftform = GiftForm(user_id=request.user.id)
+    context['giftform'] = giftform
 
     user_sales = SaleEntry.objects.filter(user=request.user.id)
     context['user_sales'] = user_sales
 
-    if request.method == 'POST':
-        if "btn_select_date" in request.POST:
+    gifts = None
+    context['gifts'] = gifts
+
+    context['user_balance'] = Balance.objects.get(user=request.user).balance
+
+    if request.method == 'POST':  
+        if "btn_register_sale" in request.POST:
+            # register sale form
+            form = SaleEntryForm(request.POST, user_id=request.user.id)
+            if form.is_valid():
+                form.save()
+
+                messages.info(request, 'Sale has been registred')
+
+            return redirect('panel')
+        
+        if 'btn_change_balance' in request.POST:
+            # change balance form
+            giftform = GiftForm(request.POST, user_id=request.user.id)
+            if giftform.is_valid():
+                giftform.save()
+
+                add_to_balance = float(request.POST.get('txt_balance_add'))
+                user_balance_obj = Balance.objects.get(user=request.user)
+                user_balance_obj.balance = user_balance_obj.balance + add_to_balance
+                user_balance_obj.save()
+
+                return redirect('panel')
+                
+
+    if request.method == "GET":
+        if "btn_filter_gifts_date" in request.GET:
+            # filter gifts form
+            dates = request.GET.get('s_filter_gifts_by_date')
+            if dates:
+                year = int(str(dates).split('-')[0])
+                month = int(str(dates).split('-')[1])
+                context['gifts'] = Gift.objects.filter(user=request.user.id, date__year=year, date__month=month)
+                context['gifts_selected_year'] = year
+                context['gifts_selected_month'] = month
+            else:
+                context['gifts'] = None
+
+        if "btn_select_date" in request.GET:
             # filter form
-            selected_filter = request.POST.get('s_filter_sales_by_date')
+            selected_filter = request.GET.get('s_filter_sales_by_date')
 
             if str(selected_filter) != 'all':
                 year = int(str(selected_filter).split('-')[0])
@@ -123,19 +205,8 @@ def panel(request):
                 context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__year=year, date__month=month)
             else:
                 context['user_sales'] = user_sales
-            return render(request, 'panel.html', context)
-            
-        if "btn_register_sale" in request.POST:
-            # register sale form
-            form = SaleEntryForm(request.POST, user_id=request.user.id)
-            if form.is_valid():
-                form.save()
-
-                messages.info(request, 'Sale has been registred')
-
-            return redirect('panel')
-
     
     context['form'] = form
+    context['giftform'] = giftform
     
     return render(request, 'panel.html', context)
