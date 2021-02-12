@@ -1,0 +1,35 @@
+<!-- Login Modal -->
+<div class="modal fade" id="sign_in_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content bg-secondary">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Sign In</h5>
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">
+                    <i class="fa fa-times-circle fa-lg"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="" id='sign-in'>
+                    {% csrf_token %}
+    
+                    <div class="form-group inner-addon">
+                        <input name="txt_login_username" type="text" class="form-control" placeholder="Username" autocomplete="false">
+                        <i class="fa fa-user fa-lg fa-fw" aria-hidden="true"></i>
+                    </div>
+                    <div class="form-group inner-addon">
+                        <input name="txt_login_pass" type="password" class="form-control" placeholder="Password" autocomplete="false">
+                        <i class="fa fa-key fa-lg fa-fw" aria-hidden="true"></i>
+                    </div>
+                    {% for message in messages %}
+                        {% if message.tags == 'error' %}
+                        <p class='alert alert-danger'>{{ message }}</p>
+                        {% elif message.tags == 'success' %}
+                        <p class='alert alert-success'>{{ message }}</p>
+                        {% endif %}
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary" name="btn_login">Log In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

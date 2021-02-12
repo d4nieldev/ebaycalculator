@@ -60,4 +60,17 @@ class Cost(models.Model):
     def __str__(self):
         return f'{user} - {name}'
 
+class HipShipper(models.Model):
+    buyer_paid = models.FloatField()
+    seller_paid = models.FloatField()
+    sale_entry = models.ForeignKey(SaleEntry, on_delete=models.CASCADE, default=0)
+
+    def save(self, *args, **kwargs):
+        self.sale_entry.profit += self.buyer_paid - self.seller_paid
+        self.sale_entry.save()
+        super(HipShipper, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.sale_entry.user}({self.sale_entry.id}) - {self.buyer_paid - self.seller_paid}'
+
 

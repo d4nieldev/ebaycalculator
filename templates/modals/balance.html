@@ -1,0 +1,58 @@
+<!--Balance Modal-->
+<div class="modal fade" id="balance_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content bg-secondary">
+            <div class="modal-header">
+                <div class="modal-title display-4" id="balance_modal_title">Balance ${{ user_balance|floatformat }}</div>
+            </div>
+            <div class="modal-body">
+                <form id="form_filter_gifts">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col">
+                            <select class='form-select' name="s_filter_gifts_by_date" id="s_filter_gifts_by_date" onchange="filter_gifts_by_date(event)">
+                                <option value="Show Gift Cards From" selected>Show Gift Cards From</option>
+                                {% for year, month_list in gifts_years_months.items %}
+                                    {% for month in month_list %}
+                                        <option value="{{ year }}-{{ month }}">{{ year }}-{{ month }}</option>
+                                    {% endfor %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </form>
+                
+                <br style="line-height: 0;" />
+                <table class="table table-light table-striped" id="table_gifts">
+                    <!--Table Content-->
+                </table>
+
+                <form id='balance' onsubmit="add_balance(event)">
+                    {% csrf_token %}
+                    <div class="form-group inner-addon">
+                        <input name="txt_balance_add" id="txt_balance_add" type="text" class="form-control" placeholder="Add This Amount For Balance" autocomplete="false" readonly>
+                        <i class="fa fa-dollar-sign fa-lg fa-fw" aria-hidden="true"></i>
+                    </div>
+                    {{ giftform.date }}
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group inner-addon">
+                                {{ giftform.gift_money }}
+                                <i class="fa fa-gift fa-lg fa-fw" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group inner-addon">
+                                {{ giftform.gift_tax }}
+                                <i class="fa fa-dollar-sign fa-lg fa-fw" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                    {{ giftform.user }}
+                    <button type="submit" class="btn btn-primary" name="btn_change_balance">Make Changes</button>
+                </form>
+                {{giftform.errors}}
+            </div>
+        </div>
+    </div>
+</div>

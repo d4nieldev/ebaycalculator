@@ -4,8 +4,8 @@ from django.core import serializers
 
 from django.http import JsonResponse
 
-from .models import SaleEntry, Balance, Gift
-from .forms import SaleEntryForm, GiftForm
+from .models import SaleEntry, Balance, Gift, Cost
+from .forms import SaleEntryForm, GiftForm, CostForm, HipShipperForm
 
 from django.contrib.auth.models import User
 
@@ -77,6 +77,8 @@ def add_sale(request):
             sale.user = request.user
             sale.save()
 
+            return JsonResponse({"sale_id": sale.id})
+
     return HttpResponse('')
 
 
@@ -124,5 +126,44 @@ def add_balance(request):
     return HttpResponse('')
 
 
+@csrf_exempt
+def add_cost(request):
+    if request.method == "POST":
+        form = CostForm(request.POST)
+
+        if form.is_valid():
+            cost = form.save(commit=False)
+            cost.user = request.user
+            cost.save()
+
+            costs_qs = Cost.objects.filter(user=request.user.id)
+            data = serializers.serialize('json', costs_qs)
+            return HttpResponse(data, content_type="application/json")
+    return JsonResponse({"data": "no data"})
+
+
+@csrf_exempt
+def delete_cost(request):
+    if request.method == 'POST':
+        id = request.POST.get('id', '')
+        Cost.objects.get(id=id).delete()
+
+        costs_qs = Cost.objects.filter(user=request.user.id)
+        data = serializers.serialize('json', costs_qs, fields=('id', 'name', 'value'))
+        return HttpResponse(data, content_type="application/json")
+    return HttpResponse('')
+
+
+@csrf_exempt
+def add_hipshipper(request):
+    if request.method == 'POST':
+        form = HipShipperForm(request.POST)
+
+        if form.is_valid():
+            form.save()
+            return JsonResponse({"success": request.POST})
+    return JsonResponse({
+        "fail": request.POST,
+        "errors": form.errors})
     
 

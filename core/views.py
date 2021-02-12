@@ -9,9 +9,9 @@ from django.shortcuts import render, redirect
 
 from django.contrib import messages
 
-from .forms import SignUpForm, SaleEntryForm, GiftForm
+from .forms import SignUpForm, SaleEntryForm, GiftForm, CostForm, HipShipperForm
 
-from .models import SaleEntry, Balance, Gift
+from .models import SaleEntry, Balance, Gift, Cost, HipShipper
 
 
 def HANDLE_LOGIN_BASE(request, current_page, context):
@@ -173,10 +173,18 @@ def panel(request):
     giftform = GiftForm()
     context['giftform'] = giftform
 
+    costform = CostForm()
+    context['costform'] = costform
+
+    hipshipperform = HipShipperForm()
+    context['hipshipperform'] = hipshipperform
+
     user_sales = SaleEntry.objects.filter(user=request.user.id).order_by('date')
     context['user_sales'] = user_sales
 
     context['user_balance'] = Balance.objects.get(user=request.user).balance
+
+    context['costs'] = Cost.objects.filter(user=request.user.id)
     
     if request.method == "GET":
         if "btn_select_date" in request.GET:
@@ -209,6 +217,5 @@ def panel(request):
                 context['user_sales'] = user_sales
     
     context['form'] = form
-    context['giftform'] = giftform
     
     return render(request, 'panel.html', context)

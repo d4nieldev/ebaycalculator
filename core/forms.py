@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 
-from .models import SaleEntry, Gift
+from .models import SaleEntry, Gift, Cost, HipShipper
 
 
 class SignUpForm(UserCreationForm):
@@ -55,7 +55,26 @@ class GiftForm(ModelForm):
         exclude = ('user',)
         widgets = {
             'date': DateInput(attrs={'class': 'form-control', 'value': date.today, 'id':'f_gift_date'}),
-            'gift_money': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gift Card (100, 300 ...)', 'id':'f_gift_money', 'onkeyup': 'calc_add_to_balance()', 'value': '0'}),
-            'gift_tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Tax', 'id':'f_gift_tax', 'onkeyup': 'calc_add_to_balance()', 'value': '0'}),
+            'gift_money': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gift Card (100, 300 ...)', 'id':'f_gift_money', 'onkeyup': 'calc_add_to_balance()'}),
+            'gift_tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Tax', 'id':'f_gift_tax', 'onkeyup': 'calc_add_to_balance()'}),
+        }
+
+
+class CostForm(ModelForm):
+    class Meta:
+        model = Cost
+        exclude = ('user',)
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Name', 'id':'f_cost_name'}),
+            'value': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Value', 'id':'f_cost_value'}),
+        }
+
+class HipShipperForm(ModelForm):
+    class Meta:
+        model = HipShipper
+        fields = '__all__'
+        widgets = {
+            'buyer_paid': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buyer Paid', 'id':'f_buyer_paid'}),
+            'seller_paid': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Seller Paid', 'id':'f_seller_paid'}),
         }
 

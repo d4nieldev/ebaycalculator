@@ -1,13 +1,17 @@
 /* 
     Global Functions
-    sum_sales_table: adding a sum row in the end of sales table
-    calc_profit: calculating the profit on creation and outputs to #f_profit
-    calc_add_to_balance: changing #txt_balance_add to amount of gift - tax
+    sum_sales_table(): adding a sum row in the end of sales table
+    calc_profit(): calculating the profit on creation and outputs to #f_profit
+    calc_add_to_balance(): changing #txt_balance_add to amount of gift - tax
+    calc_total_date_profit(): calculating the total profit of the selected date
     set_gifts_date(): set the gifts date select to today's date, if not possible show nothing
     delete_sale(item): AJAX - delete sale (item -> the element clicked)
     filter_gifts_by_date(e): AJAX - filter gifts by selected date (e -> event)
     update_sale(id, value, type): AJAX - update sale (id -> clicked sale, value -> new value to assign, type -> the field)
     add_sale(e): AJAX - add sale (e -> event)
+    add_balance(e): AJAX - adding gifts to balance (e -> event)
+    add_cost(e): AJAX - add cost (e -> event)
+    delete_cost(e): AJAX - delete cost (e -> event)
 */
 function sum_sales_table(){
     
@@ -21,8 +25,12 @@ function sum_sales_table(){
     
     $('#table_sales').find("tr:last").prev().after('<tr id="bootstrap-overrides" class="greenrow"></tr>');
     $('#table_sales').find("tr:last").prev().append('<th>Total</th>')
-    $(result).each(function(){
+    $(result).each(function(i){
         $('#table_sales').find("tr:last").prev().append('<th>'+ this.toFixed(2) +'</th>')
+        if (i == 6){
+            $('#table_sales').find("tr:last").prev().append('<th id="total_sum_profit">'+ this.toFixed(2) +'</th>')
+        }
+        
     });
     $('#table_sales').find("tr:last").prev().append('<th></th>')
     $('#table_sales').find("tr:last").prev().append('<th></th>')
@@ -44,6 +52,16 @@ function calc_add_to_balance() {
     gift_money = $('#f_gift_money').val();
     gift_tax = $('#f_gift_tax').val();
     $('#txt_balance_add').val(gift_money - gift_tax);
+}
+
+function calc_total_date_profit(){
+    profit = $("#total_sum_profit").text();
+    costs = 0;
+    $("#total-profit span").each(function(){
+        costs += parseFloat($(this).text());
+    });
+    total = profit - costs
+    $("#total-profit").html("Month Profit: " + Math.round((total + Number.EPSILON) * 100) / 100)
 }
 
 function set_gifts_date(){
@@ -68,7 +86,7 @@ function delete_sale(item){
             data:{id:id}
         })
         .done(function(response){
-            $("#table_sales").load(location.href + " #table_sales");
+            location.reload();
         })
         .fail(function(xhr, status, error){
             var err = eval("(" + xhr.responseText + ")");
@@ -133,7 +151,6 @@ function update_sale(id, value, type){
 
 function add_sale(e){
     e.preventDefault();
-        
     $.ajax({
         url:"/add_sale",
         type:"POST",
@@ -151,8 +168,35 @@ function add_sale(e){
         }
     })
     .done(function(response){
-        $("#table_sales").load(document.URL + " #table_sales");
-        sum_sales_table();
+        if ($("#f_country").val() != '-----'){
+            $("#hipshipper_modal").data("reference", response.sale_id)
+            $("#hipshipper_modal").modal("toggle");
+        }
+        else {
+            location.reload();
+        }
+    })
+    .fail(function(xhr, status, error){
+        var err = eval("(" + xhr.responseText + ")");
+            alert(err.Message);
+    })
+}
+
+function add_hipshipper(e){
+    e.preventDefault();
+    console.log("reference " + $("#hipshipper_modal").data('reference'))
+    $.ajax({
+        url:'/add_hipshipper',
+        type:'POST',
+        data:{
+            buyer_paid: $("#f_buyer_paid").val(),
+            seller_paid: $("#f_seller_paid").val(),
+            sale_entry: $("#hipshipper_modal").data('reference'),
+        }
+    })
+    .done(function(response){
+        console.log(response)
+        location.reload();
     })
     .fail(function(xhr, status, error){
         var err = eval("(" + xhr.responseText + ")");
@@ -185,6 +229,64 @@ function add_balance(e){
     })
 }
 
+function add_cost(e){
+    e.preventDefault();
+    $.ajax({
+        url:"/add_cost",
+        type:"POST",
+        data:{
+            name:$("#f_cost_name").val(),
+            value:$("#f_cost_value").val(),
+        }
+    })
+    .done(function(data){
+        // clear table contents
+        $("#table_costs").html("<tbody id='costs_table_body'></tbody>");
+        
+        // if data is valid
+        if (!data.data){
+            var headers = "<thead><tr class='headerrow-gift'><th scope='col'>Name</th><th scope='col'>Value</th><th scope='col'></th></tr></thead>"
+            $(headers).appendTo("#table_costs")
+
+            $(function() {
+                $("#costs_table_body").html("")
+                $.each(data, function(i, item) {
+                    cost_name = item.fields.name;
+                    cost_value = item.fields.value;
+                    var $tr = $('<tr>').append(
+                        $('<th>').text(cost_name),
+                        $('<td>').text(cost_value),
+                        $('<td>').html("<button data-id='" + item.pk + "' type='submit' class='btn btn-danger btn-delete-sale' onclick='delete_cost(this)' ><i class='fa fa-trash-alt fa-lg'></i></button>")
+                    ).appendTo("#costs_table_body")
+                });
+            });
+        }
+    })
+    .fail(function(response){
+        console.log(response.responseText);
+        console.log(response);
+    });
+}
+
+
+function delete_cost(item){
+    id = $(item).data("id")
+    if (confirm("Are you sure you want to delete this cost?")){
+        $.ajax({
+            url: '/delete_cost',
+            type:"POST",
+            data:{id:id}
+        })
+        .done(function(data){
+            $("#table_costs").load(document.URL + " #table_costs");
+        })
+        .fail(function(xhr, status, error){
+            var err = eval("(" + xhr.responseText + ")");
+                alert(err.Message);
+        })
+    }
+}
+
 $(document).ready(function(){
     //set gifts select date and show the relevant data
     set_gifts_date();
@@ -192,6 +294,8 @@ $(document).ready(function(){
 
     // create total column
     sum_sales_table();
+
+    calc_total_date_profit();
 
     // change data clicked to input
     $(document).on("dblclick", ".editable", function(){
