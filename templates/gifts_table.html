@@ -1,0 +1,20 @@
+<form id="form_filter_gifts">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col">
+            <select class='form-select' name="s_filter_gifts_by_date" id="s_filter_gifts_by_date" onchange="filter_gifts_by_date(event)">
+                <option value="Show Gift Cards From" selected>Show Gift Cards From</option>
+                {% for year, month_list in gifts_years_months.items %}
+                    {% for month in month_list %}
+                        <option value="{{ year }}-{{ month }}">{{ year }}-{{ month }}</option>
+                    {% endfor %}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</form>
+
+<br style="line-height: 0;" />
+<table class="table table-light table-striped" id="table_gifts">
+    <!--Table Content-->
+</table>

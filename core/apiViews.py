@@ -1,12 +1,15 @@
 from django.views.decorators.csrf import csrf_exempt
 
+from django.core import serializers
+
 from django.http import JsonResponse
 
-from .models import SaleEntry, Balance
+from .models import SaleEntry, Balance, Gift
+from .forms import SaleEntryForm, GiftForm
 
 from django.contrib.auth.models import User
 
-from django.shortcuts import redirect
+from django.shortcuts import redirect, HttpResponse, render
 
 
 @csrf_exempt
@@ -62,4 +65,64 @@ def delete_sale(request):
     id = request.POST.get('id', '')
     SaleEntry.objects.get(id=id).delete()
     return redirect('panel')
+
+
+@csrf_exempt
+def add_sale(request):
+    if request.method == 'POST':
+        form = SaleEntryForm(request.POST)
+
+        if form.is_valid():
+            sale = form.save(commit=False)
+            sale.user = request.user
+            sale.save()
+
+    return HttpResponse('')
+
+
+@csrf_exempt
+def filter_gifts(request):
+    if request.method == 'GET':
+        gifts_qs = None
+        date = str(request.GET['date'])
+
+        if date != 'Show Gift Cards From':
+            year = int(date.split('-')[0])
+            month = int(date.split('-')[1])
+
+            date_from = f'{year}-{month}-16'
+            date_to = f'{year}-{month+1}-15'
+            
+            if month == 12:
+                date_from = f'{year}-12-16'
+                date_to = f'{year+1}-01-15'
+            if month == 9:
+                date_from = f'{year}-0{month}-16'
+                date_to = f'{year}-{month+1}-15'
+            elif month < 10:
+                date_from = f'{year}-0{month}-16'
+                date_to = f'{year}-0{month+1}-15'
+
+            gifts_qs = Gift.objects.filter(user=request.user.id, date__range=[date_from, date_to])
+            data = serializers.serialize('json', gifts_qs)
+            return HttpResponse(data, content_type="application/json")
+    
+    return JsonResponse({'data': 'no data'}, status=200)
+
+@csrf_exempt
+def add_balance(request):
+    if request.method == 'POST':
+        form = GiftForm(request.POST)
+
+        if form.is_valid():
+            gift = form.save(commit=False)
+            gift.user = request.user
+            gift.save()
+
+            return JsonResponse({'balance': Balance.objects.get(user=request.user).balance})
+
+    return HttpResponse('')
+
+
+    
 

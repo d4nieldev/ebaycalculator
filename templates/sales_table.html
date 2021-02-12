@@ -1,0 +1,58 @@
+<!--View Sales-->
+<table id="table_sales" class="table table-dark table-striped table-sticky table-hover">
+    <thead>
+        <!--Titles-->
+      <tr class="stickyrow">
+        <th scope="col">Date</th>
+        <th scope="col">eBay Price</th>
+        <th scope="col">Amazon Price</th>
+        <th scope="col">eBay Tax</th>
+        <th scope="col">Paypal Tax</th>
+        <th scope="col">TM Fee</th>
+        <th scope="col">Promoted</th>
+        <th scope="col">Profit</th>
+        <th scope="col">Discount</th>
+        <th scope="col">Country</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+        <!--Data-->
+        {% for sale in user_sales %}
+        <tr>
+            <th>{{ sale.date }}</th>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_price">{{ sale.ebay_price|floatformat }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="amazon_price">{{ sale.amazon_price|floatformat }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_tax">{{ sale.ebay_tax|floatformat }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="paypal_tax">{{ sale.paypal_tax|floatformat }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="tm_fee">{{ sale.tm_fee|floatformat }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="promoted">{{ sale.promoted|floatformat }}</td>
+            <td class="sumtable" id="loop" data-id="{{ sale.id }}" data-type="profit">{{ sale.profit|floatformat }}</th>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="discount">{{ sale.discount|floatformat }}</td>
+            <td class="editable" data-id="{{ sale.id }}" data-type="country">{{ sale.country }}</td>
+            <td data-id="{{ sale.id }}" data-type="submit">
+                <button data-id="{{ sale.id }}" type="submit" class="btn btn-danger btn-delete-sale" onclick="delete_sale(this)" >
+                    <i class="fa fa-trash-alt fa-lg"></i>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+        
+        <!--Register Sale-->
+        <form id="form_add_sale" onsubmit="add_sale(event)">
+            {% csrf_token %}
+            <tr>
+                {% for field in form %}
+                    {% if field is not form.user %}
+                    <td>
+                        {{ field }}
+                    </td>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                {% endfor %}
+                <td><input class="btn btn-primary" type="submit" display="inline" name="btn_register_sale"></td>
+            </tr>
+        </form>
+    </tbody>
+</table>

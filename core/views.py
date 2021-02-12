@@ -68,15 +68,30 @@ def GET_SALES_YEARS_MONTHS(request):
             years_months[sale.date.year] = []
 
     for year in years_months:
-        for sale in SaleEntry.objects.filter(user=request.user.id, date__year=year):
-            if sale.date.month not in years_months[year]:
-                years_months[year].append(sale.date.month)
+        for sale in SaleEntry.objects.filter(user=request.user.id, date__range=[f'{year}-01-16', f'{year+1}-01-15']):
+            if sale.date.day >= 16:
+                # if the day is 16 or more - it's this month
+                if sale.date.month not in years_months[year]:
+                    years_months[year].append(sale.date.month)
+            else:
+                # if the day is less than 16 - it's the prev month
+                if sale.date.month > 1:
+                    if sale.date.month - 1 not in years_months[year]:
+                        years_months[year].append(sale.date.month-1)
+                else:
+                    if 12 not in years_months[year]:
+                        years_months[year].append(12)
+                
 
     
     return SORT_DICT(years_months)
 
 
 def GET_GIFTS_YEARS_MONTHS(request):
+    '''
+    This function returns a dictionary with all years and months the user has registred sales
+    return example --> {2020: [12, 11], 2021: [1]}
+    '''
     gifts = Gift.objects.filter(user=request.user.id)
     years_months = {}
 
@@ -85,9 +100,21 @@ def GET_GIFTS_YEARS_MONTHS(request):
             years_months[gift.date.year] = []
 
     for year in years_months:
-        for gift in Gift.objects.filter(user=request.user.id, date__year=year):
-            if gift.date.month not in years_months[year]:
-                years_months[year].append(gift.date.month)
+        for gift in Gift.objects.filter(user=request.user.id, date__range=[f'{year}-01-16', f'{year+1}-01-15']):
+            if gift.date.day >= 16:
+                # if the day is 16 or more - it's this month
+                if gift.date.month not in years_months[year]:
+                    years_months[year].append(gift.date.month)
+            else:
+                # if the day is less than 16 - it's the prev month
+                if gift.date.month > 1:
+                    if gift.date.month - 1 not in years_months[year]:
+                        years_months[year].append(gift.date.month-1)
+                else:
+                    if 12 not in years_months[year]:
+                        years_months[year].append(12)
+                
+
     
     return SORT_DICT(years_months)
 
@@ -140,58 +167,18 @@ def panel(request):
     gifts_years_months = GET_GIFTS_YEARS_MONTHS(request)
     context['gifts_years_months'] = gifts_years_months
 
-    form = SaleEntryForm(user_id=request.user.id)
+    form = SaleEntryForm()
     context['form'] = form
 
-    giftform = GiftForm(user_id=request.user.id)
+    giftform = GiftForm()
     context['giftform'] = giftform
 
-    user_sales = SaleEntry.objects.filter(user=request.user.id)
+    user_sales = SaleEntry.objects.filter(user=request.user.id).order_by('date')
     context['user_sales'] = user_sales
 
-    gifts = None
-    context['gifts'] = gifts
-
     context['user_balance'] = Balance.objects.get(user=request.user).balance
-
-    if request.method == 'POST':  
-        if "btn_register_sale" in request.POST:
-            # register sale form
-            form = SaleEntryForm(request.POST, user_id=request.user.id)
-            if form.is_valid():
-                form.save()
-
-                messages.info(request, 'Sale has been registred')
-
-            return redirect('panel')
-        
-        if 'btn_change_balance' in request.POST:
-            # change balance form
-            giftform = GiftForm(request.POST, user_id=request.user.id)
-            if giftform.is_valid():
-                giftform.save()
-
-                add_to_balance = float(request.POST.get('txt_balance_add'))
-                user_balance_obj = Balance.objects.get(user=request.user)
-                user_balance_obj.balance = user_balance_obj.balance + add_to_balance
-                user_balance_obj.save()
-
-                return redirect('panel')
-                
-
+    
     if request.method == "GET":
-        if "btn_filter_gifts_date" in request.GET:
-            # filter gifts form
-            dates = request.GET.get('s_filter_gifts_by_date')
-            if dates:
-                year = int(str(dates).split('-')[0])
-                month = int(str(dates).split('-')[1])
-                context['gifts'] = Gift.objects.filter(user=request.user.id, date__year=year, date__month=month)
-                context['gifts_selected_year'] = year
-                context['gifts_selected_month'] = month
-            else:
-                context['gifts'] = None
-
         if "btn_select_date" in request.GET:
             # filter form
             selected_filter = request.GET.get('s_filter_sales_by_date')
@@ -202,7 +189,22 @@ def panel(request):
 
                 context['user_sales_filtered_y'] = year
                 context['user_sales_filtered_m'] = month
-                context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__year=year, date__month=month)
+                
+                date_from = f'{year}-{month}-16'
+                date_to = f'{year}-{month+1}-15'
+                
+                if month == 12:
+                    date_from = f'{year}-12-16'
+                    date_to = f'{year+1}-01-15'
+                if month == 9:
+                    date_from = f'{year}-0{month}-16'
+                    date_to = f'{year}-{month+1}-15'
+                elif month < 10:
+                    date_from = f'{year}-0{month}-16'
+                    date_to = f'{year}-0{month+1}-15'
+                
+
+                context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__range=[date_from, date_to]).order_by('date')
             else:
                 context['user_sales'] = user_sales
     

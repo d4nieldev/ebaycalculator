@@ -34,9 +34,9 @@ class DateInput(forms.DateInput):
 class SaleEntryForm(ModelForm):
     class Meta:
         model = SaleEntry
-        fields = "__all__"
+        exclude = ('user',)
         widgets = {
-            'date': DateInput(attrs={'class': 'form-control'}),
+            'date': DateInput(attrs={'class': 'form-control', 'id':'f_date'}),
             'ebay_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'eBay Price', 'id':'f_ebay_price', 'onkeyup': 'calc_profit()'}),
             'amazon_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Amazon Price', 'id':'f_amazon_price', 'onkeyup': 'calc_profit()'}),
             'ebay_tax': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'eBay Tax', 'id':'f_ebay_tax', 'onkeyup': 'calc_profit()'}),
@@ -45,35 +45,17 @@ class SaleEntryForm(ModelForm):
             'promoted': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'Promoted', 'id':'f_promoted', 'onkeyup': 'calc_profit()'}),
             'profit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Profit', 'readonly':'true', 'id':'f_profit'}),
             'discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Discount', 'id':'f_discount'}),
-            'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Country', 'id':'f_country'})
+            'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Country', 'id':'f_country'}),
         }
-
-    def __init__(self, *args, **kwargs):
-        '''
-        relate the sale registration form to the user who created it.
-        '''
-        user_id = kwargs.pop('user_id')
-        super().__init__(*args, **kwargs)
-        self.fields['user'] = forms.ModelChoiceField(queryset=User.objects.filter(id=user_id), empty_label=None, initial=User.objects.get(id=user_id))
-        self.fields['user'].widget.attrs['class'] = 'no-display'
 
 
 class GiftForm(ModelForm):
     class Meta:
         model = Gift
-        fields = "__all__"
+        exclude = ('user',)
         widgets = {
-            'date': DateInput(attrs={'class': 'form-control', 'value': date.today}),
+            'date': DateInput(attrs={'class': 'form-control', 'value': date.today, 'id':'f_gift_date'}),
             'gift_money': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gift Card (100, 300 ...)', 'id':'f_gift_money', 'onkeyup': 'calc_add_to_balance()', 'value': '0'}),
             'gift_tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Tax', 'id':'f_gift_tax', 'onkeyup': 'calc_add_to_balance()', 'value': '0'}),
         }
-    
-    def __init__(self, *args, **kwargs):
-        '''
-        relate the gift form to the user who created it.
-        '''
-        user_id = kwargs.pop('user_id')
-        super().__init__(*args, **kwargs)
-        self.fields['user'] = forms.ModelChoiceField(queryset=User.objects.filter(id=user_id), empty_label=None, initial=User.objects.get(id=user_id))
-        self.fields['user'].widget.attrs['class'] = 'no-display'
 

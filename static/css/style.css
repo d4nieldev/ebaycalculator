@@ -48,6 +48,10 @@ body {
     position: sticky;
     top: 0;
 }
+.headerrow-gift{
+    --bs-table-bg: black;
+    color: white;
+}
 
 #bootstrap-overrides.greenrow{
     --bs-table-accent-bg: #5bc0de;

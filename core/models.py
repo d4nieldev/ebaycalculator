@@ -43,6 +43,12 @@ class Gift(models.Model):
     gift_tax = models.FloatField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
 
+    def save(self, *args, **kwargs):
+        balance_obj = Balance.objects.get(user=self.user)
+        balance_obj.balance += self.gift_money - self.gift_tax
+        balance_obj.save()
+        super(Gift, self).save(*args, **kwargs)
+
     def __str__(self):
         return f'{self.user} - {self.gift_money}'
 

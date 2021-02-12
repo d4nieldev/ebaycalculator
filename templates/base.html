@@ -18,10 +18,11 @@
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}"/>
     <!--Title-->
     <title>{% block title %}eBay Calculator{% endblock %}</title>
+    {% block head %}{% endblock %}
 </head>
 <body class='bg-dark' {% if open_login %} onload="document.getElementById('btn_open_login').click();" {% endif %}>
     <!-- Navigation -->
-    <nav class="navbar navbar-light bg-light static-top" style="height: 7vh">
+    <nav class="navbar navbar-light bg-light static-top">
         <div class="container">
             <a class="navbar-brand" href="{% url 'index' %}">eBay Calculator</a>
             {% if not user.is_authenticated %}
@@ -29,7 +30,7 @@
             {% else %}
             <div class="navbar-text row w-50">
                 <span class='col'>
-                    <div class="text-dark" id="div_user_balance" ><h2>${{ user_balance|floatformat }}</h2></div>
+                    <div class="text-dark"><h2 id="div_user_balance">${{ user_balance|floatformat }}</h2></div>
                 </span>
                 <span class="col">
                     <button id="btn_open_balance" type="button" class="btn btn-primary" data-toggle="modal" data-target="#balance_modal">Balance</button>
@@ -86,62 +87,15 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content bg-secondary">
                 <div class="modal-header">
-                    <div class="modal-title display-4" id="balance_exampleModalLongTitle">Balance ${{ user_balance|floatformat }}</div>
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal" name="btn_close_balance">
-                        <i class="fa fa-times-circle fa-lg"></i>
-                    </button>
+                    <div class="modal-title display-4" id="balance_modal_title">Balance ${{ user_balance|floatformat }}</div>
                 </div>
                 <div class="modal-body">
-                    <form method="GET" action="">
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col">
-                                <select class='form-select' name="s_filter_gifts_by_date" id="s_filter_gifts_by_date">
-                                    <option value="" selected>Show Gift Cards From</option>
-                                    {% for year, month_list in gifts_years_months.items %}
-                                        {% for month in month_list %}
-                                            {% if gifts_selected_year == year and gifts_selected_month == month %}
-                                                <option value="{{ year }}-{{ month }}" selected>{{ year }}-{{ month }}</option>
-                                            {% else %}
-                                                <option value="{{ year }}-{{ month }}">{{ year }}-{{ month }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col">
-                                <input type="submit" name="btn_filter_gifts_date" class="btn btn-light" value='Filter'>
-                            </div>
-                        </div>
-                    </form>
-                    
-                    {% if gifts %}
-                    <br style="line-height: 0;" />
-                    <table class="table table-light table-striped">
-                        <thead>
-                          <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Gift Amount</th>
-                            <th scope="col">Tax</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            {% for gift in gifts %}
-                            <tr>
-                                <td>{{ gift.date }}</td>
-                                <td>{{ gift.gift_money|floatformat }}</td>
-                                <td>{{ gift.gift_tax|floatformat }}</td>
-                            </tr>
-                            {% endfor %}
-                            
-                        </tbody>
-                      </table>
-                      {% endif %}
+                    {% include 'gifts_table.html' %}
 
-                    <form method="POST" action="" id='balance'>
+                    <form id='balance' onsubmit="add_balance(event)">
                         {% csrf_token %}
                         <div class="form-group inner-addon">
-                            <input name="txt_balance_add" id="txt_balance_add" type="text" class="form-control" placeholder="Add This Amount For Balance" autocomplete="false">
+                            <input name="txt_balance_add" id="txt_balance_add" type="text" class="form-control" placeholder="Add This Amount For Balance" autocomplete="false" readonly>
                             <i class="fa fa-dollar-sign fa-lg fa-fw" aria-hidden="true"></i>
                         </div>
                         {{ giftform.date }}
