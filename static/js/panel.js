@@ -24,7 +24,8 @@ function sum_sales_table(){
     });
     
     $('#table_sales').find("tr:last").prev().after('<tr id="bootstrap-overrides" class="greenrow"></tr>');
-    $('#table_sales').find("tr:last").prev().append('<th>Total</th>')
+    $('#table_sales').find("tr:last").prev().append('<th class="align-middle"><i class="fa fa-hashtag fa-md"></i></th>');
+    $('#table_sales').find("tr:last").prev().append('<th>Total</th>');
     $(result).each(function(i){
         $('#table_sales').find("tr:last").prev().append('<th>'+ this.toFixed(2) +'</th>')
         if (i == 6){

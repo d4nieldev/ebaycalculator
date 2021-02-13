@@ -21,7 +21,7 @@
         <!--Data-->
         {% for sale in user_sales %}
         <tr>
-            <th>{{ sale.id }}</th>
+            <th class="text-success">{{ sale.id }}</th>
             <th>{{ sale.date }}</th>
             <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_price">{{ sale.ebay_price|floatformat }}</td>
             <td class="editable sumtable" data-id="{{ sale.id }}" data-type="amazon_price">{{ sale.amazon_price|floatformat }}</td>
@@ -70,7 +70,7 @@
         <form id="form_add_sale" onsubmit="add_sale(event)">
             {% csrf_token %}
             <tr>
-                <th>#</th>
+                <th class="align-middle"><i class="fa fa-hashtag fa-md"></i></th>
                 {% for field in form %}
                     {% if field is not form.user %}
                     <td>
