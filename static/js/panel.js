@@ -368,10 +368,11 @@ $(document).ready(function(){
 
     // on key up update profit
     $(document).on("keyup", ".input-data", function(){
+        var type = td.data("type");
+        if (type == "country"){return;}
         var value = $(this).val();
         if (value == null){ value = 0; }
         var td = $(this).parent("td");
-        var type = td.data("type");
         var lastvalue = parseFloat(td.data("lastvalue"));
 
         positive_indexes = [0, 7];
