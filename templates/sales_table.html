@@ -3,6 +3,7 @@
     <thead>
         <!--Titles-->
       <tr class="stickyrow">
+        <th scope="col">#</th>
         <th scope="col">Date</th>
         <th scope="col">eBay Price</th>
         <th scope="col">Amazon Price</th>
@@ -20,6 +21,7 @@
         <!--Data-->
         {% for sale in user_sales %}
         <tr>
+            <th>{{ sale.id }}</th>
             <th>{{ sale.date }}</th>
             <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_price">{{ sale.ebay_price|floatformat }}</td>
             <td class="editable sumtable" data-id="{{ sale.id }}" data-type="amazon_price">{{ sale.amazon_price|floatformat }}</td>
@@ -32,22 +34,23 @@
             <td class="editable" data-id="{{ sale.id }}" data-type="country">
                 <table>
                     <tr>
-                        <td class="get-country">
+                        <td class="get-country w-100">
                             {{ sale.country }}
                         </td>
                     </tr>
-                    <tr>
+                    <tr class="w-100">
                         {% for hip in hipshippers %}
                             {% if hip.sale_entry == sale %}
-                                <td class="bg-info text-center text-secondary">
-                                    <span>Buyer Paid:</span>
+                                <td class="bg-info text-center text-secondary w-25">
+                                    <span>Buyer</span>
                                     <br />
-                                    {{ hip.buyer_paid }}
+                                    <div id="div_hipshipper_buyer">{{ hip.buyer_paid|floatformat }}</div>
                                 </td>
-                                <td class="bg-primary text-center">
-                                    <span>Seller Paid:</span>
+                                <td class="bg-primary text-center px-4">
+                                    <span>Seller</span>
                                     <br />
-                                    {{ hip.seller_paid }}
+                                    <div id="div_hipshipper_seller">{{ hip.seller_paid|floatformat }}</div>
+                                    
                                 </td>
                             {% endif %}
                         {% endfor %}
@@ -67,6 +70,7 @@
         <form id="form_add_sale" onsubmit="add_sale(event)">
             {% csrf_token %}
             <tr>
+                <th>#</th>
                 {% for field in form %}
                     {% if field is not form.user %}
                     <td>

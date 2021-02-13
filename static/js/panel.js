@@ -303,7 +303,7 @@ $(document).ready(function(){
         if ($(this).data("type") == 'country'){
             $(this).find("table").find("tr").each(function(i){
                 if (i == 0){
-                    value = $(this).find("td").text().replace(/\s/g, '');
+                    value = $.trim($(this).find("td").text());
                 }
             })
         }
