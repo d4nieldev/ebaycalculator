@@ -11,20 +11,20 @@ from .models import SaleEntry, Gift, Cost, HipShipper
 class SignUpForm(UserCreationForm):
     password1 = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password'}),
+        widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'Password', 'autocomplete': 'false'}),
     )
 
     password2 = forms.CharField(
         label="Confirm password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password'})
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password', 'autocomplete': 'false'})
     )
 
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email', 'aria-describedby': 'emailHelp'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username', 'autocomplete': 'false'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email', 'aria-describedby': 'emailHelp', 'autocomplete': 'false'}),
         }
 
 
