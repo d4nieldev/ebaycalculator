@@ -300,10 +300,27 @@ $(document).ready(function(){
     // change data clicked to input
     $(document).on("dblclick", ".editable", function(){
         var value = $(this).text();
+        if ($(this).data("type") == 'country'){
+            $(this).find("table").find("tr").each(function(i){
+                if (i == 0){
+                    value = $(this).find("td").text().replace(/\s/g, '');
+                }
+            })
+        }
         var input = "<input type='text' class='input-data form-control' value='" + value + "'>";
         if ($(this).attr('data-type') != 'country'){
             input = "<input type='Number' class='input-data form-control' value='" + value + "'>";
         }
+        profit = 0.0
+        $(this).parent("tr").find("td").each(function(i){
+            if (i == 6){
+                profit = $(this).text()
+            }
+        })
+
+        $(this).data("lastvalue", value);
+        $(this).data("originalProfit", profit)
+
         $(this).html(input);
         $(this).removeClass("editable");
         $('input', this).focus(function(){$(this).select();});
@@ -317,7 +334,11 @@ $(document).ready(function(){
         var type = td.data("type");
         $(this).remove();
         if (type == "country" && !value) {
-            value = "-----"
+            value = "-----";
+        }
+        if (type == "country"){
+            $("#hipshipper_modal").data('reference', td.data("id"));
+            $("#hipshipper_modal").modal("show");
         }
         td.html(value);
         td.addClass("editable");
@@ -333,7 +354,11 @@ $(document).ready(function(){
             var type = td.data("type");
             $(this).remove();
             if (type == "country" && !value) {
-                value = "-----"
+                value = "-----";
+            }
+            if (type == "country"){
+                $("#hipshipper_modal").data('reference', td.data("id"));
+                $("#hipshipper_modal").modal("show");
             }
             td.html(value);
             td.addClass("editable");
@@ -347,37 +372,29 @@ $(document).ready(function(){
         if (value == null){ value = 0; }
         var td = $(this).parent("td");
         var type = td.data("type");
+        var lastvalue = parseFloat(td.data("lastvalue"));
 
         positive_indexes = [0, 7];
         negative_indexes = [1, 2, 3, 4, 5];
+        type_index = -1;
         profit_index = 6;
 
-        if (type == 'ebay_price'){ positive_indexes.splice(0, 1); }
-        else if (type == 'amazon_price'){ negative_indexes.splice(0, 1); }
-        else if (type == 'ebay_tax'){ negative_indexes.splice(1, 1); }
-        else if (type == 'paypal_tax'){ negative_indexes.splice(2, 1); }
-        else if (type == 'tm_fee'){ negative_indexes.splice(3, 1); }
-        else if (type == 'promoted'){ negative_indexes.splice(4, 1); }
-        else if (type == 'discount'){ positive_indexes.splice(1, 1); }
+        if (type == 'ebay_price'){ type_index = 0; }
+        else if (type == 'amazon_price'){ type_index = 1; }
+        else if (type == 'ebay_tax'){ type_index = 2; }
+        else if (type == 'paypal_tax'){ type_index = 3; }
+        else if (type == 'tm_fee'){ type_index = 4; }
+        else if (type == 'promoted'){ type_index = 5; }
+        else if (type == 'discount'){ type_index = 7; }
 
-        var profit = 0.0;
+        var profit = parseFloat(td.data("originalProfit"))
 
-        td.parent("tr").find("td").each(function(i){
-            if (positive_indexes.includes(i)){
-                profit += parseFloat($(this).html());
-            }
-            else if (negative_indexes.includes(i)){
-                profit -= parseFloat($(this).html());
-            }
-            else if (i != 6 && i != 8 && i != 9){
-                if (type != 'ebay_price' && type != 'discount'){
-                    profit -= parseFloat(value);
-                }
-                else{
-                    profit += parseFloat(value);
-                }
-            }
-        });
+        if (positive_indexes.includes(type_index)){
+            profit += (value - lastvalue);
+        }
+        else{
+            profit -= (value - lastvalue);
+        }
 
         td.parent("tr").find("td").each(function(i){
             if (i == 6){

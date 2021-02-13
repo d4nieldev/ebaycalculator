@@ -182,6 +182,9 @@ def panel(request):
     user_sales = SaleEntry.objects.filter(user=request.user.id).order_by('date')
     context['user_sales'] = user_sales
 
+    hipshippers = HipShipper.objects.all()
+    context['hipshippers'] = hipshippers
+
     context['user_balance'] = Balance.objects.get(user=request.user).balance
 
     context['costs'] = Cost.objects.filter(user=request.user.id)

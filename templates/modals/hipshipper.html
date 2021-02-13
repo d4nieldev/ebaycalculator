@@ -1,23 +1,23 @@
 <!-- Hipshipper Modal -->
-<div class="modal fade" id="hipshipper_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-reference="">
+<div class="modal fade" id="hipshipper_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content bg-secondary">
             <div class="modal-header">
                 <h5 class="modal-title" id="hipshipper-modal-head">Hip Shipper</h5>
             </div>
             <div class="modal-body">
-                <form onsubmit="add_hipshipper(event)">
+                <form onsubmit="add_hipshipper(event)" id="form_hipshipper">
                     <div class="row">
                         <div class="col-5">
                             <div class="form-group inner-addon">
                                 {{ hipshipperform.buyer_paid }}
-                                <i class="fa fa-dollar fa-lg fa-fw" aria-hidden="true"></i>
+                                <i class="fa fa-shipping-fast fa-lg fa-fw" aria-hidden="true"></i>
                             </div>
                         </div>
                         <div class="col-5">
                             <div class="form-group inner-addon">
                                 {{ hipshipperform.seller_paid }}
-                                <i class="fa fa-dollar fa-lg fa-fw" aria-hidden="true"></i>
+                                <i class="fa fa-shipping-fast fa-lg fa-fw" aria-hidden="true"></i>
                             </div>
                         </div>
                         <div class="col-2 my-auto">

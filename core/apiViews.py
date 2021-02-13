@@ -4,7 +4,7 @@ from django.core import serializers
 
 from django.http import JsonResponse
 
-from .models import SaleEntry, Balance, Gift, Cost
+from .models import SaleEntry, Balance, Gift, Cost, HipShipper
 from .forms import SaleEntryForm, GiftForm, CostForm, HipShipperForm
 
 from django.contrib.auth.models import User
@@ -158,10 +158,29 @@ def delete_cost(request):
 def add_hipshipper(request):
     if request.method == 'POST':
         form = HipShipperForm(request.POST)
-
+        print("HELLLOOOOO")
         if form.is_valid():
+            # new
+            print("INSIDE")
             form.save()
+            
             return JsonResponse({"success": request.POST})
+
+        else:
+            if form.errors.as_data()['sale_entry']:
+                # update
+                print("UPDATE")
+                buyer_paid = request.POST['buyer_paid']
+                seller_paid = request.POST['seller_paid']
+                sale_entry = request.POST['sale_entry']
+
+                hipshipper = HipShipper.objects.get(sale_entry=SaleEntry.objects.get(id=sale_entry))
+                hipshipper.buyer_paid = float(buyer_paid)
+                hipshipper.seller_paid = float(seller_paid)
+                hipshipper.save()
+
+                return JsonResponse({"success": request.POST})
+
     return JsonResponse({
         "fail": request.POST,
         "errors": form.errors})

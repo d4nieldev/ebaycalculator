@@ -31,7 +31,13 @@ class SaleEntry(models.Model):
         super(SaleEntry, self).save(*args, **kwargs)
     
     def calc_profit(self):
-        return self.ebay_price - self.amazon_price - self.ebay_tax - self.paypal_tax - self.tm_fee - self.promoted + self.discount
+        profit = self.ebay_price - self.amazon_price - self.ebay_tax - self.paypal_tax - self.tm_fee - self.promoted + self.discount
+        if self.country == '-----':
+            return profit
+        else:
+            hipshipper_obj = HipShipper.objects.get(sale_entry=self)
+            return profit + hipshipper_obj.buyer_paid - hipshipper_obj.seller_paid
+        
 
     def __str__(self):
         return f'{self.user} - {self.profit}'
@@ -63,7 +69,7 @@ class Cost(models.Model):
 class HipShipper(models.Model):
     buyer_paid = models.FloatField()
     seller_paid = models.FloatField()
-    sale_entry = models.ForeignKey(SaleEntry, on_delete=models.CASCADE, default=0)
+    sale_entry = models.OneToOneField(SaleEntry, on_delete=models.CASCADE, default=0)
 
     def save(self, *args, **kwargs):
         self.sale_entry.profit += self.buyer_paid - self.seller_paid
@@ -71,6 +77,6 @@ class HipShipper(models.Model):
         super(HipShipper, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.sale_entry.user}({self.sale_entry.id}) - {self.buyer_paid - self.seller_paid}'
+        return f'{self.sale_entry.user}({self.sale_entry.country}) - {self.buyer_paid - self.seller_paid}'
 
 

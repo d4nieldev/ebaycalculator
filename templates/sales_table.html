@@ -29,7 +29,32 @@
             <td class="editable sumtable" data-id="{{ sale.id }}" data-type="promoted">{{ sale.promoted|floatformat }}</td>
             <td class="sumtable" id="loop" data-id="{{ sale.id }}" data-type="profit">{{ sale.profit|floatformat }}</th>
             <td class="editable sumtable" data-id="{{ sale.id }}" data-type="discount">{{ sale.discount|floatformat }}</td>
-            <td class="editable" data-id="{{ sale.id }}" data-type="country">{{ sale.country }}</td>
+            <td class="editable" data-id="{{ sale.id }}" data-type="country">
+                <table>
+                    <tr>
+                        <td class="get-country">
+                            {{ sale.country }}
+                        </td>
+                    </tr>
+                    <tr>
+                        {% for hip in hipshippers %}
+                            {% if hip.sale_entry == sale %}
+                                <td class="bg-info text-center text-secondary">
+                                    <span>Buyer Paid:</span>
+                                    <br />
+                                    {{ hip.buyer_paid }}
+                                </td>
+                                <td class="bg-primary text-center">
+                                    <span>Seller Paid:</span>
+                                    <br />
+                                    {{ hip.seller_paid }}
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                </table>
+                
+            </td>
             <td data-id="{{ sale.id }}" data-type="submit">
                 <button data-id="{{ sale.id }}" type="submit" class="btn btn-danger btn-delete-sale" onclick="delete_sale(this)" >
                     <i class="fa fa-trash-alt fa-lg"></i>
