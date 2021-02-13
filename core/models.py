@@ -23,10 +23,30 @@ class SaleEntry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
 
     def save(self, *args, **kwargs):
+        change_balance = Balance.objects.get(user=self.user)
         if not self.pk:  # object is being created, thus no primary key field yet
-            change_balance = Balance.objects.get(user=self.user)
             change_balance.balance -= self.amazon_price - self.tm_fee + self.discount
-            change_balance.save()
+            
+        else:
+            
+            if kwargs["update_type"]:
+                type = kwargs.pop("update_type")
+                value = kwargs.pop("update_value_diff")
+
+                print(type)
+                print(value)
+                print("START " + str(change_balance.balance))
+
+                matter_types = ['amazon_price', 'tm_fee', 'discount']
+                if type in matter_types:
+                    if type == 'discount':
+                        change_balance.balance += float(value)
+                    else:
+                        change_balance.balance -= float(value)
+        print("BALANCE " + str(change_balance.balance))
+        change_balance.save()
+
+                
         
         super(SaleEntry, self).save(*args, **kwargs)
     

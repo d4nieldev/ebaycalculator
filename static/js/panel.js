@@ -27,9 +27,11 @@ function sum_sales_table(){
     $('#table_sales').find("tr:last").prev().append('<th class="align-middle"><i class="fa fa-hashtag fa-md"></i></th>');
     $('#table_sales').find("tr:last").prev().append('<th>Total</th>');
     $(result).each(function(i){
-        $('#table_sales').find("tr:last").prev().append('<th>'+ this.toFixed(2) +'</th>')
         if (i == 6){
             $('#table_sales').find("tr:last").prev().append('<th id="total_sum_profit">'+ this.toFixed(2) +'</th>')
+        }
+        else{
+            $('#table_sales').find("tr:last").prev().append('<th>'+ this.toFixed(2) +'</th>')
         }
         
     });
@@ -62,7 +64,10 @@ function calc_total_date_profit(){
         costs += parseFloat($(this).text());
     });
     total = profit - costs
-    $("#total-profit").html("Month Profit: " + Math.round((total + Number.EPSILON) * 100) / 100)
+    total = Math.round((total + Number.EPSILON) * 100) / 100
+    if (total < 0){ $("#total-profit").addClass("bg-danger") }
+    else { $("#total-profit").addClass("bg-success") }
+    $("#total-profit").html("$" + total)
 }
 
 function set_gifts_date(){
@@ -136,11 +141,11 @@ function filter_gifts_by_date(e){
     })
 }
 
-function update_sale(id, value, type){
+function update_sale(id, value, lastvalue, type){
     $.ajax({
         url:"/update_sale",
         type:"POST",
-        data:{id:id, type:type, value:value},
+        data:{id:id, type:type, value:value, lastvalue:lastvalue},
     })
     .done(function(response){
         $("#div_user_balance").load(location.href + " #div_user_balance");
@@ -296,6 +301,7 @@ $(document).ready(function(){
     // create total column
     sum_sales_table();
 
+    // calculate the total profit minus the costs of selected month
     calc_total_date_profit();
 
     // change data clicked to input
@@ -332,6 +338,7 @@ $(document).ready(function(){
     $(document).on("blur", ".input-data", function(){
         var value = $(this).val();
         var td = $(this).parent("td");
+        var lastvalue = td.data('lastvalue');
         var type = td.data("type");
         $(this).remove();
         if (type == "country" && !value) {
@@ -343,7 +350,7 @@ $(document).ready(function(){
         }
         td.html(value);
         td.addClass("editable");
-        update_sale(td.data("id"), value, type);
+        update_sale(td.data("id"), value, lastvalue, type);
     });
 
     // on key press save data
@@ -352,6 +359,7 @@ $(document).ready(function(){
         if (key == 13){
             var value = $(this).val();
             var td = $(this).parent("td");
+            var lastvalue = td.data("lastvalue");
             var type = td.data("type");
             $(this).remove();
             if (type == "country" && !value) {
@@ -363,12 +371,12 @@ $(document).ready(function(){
             }
             td.html(value);
             td.addClass("editable");
-            update_sale(td.data("id"), value, type);
+            update_sale(td.data("id"), value, lastvalue, type);
         }
     });
 
     // on key up update profit
-    $(document).on("keyup", ".input-data", function(){
+    $('body').on("keyup", ".input-data", function(){
         var type = td.data("type");
         if (type == "country"){return;}
         var value = $(this).val();

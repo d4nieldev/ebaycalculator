@@ -16,6 +16,7 @@ from django.shortcuts import redirect, HttpResponse, render
 def update_sale(request):
     id = request.POST.get('id', '')
     value = request.POST.get('value', '')
+    lastvalue = request.POST.get('lastvalue', '')
     type = request.POST.get('type', '')
 
     sale = SaleEntry.objects.get(id=id)
@@ -56,7 +57,8 @@ def update_sale(request):
         sale.country = value if not str(value).strip() == "" else '-----'
     
     balance_obj.save()
-    sale.save()
+    kwargs = {'update_type':type, 'update_value_diff':float(value) - float(lastvalue)}
+    sale.save(**kwargs)
 
     return redirect('panel')
 
