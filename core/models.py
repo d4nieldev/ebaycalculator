@@ -25,10 +25,17 @@ class SaleEntry(models.Model):
     def save(self, *args, **kwargs):
         if not self.pk:  # object is being created, thus no primary key field yet
             change_balance = Balance.objects.get(user=self.user)
-            change_balance.balance = change_balance.balance - self.amazon_price - self.tm_fee + self.discount
+            change_balance.balance -= self.amazon_price - self.tm_fee + self.discount
             change_balance.save()
         
         super(SaleEntry, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        balance_obj = Balance.objects.get(user=self.user)
+        balance_obj.balance += self.amazon_price + self.tm_fee - self.discount
+        balance_obj.save()
+        
+        super(SaleEntry, self).delete(*args, **kwargs)
     
     def calc_profit(self):
         profit = self.ebay_price - self.amazon_price - self.ebay_tax - self.paypal_tax - self.tm_fee - self.promoted + self.discount
