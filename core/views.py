@@ -16,8 +16,7 @@ from .models import SaleEntry, Balance, Gift, Cost, HipShipper
 
 def HANDLE_LOGIN_BASE(request, current_page, context):
     '''
-    This function handles the login form - need to apply to every form we want to sign in from
-    forms that are using this method: index
+    This function handles the login form.
     '''
     if request.method == 'POST':
         if "btn_login" in request.POST:
@@ -26,26 +25,24 @@ def HANDLE_LOGIN_BASE(request, current_page, context):
 
             user = authenticate(request, username=username, password=password)
 
-            if user is not None:
+            if user:
                 login(request, user)
                 return redirect('panel')
             else:
                 messages.error(request, 'Username or password are incorrect')
                 context['open_login'] = True
                 return render(request, current_page, context, status=400)
-    return None
-
-
-def HANDLE_LOGOUT_BASE(request):
-    '''
-    This function handles the logout mechanism. No need to use it anywhere.
-    Already imported from urls
-    '''
-    logout(request)
-    return redirect('index')
 
 
 def SORT_DICT(dict_notsorted):
+    '''SORT_DICT
+    
+    This function sorts a dictionary mostly date dicts.
+    Used for showing the dates in the select input in nice order.
+    Example:
+    {2020: [7,5,9], 2019: [2,1,12]} --> {2019: [1,2,12], 2020: [5,7,9]}
+
+    '''
     lst = dict_notsorted
     lst = collections.OrderedDict(sorted(lst.items()))
 
@@ -56,9 +53,11 @@ def SORT_DICT(dict_notsorted):
 
 
 def GET_SALES_YEARS_MONTHS(request):
-    '''
+    '''GET_SALES_YEARS_MONTHS
     This function returns a dictionary with all years and months the user has registred sales
-    return example --> {2020: [12, 11], 2021: [1]}
+
+    Example:
+    {2020: [11,12], 2021: [1]}
     '''
     sales = SaleEntry.objects.filter(user=request.user.id)
     years_months = {}
@@ -82,15 +81,14 @@ def GET_SALES_YEARS_MONTHS(request):
                     if 12 not in years_months[year]:
                         years_months[year].append(12)
                 
-
-    
     return SORT_DICT(years_months)
 
 
 def GET_GIFTS_YEARS_MONTHS(request):
     '''
     This function returns a dictionary with all years and months the user has registred sales
-    return example --> {2020: [12, 11], 2021: [1]}
+    Example:
+    {2020: [11,12], 2021: [1]}
     '''
     gifts = Gift.objects.filter(user=request.user.id)
     years_months = {}
@@ -114,15 +112,13 @@ def GET_GIFTS_YEARS_MONTHS(request):
                     if 12 not in years_months[year]:
                         years_months[year].append(12)
                 
-
-    
     return SORT_DICT(years_months)
 
 
 def index(request):
-    '''
-    index view
-    All it does is sign up users and handle the sign in
+    '''index
+
+    View the index HTML page, register new users, and handle login.
     '''
     if request.user.is_authenticated:
         # logged in users will be automatically redirected to the panel page
@@ -134,10 +130,12 @@ def index(request):
         if request.method == 'POST':
             if "btn_signup" in request.POST:
                 form = SignUpForm(request.POST)
+
                 if form.is_valid():
                     form.save()
 
                     last_user = User.objects.latest('id')
+
                     user_balance = Balance(user=last_user, balance=0)
                     user_balance.save()
                     
@@ -145,49 +143,35 @@ def index(request):
 
                     # open the login form after successful sign up
                     context['open_login'] = True
+
                     context['form'] = form
                     return render(request, 'index.html', context)
         
         context['form'] = form
-        # handle login
+        
         login_handle = HANDLE_LOGIN_BASE(request, 'index.html', context)
-        return login_handle if login_handle is not None else render(request, 'index.html', context)
+        # check if user logged in - if true authenticate and log in. else, do nothing.
+        return login_handle if login_handle else render(request, 'index.html', context)
 
 
 @login_required(login_url='index')
 def panel(request):
+    '''panel
+    
+    View the panel HTML page
     '''
-    panel view
-    '''
-    context = {}
-
-    years_months = GET_SALES_YEARS_MONTHS(request)
-    context['years_months'] = years_months
-
-    gifts_years_months = GET_GIFTS_YEARS_MONTHS(request)
-    context['gifts_years_months'] = gifts_years_months
-
-    form = SaleEntryForm()
-    context['form'] = form
-
-    giftform = GiftForm()
-    context['giftform'] = giftform
-
-    costform = CostForm()
-    context['costform'] = costform
-
-    hipshipperform = HipShipperForm()
-    context['hipshipperform'] = hipshipperform
-
-    user_sales = SaleEntry.objects.filter(user=request.user.id).order_by('date')
-    context['user_sales'] = user_sales
-
-    hipshippers = HipShipper.objects.all()
-    context['hipshippers'] = hipshippers
-
-    context['user_balance'] = Balance.objects.get(user=request.user).balance
-
-    context['costs'] = Cost.objects.filter(user=request.user.id)
+    context = {
+        'years_months': GET_SALES_YEARS_MONTHS(request),
+        'gifts_years_months': GET_GIFTS_YEARS_MONTHS(request),
+        'form': SaleEntryForm(),
+        'giftform': GiftForm(),
+        'costform': CostForm(),
+        'hipshipperform': HipShipperForm(),
+        'user_sales': SaleEntry.objects.filter(user=request.user.id).order_by('date'),
+        'hipshippers': HipShipper.objects.all(),
+        'user_balance': Balance.objects.get(user=request.user).balance,
+        'costs': Cost.objects.filter(user=request.user.id)
+    }
     
     if request.method == "GET":
         if "btn_select_date" in request.GET:
@@ -216,9 +200,5 @@ def panel(request):
                 
 
                 context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__range=[date_from, date_to]).order_by('date')
-            else:
-                context['user_sales'] = user_sales
-    
-    context['form'] = form
     
     return render(request, 'panel.html', context)

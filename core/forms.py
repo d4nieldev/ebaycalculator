@@ -1,11 +1,16 @@
 from datetime import date
 
+from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
-from django import forms
-from django.contrib.auth.models import User
 
+from django.contrib.auth.models import User
 from .models import SaleEntry, Gift, Cost, HipShipper
+
+
+class DateInput(forms.DateInput):
+    # Present DateInput as input type=date box.
+    input_type = 'date'
 
 
 class SignUpForm(UserCreationForm):
@@ -27,9 +32,6 @@ class SignUpForm(UserCreationForm):
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email', 'aria-describedby': 'emailHelp'}),
         }
 
-
-class DateInput(forms.DateInput):
-    input_type = 'date'
 
 class SaleEntryForm(ModelForm):
     class Meta:
