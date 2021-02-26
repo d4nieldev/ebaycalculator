@@ -116,7 +116,7 @@ class SaleEntry(models.Model):
 
         if not self.pk:  
             # object is being created, thus no primary key field yet
-            change_balance.balance -= self.amazon_price - self.tm_fee + self.discount
+            change_balance.balance -= self.amazon_price + self.tm_fee - self.discount
             
         else:
             # there is a primary key already, so the object updated.
