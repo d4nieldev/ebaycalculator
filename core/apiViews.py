@@ -15,83 +15,97 @@ from .forms import SaleEntryForm, GiftForm, CostForm, HipShipperForm
 
 
 def HANDLE_LOGOUT_BASE(request):
-    '''HANDLE_LOGOUT_BASE
-
+    '''
     This function handles the logout mechanism. No need to use it anywhere.
-    Already imported from urls
+    
+    Attributes
+    ----------
+    request : django.http.HttpRequest
+        the request that triggered the caller function
     '''
     logout(request)
+
     return redirect('index')
 
 
 @csrf_exempt
 def update_sale(request):
-    '''update_sale
-
-    This function gets an ajax response with 4 parameters: id, value, lastvalue, type.
-    The relevant field is updated and the profit is recalculated. if there's a need, the balance is updated too.
     '''
+    The relevant field is updated and the profit is recalculated. if there's a need, the balance is updated too.
+
+    Attributes
+    ----------
+    request : django.http.HttpRequest
+        the request that triggered this function
+    '''
+
+    # get the values
     id = request.POST.get('id', '')
     value = request.POST.get('value', '')
     lastvalue = request.POST.get('lastvalue', '')
     type = request.POST.get('type', '')
 
+    # get the sale object
     sale = SaleEntry.objects.get(id=id)
-    balance_obj = Balance.objects.get(user=sale.user)
 
     if type == "ebay_price":
         sale.ebay_price = float(value)
-
     if type == "amazon_price":
-        balance_obj.balance += sale.amazon_price - float(value)
         sale.amazon_price = float(value)
-
     if type == "ebay_tax":
         sale.ebay_tax = float(value)
-
     if type == "paypal_tax":
         sale.paypal_tax = float(value)
-
     if type == "tm_fee":
-        balance_obj.balance += sale.tm_fee - float(value)
         sale.tm_fee = float(value)
-    
     if type == "promoted":
         sale.promoted = float(value)
-
     if type == "discount":
-        balance_obj.balance -= sale.amazon_price - float(value)
         sale.discount = float(value)
-    
     if type == "country":
         sale.country = value if not str(value).strip() == "" else '-----'
-    
-    balance_obj.save()
 
-    kwargs = {'update_type':type, 'update_value_diff':float(value) - float(lastvalue)}
+    # tell the server that the sale is updated and the update type with the value
+    kwargs = {
+        'update_type':type,
+        'update_value_diff':float(value) - float(lastvalue)
+        }
 
+    # recalculate the profit
     sale.profit = sale.calc_profit()
     
     sale.save(**kwargs)
 
+    # reload the page
     return redirect('panel')
 
 @csrf_exempt
 def delete_sale(request):
-    '''delete_sale
+    '''
+    Gets an ajax response with the sale the user wishes to delete and deletes this sale.
 
-    This function gets an ajax response with the sale the user wishes to delete and deletes this sale.
+    Attributes
+    ----------
+    request : django.http.HttpRequest
+        the request that triggered this function 
     '''
     id = request.POST.get('id', '')
+
     SaleEntry.objects.get(id=id).delete()
+    
+    # reload the page
     return redirect('panel')
 
 
 @csrf_exempt
 def add_sale(request):
-    '''add_sale
+    '''
+    Gets an ajax response which containes a form with all the fields needed to create a SaleEntry and creating one.
 
-    This function gets an ajax response which containes a form with all the fields needed to create a SaleEntry and creating one.
+    Attributes
+    ----------
+    request : django.http.HttpRequest
+        the request that triggered this function 
     '''
     if request.method == 'POST':
         form = SaleEntryForm(request.POST)
@@ -108,10 +122,14 @@ def add_sale(request):
 
 @csrf_exempt
 def filter_gifts(request):
-    '''filter_gifts
+    '''
+    Gets a month and finds the relevant gifts registered in this month.
+    The gifts query set is returned to the html page via a json response.
 
-    The function gets a month and finds the relevant gifts registered in this month.
-    The gifts query set is returned to the html page via a json response
+    Attributes
+    ----------
+    request : django.http.HttpRequest
+        the request that triggered this function 
     '''
     if request.method == 'GET':
         gifts_qs = None
@@ -142,13 +160,18 @@ def filter_gifts(request):
             data = serializers.serialize('json', gifts_qs)
             return HttpResponse(data, content_type="application/json")
     
+    # return an indication that there is an error
     return JsonResponse({'data': 'no data'}, status=200)
 
 @csrf_exempt
 def add_balance(request):
-    '''add_balance
+    '''
+    Creates a new gift (which is automatically added to the balance).
 
-    This function creates a new gift (which is automatically added to the balance).
+    Attributes
+    ----------
+    request : django.http.HttpRequest
+        the request that triggered this function 
     '''
     if request.method == 'POST':
         form = GiftForm(request.POST)
@@ -165,10 +188,14 @@ def add_balance(request):
 
 @csrf_exempt
 def add_cost(request):
-    '''add_cost
-
-    This function creates a new Cost object.
+    '''
+    Creates a new Cost object.
     On success, the costs queryset of the pqrticular user is returned.
+
+    Attributes
+    ----------
+    request : django.http.HttpRequest
+        the request that triggered this function 
     '''
     if request.method == "POST":
         form = CostForm(request.POST)
@@ -184,18 +211,24 @@ def add_cost(request):
             # serialize the query set so it could be given as a json response
             data = serializers.serialize('json', costs_qs)
             return HttpResponse(data, content_type="application/json")
+
     return JsonResponse({"data": "no data"})
 
 
 @csrf_exempt
 def delete_cost(request):
-    '''delete_cost
-
-    This function deletes a selected cost.
+    '''
+    Deletes a selected cost.
     On success, this function returnes the new costs query set.
+
+    Attributes
+    ----------
+    request : django.http.HttpRequest
+        the request that triggered this function 
     '''
     if request.method == 'POST':
         id = request.POST.get('id', '')
+
         Cost.objects.get(id=id).delete()
 
         # get the relevant costs
@@ -203,6 +236,7 @@ def delete_cost(request):
         
         # serialize the query set so it could be given as a json response
         data = serializers.serialize('json', costs_qs, fields=('id', 'name', 'value'))
+
         return HttpResponse(data, content_type="application/json")
 
     return JsonResponse({"data":"no data"})
@@ -210,13 +244,18 @@ def delete_cost(request):
 
 @csrf_exempt
 def add_hipshipper(request):
-    '''add_hipshipper
+    '''
+    Creates a new Hipshipper object.
 
-    This function creates a new Hipshipper object.
+    Attributes
+    ----------
+    request : django.http.HttpRequest
+        the request that triggered this function 
     '''
     if request.method == 'POST':
         form = HipShipperForm(request.POST)
         if form.is_valid():
+            # save the object with the selected sale.
             hipshipper = form.save(commit=False)
             hipshipper.sale_entry = SaleEntry.objects.get(id=request.POST['sale_entry'])
             hipshipper.save()

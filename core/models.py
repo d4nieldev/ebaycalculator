@@ -3,52 +3,69 @@ from django.contrib.auth.models import User
 
 
 class Balance(models.Model):
-    """Balance Class
-
-    This class has only one 2 parameters:
-    user (type - django.contrib.auth.models.User): The user this balance object is related to.
-    balance (type - int): The balance value for this particular user. default = 0.
-
-    Purpose:
+    """
     Every new user automatically gets a balance object right after signing up with the sign up form.
     The balance is the money the user has in the monitor app.
 
-    Balance Calculation:
-    ask dad.
+    Attributes
+    ----------
+    user : django.contrib.auth.models.User
+        The user this balance object is related to.
+    balance : int
+        The balance value for this particular user. default = 0.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, default=0)
     balance = models.FloatField(default=0)
 
     def __str__(self):
-        '''Example:
-
+        '''
+        Example
+        -------
         user = Daniel
+
         balance = 541.62
 
         Daniel - 541.62
+        ---------------
         '''
         return f'{self.user} - {self.balance}'
 
 
 class SaleEntry(models.Model):
-    """SaleEntry Class
-
-    This class has 11 parameters:
-    date (type - datetime.date): The date this product has been sold.
-    ebay_price (type - float): Product selling price on ebay.
-    amazon_price (type - float): Product buying price from amazon.
-    ebay_tax (type - float): Tax ($) eBay claimed for this sale.
-    paypal_tax (type - float): Tax ($) paypal claimed for this sale.
-    tm_fee (type - float): Trademark (TM) fee. default = 0.3. 
-    promoted (type - float): If your sale is promoted, enter the promotion fee. default = 0. (not promoted)
-    profit (type - float): Total profit
-    discount (type - float): If you got a discount from the monitor, enter the discount amount. default = 0. (no discount)
-    country (type - str): If you bought this product from foreign country, enter the country name. default = ----- (USA or some default country).
-    user (type - django.contrib.auth.models.User): The user this balance object is related to.
-
-    Purpose:
+    """
     Every sale the user registers is a SaleEnrty object.
+
     The purpose of this model is to organize every sale registered to the same format which is described above.
+
+    Attributes
+    ----------
+    date : datetime.date 
+        The date this product has been sold.
+    ebay_price : float
+        Product selling price on ebay.
+    amazon_price : float
+        Product buying price from amazon.
+    ebay_tax : float
+        Tax ($) eBay claimed for this sale.
+    paypal_tax : float
+        Tax ($) paypal claimed for this sale.
+    tm_fee : float
+        Trademark (TM) fee. optinal (default = 0.3).
+    promoted : float
+        If your sale is promoted, enter the promotion fee. optinal (default = 0).
+    profit : float
+        Total profit
+    discount : float:
+        If you got a discount from the monitor, enter the discount amount. optinal (default = 0).
+    country : str:
+        If you bought this product from foreign country, enter the country name. optinal (default = -----).
+    user : django.contrib.auth.models.User
+        The user this balance object is related to.
+    
+    Methods
+    -------
+    calc_profit()
+        calculates and returnes the profit
     """
     
     date = models.DateField()
@@ -57,7 +74,7 @@ class SaleEntry(models.Model):
     ebay_tax = models.FloatField()
     paypal_tax = models.FloatField()
     tm_fee = models.FloatField(default=0.3)
-    promoted = models.FloatField(default=0.0)
+    promoted = models.FloatField(default=0)
     profit = models.FloatField()
     discount = models.FloatField(default=0)
     country = models.CharField(max_length=100, default="-"*5)
@@ -65,7 +82,13 @@ class SaleEntry(models.Model):
 
 
     def calc_profit(self):
-        '''This method is used for calculating the profit from the other parameters given to the equation'''
+        '''
+        Calculate the profit
+        
+        Returns
+        -------
+        returnes the profit
+        '''
         
         profit = self.ebay_price - self.amazon_price - self.ebay_tax - self.paypal_tax - self.tm_fee - self.promoted + self.discount
 
@@ -79,10 +102,15 @@ class SaleEntry(models.Model):
 
 
     def save(self, *args, **kwargs):
-        '''When the object is being created or updated, this method is executing
-        
-        My modifications:
+        '''
         Changing the balance for amazon_price, tm_fee and discount parameters on update and on creation.
+
+        Keyword Arguments
+        -----------------
+        update_type : str
+            What field has been updated
+        update_value_diff : float
+            The change in that value
         '''
         change_balance = Balance.objects.get(user=self.user)
 
@@ -110,9 +138,7 @@ class SaleEntry(models.Model):
     
 
     def delete(self, *args, **kwargs):
-        '''When the object is being deleted, this method is called
-        
-        My modifications:
+        '''
         When a sale is deleted, I need to revert the changes to balance I did in the save() method.
         '''
         balance_obj = Balance.objects.get(user=self.user)
@@ -123,28 +149,40 @@ class SaleEntry(models.Model):
 
 
     def __str__(self):
-        '''Example:
-
+        '''
+        Example
+        -------
         user = Daniel
+
         profit = 17.41
 
         Daniel - 17.41
+        --------------
         '''
         return f'{self.user} - {self.profit}'
 
 
 class Gift(models.Model):
-    """Gift Clasas
-
-    This class has 4 parameters:
-    date (type - datetime.date): The date this gift was added.
-    gift_money (type - float): Gift worth ($) with taxes.
-    gift_tax (type - float): Gift Tax ($).
-    user (type - django.contrib.auth.models.User): The user this balance object is related to.
-
-    Purpose:
+    """
     Gifts can be bought to add money to your monitor balance.
+
     This model is used to keep track of these gifts and organize them together.
+
+    Attributes
+    ----------
+    date : datetime.date
+        The date this gift was added.
+    gift_money : float
+        Gift worth ($) with taxes.
+    gift_tax : float
+        Gift Tax ($).
+    user : django.contrib.auth.models.User
+        The user this balance object is related to.
+
+    Methods
+    -------
+    calc_gift_value()
+        returnes the gift minus the taxes
     """
     date = models.DateField()
     gift_money = models.FloatField()
@@ -158,9 +196,7 @@ class Gift(models.Model):
 
 
     def save(self, *args, **kwargs):
-        '''When the object is being created or updated, this method is executing
-
-        My modifications:
+        '''
         Add the gift value to the balance.
         '''
         balance_obj = Balance.objects.get(user=self.user)
@@ -170,55 +206,68 @@ class Gift(models.Model):
         super(Gift, self).save(*args, **kwargs)
 
     def __str__(self):
-        '''Example:
-
+        '''
+        Example
+        -------
         date = 25/02/2021
-        gift_money = 103.0
-        gift_tax = 3.0
-        user = Daniel
 
+        gift_money = 103.0
+
+        gift_tax = 3.0
+
+        user = Daniel
         Daniel - 100.0
+        --------------
         '''
         return f'{self.user} - {self.calc_gift_value()}'
 
 class Cost(models.Model):
-    """Cost Class
-
-    This class has 3 parameters:
-    name (type - str): Cost name.
-    value (type - float): Cost value (per month).
-    user (type - django.contrib.auth.models.User): The user this balance object is related to.
-
-    Purpose:
+    """
     Managing an eBay store has it's costs, it can be monitors, programs that are used to help manage the store, eBay store price, etc...
+
     We can help the users consider this costs in the total profit calculation.
+
+    Attributes
+    ----------
+    name :str
+        Cost name.
+    value : float
+        Cost value (per month).
+    user : django.contrib.auth.models.User
+        The user this balance object is related to.
     """
     name = models.CharField(max_length=100)
     value = models.FloatField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
 
     def __str__(self):
-        '''Example:
-
+        '''
+        Example
+        -------
         name = Monitor
-        value = 400.0
-        user = Daniel
 
+        value = 400.0
+
+        user = Daniel
         Daniel: Monitor $400
+        --------------------
         '''
         return f'{self.user}: {self.name} ${self.value}'
 
 class HipShipper(models.Model):
-    """HipShipper Class
-
-    This class has 3 parameters:
-    buyer_paid (type - float): How much did the buyer paid for shipping.
-    seller_paid (type - float): How much did the seller (the user) paid for shipping.
-    sale_entry (type - .models.SaleEntry): The sale related to this shipment.
-
-    Purpose:
+    """
     When a product is being shipped from another country, it has a special cost.
+
     This model organizes all the times the user has paid for shipping and recalculating the profit.
+
+    Attributes
+    ----------
+    buyer_paid : float
+        How much did the buyer paid for shipping.
+    seller_paid : float
+        How much did the seller (the user) paid for shipping.
+    sale_entry : .models.SaleEntry
+        The sale related to this shipment.
     """
     buyer_paid = models.FloatField()
     seller_paid = models.FloatField()
@@ -232,13 +281,16 @@ class HipShipper(models.Model):
         super(HipShipper, self).save(*args, **kwargs)
 
     def __str__(self):
-        '''Example: 
-
+        '''
+        Example
+        -------
         buyer_paid = 15.0
-        seller_paid = 5.0
-        user = Daniel
 
+        seller_paid = 5.0
+
+        user = Daniel
         Daniel(Israel) - 10.0
+        ---------------------
         '''
         return f'{self.sale_entry.user}({self.sale_entry.country}) - {self.buyer_paid - self.seller_paid}'
 
