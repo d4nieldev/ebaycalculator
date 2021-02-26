@@ -10,7 +10,7 @@
                     {% csrf_token %}
                     <div class="row">
                         <div class="col">
-                            <select class='form-select' name="s_filter_gifts_by_date" id="s_filter_gifts_by_date" onchange="filter_gifts_by_date(event)">
+                            <select class='form-select' name="s_filter_gifts_by_date" id="s_filter_gifts_by_date" onchange="filter_gifts_by_date()">
                                 <option value="Show Gift Cards From" selected>Show Gift Cards From</option>
                                 {% for year, month_list in gifts_years_months.items %}
                                     {% for month in month_list %}
