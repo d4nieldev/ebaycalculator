@@ -27,7 +27,7 @@
                     <!--Table Content-->
                 </table>
 
-                <form id='balance' onsubmit="add_balance(event)">
+                <form id='balance-form'>
                     {% csrf_token %}
                     <div class="form-group inner-addon">
                         <input name="txt_balance_add" id="txt_balance_add" type="text" class="form-control" placeholder="Add This Amount For Balance" autocomplete="false" readonly>

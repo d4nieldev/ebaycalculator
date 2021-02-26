@@ -31,7 +31,7 @@
             </div>
             <div class="col-1 text-center rounded" style="font-size: 1.5rem;" id="total-profit">
                 {% for cost in costs %}
-                    <span style="display: none;">{{ cost.value }}</span>
+                    <span class="hidden-cost" style="display: none;">{{ cost.value }}</span>
                 {% endfor %}
             </div>
         </div>

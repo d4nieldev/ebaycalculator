@@ -136,25 +136,29 @@ def filter_gifts(request):
         date = str(request.GET['date'])
 
         if date != 'Show Gift Cards From':
-            # get the date range
-            year = int(date.split('-')[0])
-            month = int(date.split('-')[1])
+            if date == 'all':
+                gifts_qs = Gift.objects.filter(user=request.user.id)
 
-            date_from = f'{year}-{month}-16'
-            date_to = f'{year}-{month+1}-15'
-            
-            if month == 12:
-                date_from = f'{year}-12-16'
-                date_to = f'{year+1}-01-15'
-            if month == 9:
-                date_from = f'{year}-0{month}-16'
+            else:
+                # get the date range
+                year = int(date.split('-')[0])
+                month = int(date.split('-')[1])
+
+                date_from = f'{year}-{month}-16'
                 date_to = f'{year}-{month+1}-15'
-            elif month < 10:
-                date_from = f'{year}-0{month}-16'
-                date_to = f'{year}-0{month+1}-15'
+                
+                if month == 12:
+                    date_from = f'{year}-12-16'
+                    date_to = f'{year+1}-01-15'
+                if month == 9:
+                    date_from = f'{year}-0{month}-16'
+                    date_to = f'{year}-{month+1}-15'
+                elif month < 10:
+                    date_from = f'{year}-0{month}-16'
+                    date_to = f'{year}-0{month+1}-15'
 
-            # get the relevant gifts
-            gifts_qs = Gift.objects.filter(user=request.user.id, date__range=[date_from, date_to])
+                # get the relevant gifts
+                gifts_qs = Gift.objects.filter(user=request.user.id, date__range=[date_from, date_to])
 
             # serialize the query set so it could be given as a json response
             data = serializers.serialize('json', gifts_qs)

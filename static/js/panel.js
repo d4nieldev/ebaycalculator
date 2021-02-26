@@ -77,24 +77,44 @@ function calc_add_to_balance() {
  * Calculating the profit of all the sales shown on the screen minus the costs.
  */
 function calc_total_date_profit(){
-    
     // get the values
     profit = $("#total_sum_profit").text();
+
     costs = 0;
-    $("#total-profit span").each(function(){
+    $("#total-profit span.hidden-cost").each(function(){
         costs += parseFloat($(this).text());
     });
 
-    // calculate and round the total to 2 digits after the decimal.
-    total = parseFloat(profit) - parseFloat(costs)
-    total = Math.round((total + Number.EPSILON) * 100) / 100
+    gifts_tax = 0;
+    selected_date = $("#s_sales_filter_by_date").val()
 
-    // if the total profit is grater than 0, show it in green, else show it in red.
-    if (total < 0) $("#total-profit").addClass("bg-danger") 
-    else $("#total-profit").addClass("bg-success")
+    $.ajax({
+        url: "/filter_gifts",
+        type: "GET",
+        data: {
+            date: selected_date,
+        },
+        success:function(data){
+            $.each(data, function(i, item) {
+                gifts_tax += parseFloat(item.fields.gift_tax);
+            });
+            // calculate and round the total to 2 digits after the decimal.
+            total = parseFloat(profit) - parseFloat(costs) - parseFloat(gifts_tax)
+            total = Math.round((total + Number.EPSILON) * 100) / 100
 
-    // print the total profit
-    $("#total-profit").html("$" + total)
+            // if the total profit is grater than 0, show it in green, else show it in red.
+            if (total < 0) $("#total-profit").addClass("bg-danger") 
+            else $("#total-profit").addClass("bg-success")
+
+            // print the total profit
+            $("#total-profit").html("$" + total)
+        }
+    })
+    .fail(function(data){
+        console.log(data);
+    });
+
+    
 }
 
 
@@ -203,10 +223,12 @@ function add_balance(e){
         balance = Math.round((parseFloat(response.balance) + Number.EPSILON) * 100) / 100
         $('#div_user_balance').html("$" + balance)
         $("#balance_modal_title").html("Balance $" + balance)
+
+        // show the new total profit
+        $("#total-profit").html("$" + (parseFloat($("#total-profit").html().replace('$', '')) - parseFloat($("#f_gift_tax").val())))
     })
     .fail(function(xhr, status, error){
-        var err = eval("(" + xhr.responseText + ")");
-            alert(err.Message);
+        console.log(xhr)
     })
 }
 
@@ -521,6 +543,8 @@ $(document).ready(function(){
     $(document).on("submit", '#form_add_sale', add_sale)
 
     $(document).on("submit", "#form_hipshipper", add_hipshipper)
+
+    $(document).on("submit", '#balance-form', add_balance)
     /**
      * Updates the profit in live.
      * @returns nothing when the country is changed

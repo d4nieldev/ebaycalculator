@@ -170,7 +170,7 @@ def panel(request):
         'user_sales': SaleEntry.objects.filter(user=request.user.id).order_by('date'),
         'hipshippers': HipShipper.objects.all(),
         'user_balance': Balance.objects.get(user=request.user).balance,
-        'costs': Cost.objects.filter(user=request.user.id)
+        'costs': Cost.objects.filter(user=request.user)
     }
     
     if request.method == "GET":
