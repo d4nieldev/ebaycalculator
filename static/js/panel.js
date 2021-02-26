@@ -519,6 +519,8 @@ $(document).ready(function(){
     $(document).on("keyup", '.form-add-sale', calc_profit_form)
 
     $(document).on("submit", '#form_add_sale', add_sale)
+
+    $(document).on("submit", "#form_hipshipper", add_hipshipper)
     /**
      * Updates the profit in live.
      * @returns nothing when the country is changed
