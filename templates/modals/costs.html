@@ -21,7 +21,7 @@
                             <th>{{ cost.name }}</th>
                             <td>{{cost.value }}</td>
                             <td>
-                                <button data-id="{{ cost.id }}" type="submit" class="btn btn-danger btn-delete-sale" onclick="delete_cost(this)" >
+                                <button data-id="{{ cost.id }}" type="submit" class="btn btn-danger btn-delete-cost">
                                     <i class="fa fa-trash-alt fa-lg"></i>
                                 </button>
                             </td>
@@ -29,7 +29,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <form id='cost-register' onsubmit="add_cost(event)">
+                <form id='cost-register'>
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-5">

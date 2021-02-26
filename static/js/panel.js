@@ -160,7 +160,7 @@ function filter_gifts_by_date(){
             // if there are gifts in this time period, create the table with the values from the server.
             if (!data.data){
                 // create the table structure
-                var headers = "<thead><tr class='headerrow-gift'><th scope='col'>Date</th><th scope='col'>Gift Amount</th><th scope='col'>Tax</th></tr></thead>"
+                var headers = "<thead><tr class='headerrow-gift'><th scope='col'>Date</th><th scope='col'>Gift Amount</th><th scope='col'>Tax</th><td></td></tr></thead>"
                 $(headers).appendTo("#table_gifts")
 
                 $(function() {
@@ -182,7 +182,8 @@ function filter_gifts_by_date(){
                         var $tr = $('<tr>').append(
                             $('<th>').text(month + day + ', ' + year),
                             $('<td>').text(item.fields.gift_money),
-                            $('<td>').text(item.fields.gift_tax)
+                            $('<td>').text(item.fields.gift_tax),
+                            $('<td>').html('<button data-id="'+ item.pk +'" data-amount="'+ item.fields.gift_money +'" data-tax="'+ item.fields.gift_tax +'" type="submit" class="btn btn-danger btn-delete-gift"><i class="fa fa-trash-alt fa-lg"></i></button>')
                         ).appendTo("#gifts_table_body")
                     });
                 });
@@ -219,6 +220,10 @@ function add_balance(e){
         // get the new dates and set the gifts date to current date.
         set_gifts_date();
         
+        // reset the textboxes
+        $("#f_gift_money").val('');
+        $("#f_gift_tax").val('');
+
         // get the new balance value and update it in the toolbar and in the modal
         balance = Math.round((parseFloat(response.balance) + Number.EPSILON) * 100) / 100
         $('#div_user_balance').html("$" + balance)
@@ -226,10 +231,52 @@ function add_balance(e){
 
         // show the new total profit
         $("#total-profit").html("$" + (parseFloat($("#total-profit").html().replace('$', '')) - parseFloat($("#f_gift_tax").val())))
+
+        // on success, reload the gifts table to show the new gifts
+        $('#s_filter_gifts_by_date').trigger("change");
     })
     .fail(function(xhr, status, error){
         console.log(xhr)
     })
+}
+
+
+/**
+ * Gets a gift id to delete and deletes the gift associated with this id.
+ */
+function delete_gift(){
+    id = $(this).data("id")
+    gift_amount = $(this).data("amount")
+    gift_tax = $(this).data("tax")
+    gift_value = gift_amount - gift_tax
+
+    if (confirm("Are you sure you want to delete this gift?")){
+        $.ajax({
+            url: '/delete_gift',
+            type:"POST",
+            data:{
+                id: id
+            }
+        })
+        .done(function(data){
+            // get the new dates and set the gifts date to current date.
+            set_gifts_date();
+
+            balance = parseFloat($("#div_user_balance").html().replace('$', '')) - parseFloat(gift_value)
+            $('#div_user_balance').html("$" + balance)
+            $("#balance_modal_title").html("Balance $" + balance)
+
+            // show the new total profit
+            $("#total-profit").html("$" + (parseFloat($("#total-profit").html().replace('$', '')) - parseFloat(gift_tax)))
+
+            // on success, reload the gifts table to show the new gifts
+            $('#s_filter_gifts_by_date').trigger("change");
+        })
+        .fail(function(xhr, status, error){
+            var err = eval("(" + xhr.responseText + ")");
+                alert(err.Message);
+        })
+    }
 }
 
 
@@ -307,11 +354,10 @@ function update_sale(id, value, lastvalue, type){
 
 /**
  * Gets a sale id to delete and deletes the sale associated with this id.
- * @param  {int} item The sale id that has been clicked
  */
-function delete_sale(item){
+function delete_sale(){
     
-    id = $(item).parent("td").data("id");
+    id = $(this).parent("td").data("id");
 
     if (confirm("Are you sure you want to delete this sale?")){
         $.ajax({
@@ -402,7 +448,7 @@ function add_cost(e){
                     var $tr = $('<tr>').append(
                         $('<th>').text(cost_name),
                         $('<td>').text(cost_value),
-                        $('<td>').html("<button data-id='" + item.pk + "' type='submit' class='btn btn-danger btn-delete-sale' onclick='delete_cost(this)' ><i class='fa fa-trash-alt fa-lg'></i></button>")
+                        $('<td>').html("<button data-id='" + item.pk + "' type='submit' class='btn btn-danger btn-delete-cost' ><i class='fa fa-trash-alt fa-lg'></i></button>")
                     ).appendTo("#costs_table_body")
                 });
             });
@@ -419,9 +465,9 @@ function add_cost(e){
  * Sends the relevant data to the backend to delete a cost
  * @param {int} item The id of the item that has been clicked
  */
-function delete_cost(item){
+function delete_cost(e){
     
-    id = $(item).data("id")
+    id = $(this).data("id")
 
     if (confirm("Are you sure you want to delete this cost?")){
         $.ajax({
@@ -545,6 +591,14 @@ $(document).ready(function(){
     $(document).on("submit", "#form_hipshipper", add_hipshipper)
 
     $(document).on("submit", '#balance-form', add_balance)
+
+    $(document).on("submit", '#cost-register', add_cost)
+
+    $(document).on("click", ".btn-delete-cost", delete_cost)
+
+    $(document).on("click", ".btn-delete-sale", delete_sale)
+
+    $(document).on("click", '.btn-delete-gift', delete_gift)
     /**
      * Updates the profit in live.
      * @returns nothing when the country is changed

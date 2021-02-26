@@ -204,6 +204,17 @@ class Gift(models.Model):
         balance_obj.save()
 
         super(Gift, self).save(*args, **kwargs)
+    
+
+    def delete(self, *args, **kwargs):
+        '''
+        Subtract the gift value from the balance
+        '''
+        balance_obj = Balance.objects.get(user=self.user)
+        balance_obj.balance -= self.calc_gift_value()
+        balance_obj.save()
+
+        super(Gift, self).delete(*args, **kwargs)
 
     def __str__(self):
         '''

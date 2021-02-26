@@ -191,6 +191,30 @@ def add_balance(request):
 
 
 @csrf_exempt
+def delete_gift(request):
+    """Deletes a given gift
+
+    Attributes
+    ----------
+    request : django.HttpRequest
+        the request that triggered this function
+    """
+    if request.method == 'POST':
+        id = request.POST.get('id', '')
+
+        Gift.objects.get(id=id).delete()
+
+        # get the relevant gifts
+        gifts_qs = Gift.objects.filter(user=request.user.id)
+        
+        # serialize the query set so it could be given as a json response
+        data = serializers.serialize('json', gifts_qs, fields=('id', 'gift_amount', 'gift_tax'))
+        return HttpResponse(data, content_type="application/json")
+
+    return JsonResponse({"data":"no data"})
+
+
+@csrf_exempt
 def add_cost(request):
     '''
     Creates a new Cost object.

@@ -57,7 +57,7 @@ class GiftForm(ModelForm):
         exclude = ('user',)
         widgets = {
             'date': DateInput(attrs={'class': 'form-control', 'value': date.today, 'id':'f_gift_date'}),
-            'gift_money': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gift Card (100, 300 ...)', 'id':'f_gift_money', 'onkeyup': 'calc_add_to_balance()'}),
+            'gift_money': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gift Card (103, 206 ...)', 'id':'f_gift_money', 'onkeyup': 'calc_add_to_balance()'}),
             'gift_tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Tax', 'id':'f_gift_tax', 'onkeyup': 'calc_add_to_balance()'}),
         }
 
