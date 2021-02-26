@@ -38,16 +38,16 @@ class SaleEntryForm(ModelForm):
         model = SaleEntry
         exclude = ('user',)
         widgets = {
-            'date': DateInput(attrs={'class': 'form-control', 'id':'f_date'}),
-            'ebay_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'eBay Price', 'id':'f_ebay_price', 'onkeyup': 'calc_profit()'}),
-            'amazon_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Amazon Price', 'id':'f_amazon_price', 'onkeyup': 'calc_profit()'}),
-            'ebay_tax': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'eBay Tax', 'id':'f_ebay_tax', 'onkeyup': 'calc_profit()'}),
-            'paypal_tax': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'Paypal Tax', 'id':'f_paypal_tax', 'onkeyup': 'calc_profit()'}),
-            'tm_fee': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'TM Fee', 'id':'f_tm_fee', 'onkeyup': 'calc_profit()'}),
-            'promoted': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'Promoted', 'id':'f_promoted', 'onkeyup': 'calc_profit()'}),
+            'date': DateInput(attrs={'class': 'form-control form-add-sale', 'id':'f_date'}),
+            'ebay_price': forms.NumberInput(attrs={'class': 'form-control form-add-sale', 'placeholder': 'eBay Price', 'id':'f_ebay_price'}),
+            'amazon_price': forms.NumberInput(attrs={'class': 'form-control form-add-sale', 'placeholder': 'Amazon Price', 'id':'f_amazon_price'}),
+            'ebay_tax': forms.NumberInput(attrs={'class': 'form-control col-1 form-add-sale', 'placeholder': 'eBay Tax', 'id':'f_ebay_tax'}),
+            'paypal_tax': forms.NumberInput(attrs={'class': 'form-control col-1 form-add-sale', 'placeholder': 'Paypal Tax', 'id':'f_paypal_tax'}),
+            'tm_fee': forms.NumberInput(attrs={'class': 'form-control col-1 form-add-sale', 'placeholder': 'TM Fee', 'id':'f_tm_fee'}),
+            'promoted': forms.NumberInput(attrs={'class': 'form-control col-1 form-add-sale', 'placeholder': 'Promoted', 'id':'f_promoted'}),
             'profit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Profit', 'readonly':'true', 'id':'f_profit'}),
-            'discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Discount', 'id':'f_discount'}),
-            'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Country', 'id':'f_country'}),
+            'discount': forms.NumberInput(attrs={'class': 'form-control form-add-sale', 'placeholder': 'Discount', 'id':'f_discount'}),
+            'country': forms.TextInput(attrs={'class': 'form-control form-add-sale', 'placeholder': 'Country', 'id':'f_country'}),
         }
 
 

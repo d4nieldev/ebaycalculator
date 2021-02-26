@@ -1,3 +1,4 @@
+{% load filters %}
 <!--View Sales-->
 <table id="table_sales" class="table table-dark table-striped table-sticky table-hover">
     <thead>
@@ -23,14 +24,14 @@
         <tr>
             <th class="text-success">{{ sale.id }}</th>
             <th>{{ sale.date }}</th>
-            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_price">{{ sale.ebay_price|floatformat }}</td>
-            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="amazon_price">{{ sale.amazon_price|floatformat }}</td>
-            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_tax">{{ sale.ebay_tax|floatformat }}</td>
-            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="paypal_tax">{{ sale.paypal_tax|floatformat }}</td>
-            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="tm_fee">{{ sale.tm_fee|floatformat }}</td>
-            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="promoted">{{ sale.promoted|floatformat }}</td>
-            <td class="sumtable" id="loop" data-id="{{ sale.id }}" data-type="profit">{{ sale.profit|floatformat }}</th>
-            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="discount">{{ sale.discount|floatformat }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_price">{{ sale.ebay_price|roundFloat:2 }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="amazon_price">{{ sale.amazon_price|roundFloat:2 }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_tax">{{ sale.ebay_tax|roundFloat:2 }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="paypal_tax">{{ sale.paypal_tax|roundFloat:2 }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="tm_fee">{{ sale.tm_fee|roundFloat:2 }}</td>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="promoted">{{ sale.promoted|roundFloat:2 }}</td>
+            <td class="sumtable" id="loop" data-id="{{ sale.id }}" data-type="profit">{{ sale.profit|roundFloat:2 }}</th>
+            <td class="editable sumtable" data-id="{{ sale.id }}" data-type="discount">{{ sale.discount|roundFloat:2 }}</td>
             <td class="editable" data-id="{{ sale.id }}" data-type="country">
                 <table>
                     <tr>
@@ -44,12 +45,12 @@
                                 <td class="bg-info text-center text-secondary w-25">
                                     <span>Buyer</span>
                                     <br />
-                                    <div id="div_hipshipper_buyer">{{ hip.buyer_paid|floatformat }}</div>
+                                    <div id="div_hipshipper_buyer">{{ hip.buyer_paid|roundFloat:2 }}</div>
                                 </td>
                                 <td class="bg-primary text-center px-4">
                                     <span>Seller</span>
                                     <br />
-                                    <div id="div_hipshipper_seller">{{ hip.seller_paid|floatformat }}</div>
+                                    <div id="div_hipshipper_seller">{{ hip.seller_paid|roundFloat:2 }}</div>
                                     
                                 </td>
                             {% endif %}
