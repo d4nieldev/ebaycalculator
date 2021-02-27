@@ -41,7 +41,7 @@ function sum_sales_table() {
 
 
 /**
- * Calculates the profit from the form inputs and prints it in the profit input.
+ * Calculates the profit from the add sale form inputs and prints it in the profit input.
  */
 function calc_profit_form() {
     
@@ -572,6 +572,7 @@ $(document).ready(function(){
 
     calc_total_date_profit();
     
+    // editable tables
     $(document).on("dblclick", ".editable", change_editable)
 
     $(document).on("blur", ".input-data", send_to_update_sale)
@@ -579,26 +580,29 @@ $(document).ready(function(){
     $(document).on("keypress", ".input-data", function(e){
         var key = e.which;
         if (key == 13){
-            send_to_update_sale();
+            $(this).trigger("blur");
         }
     });
 
+    // calc profit live on sale creation
+    $(document).on("keyup", '#form_add_sale input[type="Number"]', calc_profit_form)
 
-    $(document).on("keyup", '.form-add-sale', calc_profit_form)
+    // $(document).on("submit", '#form_filter_sales', )
 
+    // submit forms
     $(document).on("submit", '#form_add_sale', add_sale)
-
     $(document).on("submit", "#form_hipshipper", add_hipshipper)
-
     $(document).on("submit", '#balance-form', add_balance)
-
     $(document).on("submit", '#cost-register', add_cost)
 
-    $(document).on("click", ".btn-delete-cost", delete_cost)
+    // delete models
+    $(document).on("click", "#table_costs .btn-delete-cost", delete_cost)
+    $(document).on("click", "#table_sales .btn-delete-sale", delete_sale)
+    $(document).on("click", '#table_gifts .btn-delete-gift', delete_gift)
 
-    $(document).on("click", ".btn-delete-sale", delete_sale)
-
-    $(document).on("click", '.btn-delete-gift', delete_gift)
+    // calc add to balance live on gift creation
+    $(document).on("keyup", '.add-gift-form', calc_add_to_balance)
+    
     /**
      * Updates the profit in live.
      * @returns nothing when the country is changed
@@ -606,13 +610,13 @@ $(document).ready(function(){
     $(document).on("keyup", ".input-data", function(){
 
         // get the values
+        var td = $(this).parent("td");
         var type = td.data("type");
         if (type == "country"){return;}
 
         var value = $(this).val();
         if (value == null){ value = 0; }
 
-        var td = $(this).parent("td");
         var lastvalue = parseFloat(td.data("lastvalue"));
         var profit = parseFloat(td.data("originalProfit"))
 

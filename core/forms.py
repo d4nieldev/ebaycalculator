@@ -38,16 +38,16 @@ class SaleEntryForm(ModelForm):
         model = SaleEntry
         exclude = ('user',)
         widgets = {
-            'date': DateInput(attrs={'class': 'form-control form-add-sale', 'id':'f_date'}),
-            'ebay_price': forms.NumberInput(attrs={'class': 'form-control form-add-sale', 'placeholder': 'eBay Price', 'id':'f_ebay_price'}),
-            'amazon_price': forms.NumberInput(attrs={'class': 'form-control form-add-sale', 'placeholder': 'Amazon Price', 'id':'f_amazon_price'}),
-            'ebay_tax': forms.NumberInput(attrs={'class': 'form-control col-1 form-add-sale', 'placeholder': 'eBay Tax', 'id':'f_ebay_tax'}),
-            'paypal_tax': forms.NumberInput(attrs={'class': 'form-control col-1 form-add-sale', 'placeholder': 'Paypal Tax', 'id':'f_paypal_tax'}),
-            'tm_fee': forms.NumberInput(attrs={'class': 'form-control col-1 form-add-sale', 'placeholder': 'TM Fee', 'id':'f_tm_fee'}),
-            'promoted': forms.NumberInput(attrs={'class': 'form-control col-1 form-add-sale', 'placeholder': 'Promoted', 'id':'f_promoted'}),
+            'date': DateInput(attrs={'class': 'form-control', 'id':'f_date'}),
+            'ebay_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'eBay Price', 'id':'f_ebay_price'}),
+            'amazon_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Amazon Price', 'id':'f_amazon_price'}),
+            'ebay_tax': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'eBay Tax', 'id':'f_ebay_tax'}),
+            'paypal_tax': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'Paypal Tax', 'id':'f_paypal_tax'}),
+            'tm_fee': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'TM Fee', 'id':'f_tm_fee'}),
+            'promoted': forms.NumberInput(attrs={'class': 'form-control col-1', 'placeholder': 'Promoted', 'id':'f_promoted'}),
             'profit': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Profit', 'readonly':'true', 'id':'f_profit'}),
-            'discount': forms.NumberInput(attrs={'class': 'form-control form-add-sale', 'placeholder': 'Discount', 'id':'f_discount'}),
-            'country': forms.TextInput(attrs={'class': 'form-control form-add-sale', 'placeholder': 'Country', 'id':'f_country'}),
+            'discount': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Discount', 'id':'f_discount'}),
+            'country': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Country', 'id':'f_country'}),
         }
 
 
@@ -57,8 +57,8 @@ class GiftForm(ModelForm):
         exclude = ('user',)
         widgets = {
             'date': DateInput(attrs={'class': 'form-control', 'value': date.today, 'id':'f_gift_date'}),
-            'gift_money': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Gift Card (103, 206 ...)', 'id':'f_gift_money', 'onkeyup': 'calc_add_to_balance()'}),
-            'gift_tax': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Tax', 'id':'f_gift_tax', 'onkeyup': 'calc_add_to_balance()'}),
+            'gift_money': forms.NumberInput(attrs={'class': 'form-control add-gift-form', 'placeholder': 'Gift Card (103, 206 ...)', 'id':'f_gift_money'}),
+            'gift_tax': forms.NumberInput(attrs={'class': 'form-control add-gift-form', 'placeholder': 'Tax', 'id':'f_gift_tax'}),
         }
 
 
@@ -74,7 +74,7 @@ class CostForm(ModelForm):
 class HipShipperForm(ModelForm):
     class Meta:
         model = HipShipper
-        fields = '__all__'
+        exclude = ('sale_entry',)
         widgets = {
             'buyer_paid': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buyer Paid', 'id':'f_buyer_paid'}),
             'seller_paid': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Seller Paid', 'id':'f_seller_paid'}),

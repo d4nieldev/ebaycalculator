@@ -9,7 +9,7 @@
 {% include 'modals/hipshipper.html' %}
 <div class="container-fluid my-3">
     <!--Filter Sales-->
-    <form onsubmit="filter_sales(event)">
+    <form id="form_filter_sales">
         {% csrf_token %}
         <div class="row">
             <div class="col-2">

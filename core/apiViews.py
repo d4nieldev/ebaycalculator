@@ -68,7 +68,7 @@ def update_sale(request):
     # tell the server that the sale is updated and the update type with the value
     kwargs = {
         'update_type':type,
-        'update_value_diff':float(value) - float(lastvalue)
+        'update_value_diff':(float(value) - float(lastvalue)) if type != 'country' else value
         }
 
     # recalculate the profit
@@ -283,10 +283,20 @@ def add_hipshipper(request):
     if request.method == 'POST':
         form = HipShipperForm(request.POST)
         if form.is_valid():
-            # save the object with the selected sale.
-            hipshipper = form.save(commit=False)
-            hipshipper.sale_entry = SaleEntry.objects.get(id=request.POST['sale_entry'])
+            
+            if HipShipper.objects.filter(sale_entry=SaleEntry.objects.get(id=request.POST['sale_entry'])).count == 0: # new hipshipper
+                # save the object with the selected sale.
+                hipshipper = form.save(commit=False)
+                hipshipper.sale_entry = SaleEntry.objects.get(id=request.POST['sale_entry'])
+            else:
+                hipshipper = HipShipper.objects.get(sale_entry=SaleEntry.objects.get(id=request.POST['sale_entry']))
+                hipshipper.buyer_paid = request.POST['buyer_paid']
+                hipshipper.seller_paid = request.POST['seller_paid']
+
             hipshipper.save()
+            
+            hipshipper.sale_entry.profit = hipshipper.sale_entry.calc_profit()
+            hipshipper.sale_entry.save()
             
             return JsonResponse({"success": request.POST})
 

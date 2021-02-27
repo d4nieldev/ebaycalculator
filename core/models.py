@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class Balance(models.Model):
@@ -97,7 +98,12 @@ class SaleEntry(models.Model):
             return profit
         else:
             # country is something else - consider the hipshipper prices
-            hipshipper_obj = HipShipper.objects.get(sale_entry=self)
+            try:
+                hipshipper_obj = HipShipper.objects.get(sale_entry=self)
+            except ObjectDoesNotExist:
+                hipshipper_obj = HipShipper(sale_entry=self, buyer_paid=0, seller_paid=0)
+                hipshipper_obj.save()
+
             return profit + hipshipper_obj.buyer_paid - hipshipper_obj.seller_paid
 
 
@@ -120,7 +126,7 @@ class SaleEntry(models.Model):
             
         else:
             # there is a primary key already, so the object updated.
-            if kwargs["update_type"]:
+            if kwargs.get('update_type'):
                 type = kwargs.pop("update_type") # What was updated?
                 value = kwargs.pop("update_value_diff") # How did the value change?
 
@@ -283,13 +289,6 @@ class HipShipper(models.Model):
     buyer_paid = models.FloatField()
     seller_paid = models.FloatField()
     sale_entry = models.OneToOneField(SaleEntry, on_delete=models.CASCADE, default=0)
-
-    def save(self, *args, **kwargs):
-        '''Adding the profit from shipping to total profit'''
-        self.sale_entry.profit += self.buyer_paid - self.seller_paid
-        self.sale_entry.save()
-
-        super(HipShipper, self).save(*args, **kwargs)
 
     def __str__(self):
         '''
