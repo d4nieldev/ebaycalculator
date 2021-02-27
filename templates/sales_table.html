@@ -21,7 +21,11 @@
     <tbody>
         <!--Data-->
         {% for sale in user_sales %}
+        {% if sale in returned_sales %}
+        <tr id="bootstrap-overrides" class='warningrow'>
+        {% else %}
         <tr>
+        {% endif %}
             <th class="text-success">{{ sale.id }}</th>
             <th>{{ sale.date }}</th>
             <td class="editable sumtable" data-id="{{ sale.id }}" data-type="ebay_price">{{ sale.ebay_price|roundFloat:2 }}</td>
@@ -32,47 +36,50 @@
             <td class="editable sumtable" data-id="{{ sale.id }}" data-type="promoted">{{ sale.promoted|roundFloat:2 }}</td>
             <td class="sumtable" id="loop" data-id="{{ sale.id }}" data-type="profit">{{ sale.profit|roundFloat:2 }}</th>
             <td class="editable sumtable" data-id="{{ sale.id }}" data-type="discount">{{ sale.discount|roundFloat:2 }}</td>
-            <td class="editable" data-id="{{ sale.id }}" data-type="country">
-                <table>
-                    <tr>
-                        <td class="get-country w-100">
-                            {{ sale.country }}
-                        </td>
-                    </tr>
-                    <tr class="w-100">
-                        {% for hip in hipshippers %}
-                            {% if hip.sale_entry == sale %}
-                                <td class="bg-info text-center text-secondary w-25">
-                                    <span>Buyer</span>
-                                    <br />
-                                    <div id="div_hipshipper_buyer">{{ hip.buyer_paid|roundFloat:2 }}</div>
-                                </td>
-                                <td class="bg-primary text-center px-4">
-                                    <span>Seller</span>
-                                    <br />
-                                    <div id="div_hipshipper_seller">{{ hip.seller_paid|roundFloat:2 }}</div>
-                                    
-                                </td>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
-                </table>
-                
+            <td class="editable text-center" data-id="{{ sale.id }}" data-type="country" >
+            <table style="width: 90%;">
+                {% if sale.country != '-----' %}
+                <tr class="bg-secondary">
+                {% else %}
+                <tr>
+                {% endif %}
+                    <td class="get-country col-12 text-center" colspan="2">
+                        {{ sale.country }}
+                    </td>
+                </tr>
+                <tr>
+                    {% for hip in hipshippers %}
+                        {% if hip.sale_entry == sale %}
+                            <td class="bg-info text-center text-secondary col-6">
+                                <span>Buyer</span>
+                                <br />
+                                <div id="div_hipshipper_buyer">{{ hip.buyer_paid|roundFloat:2 }}</div>
+                            </td>
+                            <td class="bg-primary text-center col-6">
+                                <span>Seller</span>
+                                <br />
+                                <div id="div_hipshipper_seller">{{ hip.seller_paid|roundFloat:2 }}</div>
+                                
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </table>
             </td>
-            <td data-id="{{ sale.id }}" data-type="submit">
+            <td data-id="{{ sale.id }}" data-type="submit" class='text-center'>
+                <button data-id="{{ sale.id }}" type="submit" class="btn btn-warning btn-return-sale" >
+                    <i class="fa fa-undo-alt fa-lg"></i>
+                </button>
                 <button data-id="{{ sale.id }}" type="submit" class="btn btn-danger btn-delete-sale" >
                     <i class="fa fa-trash-alt fa-lg"></i>
                 </button>
             </td>
         </tr>
         {% endfor %}
-        
-        <!--Register Sale-->
-        <tr>
-            
-        </tr>
     </tbody>
 </table>
+
+
 <form id="form_add_sale">
     {% csrf_token %}
     <table class="table table-dark table-striped table-hover">

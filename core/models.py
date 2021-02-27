@@ -305,3 +305,39 @@ class HipShipper(models.Model):
         return f'{self.sale_entry.user}({self.sale_entry.country}) - {self.buyer_paid - self.seller_paid}'
 
 
+class ReturnedSale(models.Model):
+    """
+    When a user returnes a sale, it is saved in this table for the report
+
+    Attributes
+    ----------
+    sale : SaleEntry
+        The sale that was returned
+    date_of_return : datetime.date
+        The date of return
+    """
+    sale = models.OneToOneField(SaleEntry, on_delete=models.CASCADE, default=0)
+    date_of_return = models.DateField()
+
+
+    def save(self, *args, **kwargs):
+        if not self.pk: 
+            # sale has been returned - add amazon price to balance
+            balance_obj = Balance.objects.get(user=self.sale.user)
+            balance_obj.balance += self.sale.amazon_price
+            balance_obj.save()
+
+        super(ReturnedSale, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs): 
+        # sale return was canceled - substract amazon price from balance
+        balance_obj = Balance.objects.get(user=self.sale.user)
+        balance_obj.balance -= self.sale.amazon_price
+        balance_obj.save()
+
+        super(ReturnedSale, self).delete(*args, **kwargs)
+
+    def __str__(self):
+        return f'[{self.date_of_return}] {self.sale}'
+
+

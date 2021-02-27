@@ -11,7 +11,7 @@ from django.contrib import messages
 
 from .forms import SignUpForm, SaleEntryForm, GiftForm, CostForm, HipShipperForm
 
-from .models import SaleEntry, Balance, Gift, Cost, HipShipper
+from .models import SaleEntry, Balance, Gift, Cost, HipShipper, ReturnedSale
 
 
 def HANDLE_LOGIN_BASE(request, current_page, context):
@@ -160,6 +160,14 @@ def panel(request):
     
     View the panel HTML page
     '''
+    user_sales = SaleEntry.objects.filter(user=request.user.id).order_by('date')
+
+    user_returned_sales = []
+    for sale in user_sales:
+        if ReturnedSale.objects.filter(sale=sale).count() != 0:
+            # returned sale found
+            user_returned_sales.append(sale)
+
     context = {
         'years_months': GET_SALES_YEARS_MONTHS(request),
         'gifts_years_months': GET_GIFTS_YEARS_MONTHS(request),
@@ -167,10 +175,11 @@ def panel(request):
         'giftform': GiftForm(),
         'costform': CostForm(),
         'hipshipperform': HipShipperForm(),
-        'user_sales': SaleEntry.objects.filter(user=request.user.id).order_by('date'),
+        'user_sales': user_sales,
         'hipshippers': HipShipper.objects.all(),
         'user_balance': Balance.objects.get(user=request.user).balance,
-        'costs': Cost.objects.filter(user=request.user)
+        'costs': Cost.objects.filter(user=request.user),
+        'returned_sales': user_returned_sales
     }
     
     if request.method == "GET":

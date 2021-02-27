@@ -57,3 +57,6 @@ body {
     --bs-table-accent-bg: #5bc0de;
     color: black;
 }
+#bootstrap-overrides.warningrow{
+    --bs-table-accent-bg: #f0ad4e;
+}

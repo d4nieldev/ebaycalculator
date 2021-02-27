@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load filters %}
 {% block title %}Panel{% endblock %}
 {% block head %}
 <script src="{% static 'js/panel.js' %}" type="text/javascript"></script>
@@ -29,11 +30,12 @@
             <div class="col-1">
                 <input type="submit" class="btn btn-secondary" name="btn_select_date" value="Filter">
             </div>
-            <div class="col-1 text-center rounded" style="font-size: 1.5rem;" id="total-profit">
-                {% for cost in costs %}
-                    <span class="hidden-cost" style="display: none;">{{ cost.value }}</span>
-                {% endfor %}
-            </div>
+            <span class='col'>
+                <div class="align-middle">
+                    <span class="display-6">Triplemars Status: </span>
+                    <span id="div_user_balance" class="display-6">${{ user_balance|roundFloat:2 }}</span>
+                </div>
+            </span>
         </div>
     </form>
 

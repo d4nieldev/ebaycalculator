@@ -1,6 +1,9 @@
 // Globals
 PROFIT_INDEX = 6;
-
+ORIGIN_PARSEFLOAT = parseFloat;
+parseFloat = function(value){
+    return Math.round((ORIGIN_PARSEFLOAT(value) + Number.EPSILON) * 100) / 100;
+}
 
 /**
  * Adds a sum row at the end of the sales table.
@@ -10,33 +13,35 @@ function sum_sales_table() {
     var result = [];
     
     // iterate over each row and find all the numbers that are needed to sum up.
-    $('#table_sales tr').each(function(){
-        $('td.sumtable', this).each(function(index, val){
-            // sum up the numbers and give in to result array.
-            if(!result[index]) result[index] = 0;
-            result[index] += parseFloat($(val).text());
-        });
+    $('#table_sales > tbody > tr').each(function(){
+        if ($(this).attr("id") != "bootstrap-overrides"){
+            $('td.sumtable', this).each(function(index, val){
+                // sum up the numbers and give in to result array.
+                if(!result[index]) result[index] = 0;
+                result[index] += parseFloat($(val).text());
+            });
+        }
     });
     
     // create and design the sum row
-    $('#table_sales').find("tr:last").prev().after('<tr id="bootstrap-overrides" class="greenrow"></tr>');
-    $('#table_sales').find("tr:last").prev().append('<th class="align-middle"><i class="fa fa-hashtag fa-md"></i></th>');
-    $('#table_sales').find("tr:last").prev().append('<th>Total</th>');
+    $('#table_sales > tbody:last-child').append('<tr id="bootstrap-overrides" class="greenrow"></tr>');
+    $('#table_sales > tbody:last-child > tr:last').append('<th class="align-middle"><i class="fa fa-hashtag fa-md"></i></th>');
+    $('#table_sales > tbody:last-child > tr:last').append('<th>Total</th>');
 
     // print the sum row numbers
     $(result).each(function(i){
         if (i == PROFIT_INDEX){
-            $('#table_sales').find("tr:last").prev().append('<th id="total_sum_profit">'+ this.toFixed(2) +'</th>')
+            $('#table_sales > tbody:last-child > tr:last').append('<th id="total_sum_profit">'+ parseFloat(this) +'</th>')
         }
         else{
-            $('#table_sales').find("tr:last").prev().append('<th>'+ this.toFixed(2) +'</th>')
+            $('#table_sales > tbody:last-child > tr:last').append('<th>'+ parseFloat(this) +'</th>')
         }
         
     });
 
     // fill out blank columns
-    $('#table_sales').find("tr:last").prev().append('<th></th>')
-    $('#table_sales').find("tr:last").prev().append('<th></th>')
+    $('#table_sales > tbody:last-child > tr:last').append('<th></th>')
+    $('#table_sales > tbody:last-child > tr:last').append('<th></th>')
 }
 
 
@@ -100,9 +105,8 @@ function calc_total_date_profit(){
             $.each(data, function(i, item) {
                 gifts_tax += parseFloat(item.fields.gift_tax);
             });
-            // calculate and round the total to 2 digits after the decimal.
+            // calculate the total profit
             total = parseFloat(profit) - parseFloat(costs) - parseFloat(gifts_tax)
-            total = Math.round((total + Number.EPSILON) * 100) / 100
 
             // if the total profit is grater than 0, show it in green, else show it in red.
             if (total < 0) $("#total-profit").addClass("bg-danger") 
@@ -221,10 +225,6 @@ function add_balance(e){
     .done(function(response){
         // get the new dates and set the gifts date to current date.
         set_gifts_date();
-        
-        // reset the textboxes
-        $("#f_gift_money").val('');
-        $("#f_gift_tax").val('');
 
         // get the new balance value and update it in the toolbar and in the modal
         balance = Math.round((parseFloat(response.balance) + Number.EPSILON) * 100) / 100
@@ -232,10 +232,14 @@ function add_balance(e){
         $("#balance_modal_title").html("Balance $" + balance)
 
         // show the new total profit
-        $("#total-profit").html("$" + (parseFloat($("#total-profit").html().replace('$', '')) - parseFloat($("#f_gift_tax").val())))
+        $("#total-profit").html("$" + (parseFloat($("#total-profit").html().replace('$', '')) - parseFloat($("#f_gift_tax").val())));
 
         // on success, reload the gifts table to show the new gifts
         $('#s_filter_gifts_by_date').trigger("change");
+
+        // reset the textboxes
+        $("#f_gift_money").val('');
+        $("#f_gift_tax").val('');
     })
     .fail(function(xhr, status, error){
         console.log(xhr)
@@ -565,6 +569,58 @@ function change_editable(){
 }
 
 
+function return_sale(){
+    tr = $(this).parent("td").parent("tr")
+
+    if (tr.attr('id') == "bootstrap-overrides"){
+        // sale is coming back to life
+        tr.attr("id", "");
+
+        $.ajax({
+            url: "/cancel_return_sale",
+            type: "POST",
+            data: {
+                sale_id: $(this).data('id'),
+            },
+            success:function(data){
+                // update total profit
+                $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) + parseFloat(data.profit)))
+            }
+        })
+        .fail(function(data){
+            console.log(data);
+        });
+    }
+    else{
+        // sale is being returned
+        tr.attr("id", "bootstrap-overrides");
+
+        $.ajax({
+            url: "/return_sale",
+            type: "POST",
+            data: {
+                sale_id: $(this).data('id'),
+            },
+            success:function(data){
+                // update total profit
+                $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) - parseFloat(data.profit)))
+            }
+        })
+        .fail(function(data){
+            console.log(data);
+        });
+    }
+
+    tr.toggleClass('warningrow');
+    // reload sales table and sum row
+    $("#table_sales").load(location.href + " #table_sales");
+
+    //update balance
+    $("#div_user_balance").load(location.href + " #div_user_balance")
+    $("#balance_modal_title").load(location.href + " #balance_modal_title")
+}
+
+
 
 $(document).ready(function(){
     
@@ -601,6 +657,9 @@ $(document).ready(function(){
     $(document).on("click", "#table_costs .btn-delete-cost", delete_cost)
     $(document).on("click", "#table_sales .btn-delete-sale", delete_sale)
     $(document).on("click", '#table_gifts .btn-delete-gift', delete_gift)
+
+    // return sale
+    $(document).on('click', "#table_sales .btn-return-sale", return_sale)
 
     // calc add to balance live on gift creation
     $(document).on("keyup", '.add-gift-form', calc_add_to_balance)

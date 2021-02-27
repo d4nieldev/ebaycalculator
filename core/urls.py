@@ -18,4 +18,6 @@ urlpatterns = [
     path('delete_cost', apiViews.delete_cost, name="delete_cost"),
     path('add_hipshipper', apiViews.add_hipshipper, name="add_hipshipper"),
     path('delete_gift', apiViews.delete_gift, name="delete_gift"),
+    path('return_sale', apiViews.return_sale, name="return_sale"),
+    path('cancel_return_sale', apiViews.cancel_return_sale, name="cancel_return_sale")
 ]

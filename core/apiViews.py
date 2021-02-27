@@ -1,3 +1,5 @@
+import datetime
+
 from django.views.decorators.csrf import csrf_exempt
 
 from django.core import serializers
@@ -9,7 +11,7 @@ from django.contrib.auth import logout
 from django.shortcuts import redirect, HttpResponse
 
 from django.contrib.auth.models import User
-from .models import SaleEntry, Balance, Gift, Cost, HipShipper
+from .models import SaleEntry, Balance, Gift, Cost, HipShipper, ReturnedSale
 
 from .forms import SaleEntryForm, GiftForm, CostForm, HipShipperForm
 
@@ -303,3 +305,30 @@ def add_hipshipper(request):
     return JsonResponse({
         "fail": request.POST,
         "errors": form.errors})
+
+
+@csrf_exempt
+def return_sale(request):
+    if request.method == 'POST':
+        sale = SaleEntry.objects.get(id=request.POST['sale_id'])
+        returned_sale = ReturnedSale(sale=sale, date_of_return=datetime.date.today())
+        returned_sale.save()
+
+        return JsonResponse({
+            "success": f'sale [{sale}] was returned',
+            'profit': sale.profit,
+            })
+    return JsonResponse({"error": "an error occured"})
+
+
+@csrf_exempt
+def cancel_return_sale(request):
+    if request.method == 'POST':
+        sale = SaleEntry.objects.get(id=request.POST['sale_id'])
+        ReturnedSale.objects.get(sale=sale).delete()
+
+        return JsonResponse({
+            "success": f'sale [{sale}] was returned',
+            'profit': sale.profit,
+            })
+    return JsonResponse({"error": "an error occured"})
