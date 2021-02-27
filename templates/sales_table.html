@@ -68,21 +68,26 @@
         {% endfor %}
         
         <!--Register Sale-->
-        <form id="form_add_sale">
-            {% csrf_token %}
-            <tr>
-                <th class="align-middle"><i class="fa fa-hashtag fa-md"></i></th>
-                {% for field in form %}
-                    {% if field is not form.user %}
-                    <td>
-                        {{ field }}
-                    </td>
-                    {% else %}
-                        {{ field }}
-                    {% endif %}
-                {% endfor %}
-                <td><input class="btn btn-primary" type="submit" display="inline" name="btn_register_sale"></td>
-            </tr>
-        </form>
+        <tr>
+            
+        </tr>
     </tbody>
 </table>
+<form id="form_add_sale">
+    {% csrf_token %}
+    <table class="table table-dark table-striped table-hover">
+        <tr>
+            <th class="align-middle"><i class="fa fa-hashtag fa-md"></i></th>
+            {% for field in form %}
+                {% if field is not form.user %}
+                <td>
+                    {{ field }}
+                </td>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+            {% endfor %}
+            <td><input class="btn btn-primary" type="submit" display="inline" name="btn_register_sale"></td>
+        </tr>
+    </table>
+</form>

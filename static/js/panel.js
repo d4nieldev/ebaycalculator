@@ -44,6 +44,8 @@ function sum_sales_table() {
  * Calculates the profit from the add sale form inputs and prints it in the profit input.
  */
 function calc_profit_form() {
+
+    console.log("click")
     
     // get the values
     ebay_price = $('#f_ebay_price').val();
@@ -585,7 +587,7 @@ $(document).ready(function(){
     });
 
     // calc profit live on sale creation
-    $(document).on("keyup", '#form_add_sale input[type="Number"]', calc_profit_form)
+    $(document).on("keyup", '#form_add_sale input', calc_profit_form)
 
     // $(document).on("submit", '#form_filter_sales', )
 
