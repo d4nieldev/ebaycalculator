@@ -625,7 +625,7 @@ function return_sale(){
 $(document).ready(function(){
     
     set_gifts_date();
-
+    
     sum_sales_table();
 
     calc_total_date_profit();
