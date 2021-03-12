@@ -118,7 +118,8 @@ function calc_total_date_profit(){
             else $("#total-profit").addClass("bg-success")
             
             // print the total profit
-            $("#total-profit").html("$" + total)
+            console.log(total);
+            $("#total-profit").html("$" + parseFloat(total))
         }
     })
     .fail(function(data){
@@ -233,7 +234,7 @@ function add_balance(e){
         set_gifts_date();
 
         // get the new balance value and update it in the toolbar and in the modal
-        balance = Math.round((parseFloat(response.balance) + Number.EPSILON) * 100) / 100
+        balance = parseFloat(response.balance)
         $('#div_user_balance').html("$" + balance)
         $("#balance_modal_title").html("Balance $" + balance)
 
