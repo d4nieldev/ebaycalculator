@@ -27,6 +27,7 @@
                     {% endfor %}
                 </select>
             </div>
+            
             <div class="col-1">
                 <input type="submit" class="btn btn-secondary" name="btn_select_date" value="Filter">
             </div>
@@ -38,6 +39,10 @@
             </span>
         </div>
     </form>
+
+    <a href="#form_add_sale" class="scroll-to-bottom">
+        <i class="fas fa-arrow-down fa-lg"></i>
+    </a>
 
     {% include 'sales_table.html' %}
 

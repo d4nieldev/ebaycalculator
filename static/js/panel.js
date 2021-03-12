@@ -636,6 +636,16 @@ $(document).ready(function(){
     sum_sales_table();
 
     calc_total_date_profit();
+
+    console.log(document.body.scrollHeight)
+    console.log(document.body.clientHeight)
+    if (document.body.scrollHeight != document.body.clientHeight) {
+        // page is scrollable
+        console.log($(document).height())
+        if($(window).scrollTop() + $(window).height() == $(document).height()){
+            // alert("bottom");
+        }
+    }
     
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)

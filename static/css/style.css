@@ -1,3 +1,6 @@
+html{
+    scroll-behavior: smooth;
+}
 body {
     color:white;
 }
@@ -59,4 +62,16 @@ body {
 }
 #bootstrap-overrides.warningrow{
     --bs-table-accent-bg: #f0ad4e;
+}
+
+.scroll-to-bottom{
+    padding: 1%;
+    border-radius: 50%;
+    background-color: #5bc0de;
+    color: white;
+    position: fixed;
+    z-index: 1;
+    bottom: 1%;
+    right: 1%;
+    display: none;
 }
