@@ -106,7 +106,7 @@ function calc_total_date_profit(){
                 gifts_tax += parseFloat(item.fields.gift_tax);
             });
             // calculate the total profit
-            if (parseFloat(profit) == null){
+            if (isNaN(parseFloat(profit))){
                 total = -1 * (parseFloat(costs) + parseFloat(gifts_tax))
             }
             else {
