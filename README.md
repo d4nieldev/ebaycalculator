@@ -13,3 +13,5 @@ Welcome! You have registred to ebay calculator.
 You have a set of operations you can do. one of them is to of course, add a sale!
 ![](add_sale.gif)
 
+SEE?
+
