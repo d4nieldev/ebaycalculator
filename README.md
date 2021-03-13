@@ -12,7 +12,7 @@ First, you need to sign up:
 Welcome! You have registred to ebay calculator.
 You have a set of operations you can do. one of them is to of course, add a sale!
 
-![](add_sale.gif)
+![hippo](https://gph.is/g/aK6R5AY)
 
 SEE?
 
