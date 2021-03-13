@@ -636,16 +636,28 @@ $(document).ready(function(){
     sum_sales_table();
 
     calc_total_date_profit();
-
-    console.log(document.body.scrollHeight)
-    console.log(document.body.clientHeight)
+    /*
     if (document.body.scrollHeight != document.body.clientHeight) {
         // page is scrollable
-        console.log($(document).height())
+        console.log("scrollTop: " + $(window).scrollTop())
+        console.log("window height: " + $(window).height())
+        console.log("body height: " + $("body").height())
+        console.log("document height: " + $(document).height())
         if($(window).scrollTop() + $(window).height() == $(document).height()){
             // alert("bottom");
         }
     }
+    */
+    $(document).scroll(function(){
+        if ($(window).scrollTop() + $(window).height() == $(document).height()){
+            $(".scroll-to-bottom").html("<i class='fas fa-arrow-up fa-lg'></i>");
+            $(".scroll-to-bottom").attr("href", "#top");
+        }
+        else if ($(window).scrollTop() == 0){
+            $(".scroll-to-bottom").html("<i class='fas fa-arrow-down fa-lg'></i>");
+            $(".scroll-to-bottom").attr("href", "#form_add_sale");
+        }
+    });
     
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)
