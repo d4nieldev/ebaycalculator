@@ -414,9 +414,8 @@ function add_hipshipper(e){
         // if successful, refresh the page
         location.reload();
     })
-    .fail(function(xhr, status, error){
-        var err = eval("(" + xhr.responseText + ")");
-            alert(err.Message);
+    .fail(function(xhr){
+        console.log(xhr);
     })
 }
 
@@ -724,11 +723,18 @@ $(document).ready(function(){
         // change the profit on live
         td.parent("tr").find("td").each(function(i){
             if (i == PROFIT_INDEX){
-                $(this).html((profit.toFixed(2)).toString());
+                $(this).html((profit));
             }
-        });
+        }); 
 
+        // if the total profit is grater than 0, show it in green, else show it in red.
+        if (profit < 0) $("#total-profit").addClass("bg-danger").removeClass("bg-success");
+        else $("#total-profit").addClass("bg-success").removeClass("bg-danger");
         
+        // print the total profit
+        $("#total-profit").html("$" + parseFloat(profit))
+        
+
     });
 });
 

@@ -285,8 +285,8 @@ def add_hipshipper(request):
     if request.method == 'POST':
         form = HipShipperForm(request.POST)
         if form.is_valid():
-            
-            if HipShipper.objects.filter(sale_entry=SaleEntry.objects.get(id=request.POST['sale_entry'])).count == 0: # new hipshipper
+            print("COUNT IS: " + str(HipShipper.objects.filter(sale_entry=SaleEntry.objects.get(id=int(request.POST['sale_entry']))).count()))
+            if HipShipper.objects.filter(sale_entry=SaleEntry.objects.get(id=request.POST['sale_entry'])).count() == 0: # new hipshipper
                 # save the object with the selected sale.
                 hipshipper = form.save(commit=False)
                 hipshipper.sale_entry = SaleEntry.objects.get(id=request.POST['sale_entry'])
