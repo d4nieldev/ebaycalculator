@@ -103,6 +103,6 @@ body {
 .table-wrapper-scroll-y{
     display: block;
     position: relative;
-    height: 75vh;
+    height: 50vh;
     overflow: auto;
 }
