@@ -636,24 +636,6 @@ $(document).ready(function(){
 
     calc_total_date_profit();
     
-    if ($(document).height() > $(window).height()){
-        $(document).scroll(function(){
-            if ($(window).scrollTop() + $(window).height() == $(document).height()){
-                $(".scroll-to-bottom").html("<i class='fas fa-arrow-up fa-lg'></i>");
-                $(".scroll-to-bottom").attr("href", "#top");
-                $(".scroll-to-bottom").css("bottom", "94%");
-            }
-            else if ($(window).scrollTop() == 0){
-                $(".scroll-to-bottom").html("<i class='fas fa-arrow-down fa-lg'></i>");
-                $(".scroll-to-bottom").attr("href", "#form_add_sale");
-                $(".scroll-to-bottom").css("bottom", "1%");
-            }
-        });
-    }
-    else{
-        $(".scroll-to-bottom").css("display", "none");
-    }
-    
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)
 
