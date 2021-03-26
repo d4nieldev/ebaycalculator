@@ -1,5 +1,7 @@
 // Globals
 PROFIT_INDEX = 6;
+EBAYTAX_INDEX = 2;
+PROMOTED_INDEX = 5;
 ORIGIN_PARSEFLOAT = parseFloat;
 parseFloat = function(value){
     return Math.round((ORIGIN_PARSEFLOAT(value) + Number.EPSILON) * 100) / 100;
@@ -32,6 +34,12 @@ function sum_sales_table() {
     $(result).each(function(i){
         if (i == PROFIT_INDEX){
             $('#table_sales > tbody:last-child > tr:last').append('<th id="total_sum_profit">'+ parseFloat(this) +'</th>')
+        }
+        else if (i == PROMOTED_INDEX){
+            $('#table_sales > tbody:last-child > tr:last').append('<th id="total_sum_promoted">'+ parseFloat(this) +'</th>')
+        }
+        else if (i == EBAYTAX_INDEX){
+            $('#table_sales > tbody:last-child > tr:last').append('<th id="total_sum_eBay_tax">'+ parseFloat(this) +'</th>')
         }
         else{
             $('#table_sales > tbody:last-child > tr:last').append('<th>'+ parseFloat(this) +'</th>')
@@ -637,6 +645,9 @@ $(document).ready(function(){
     calc_total_date_profit();
 
     $("#sales-count").html("Sales: " + parseFloat($("#table_sales > tbody > tr").length - 1));
+
+    ebay_bill = parseFloat($("#total_sum_eBay_tax").html()) + parseFloat($("#total_sum_promoted").html())
+    $("#ebay-bill").html("Bill: " + -1*ebay_bill);
     
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)
