@@ -599,6 +599,14 @@ function return_sale(){
             success:function(data){
                 // update total profit
                 $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) + parseFloat(data.profit)))
+
+                tr.toggleClass('warningrow');
+                // reload sales table and sum row
+                $("#table_sales").load(location.href + " #table_sales");
+
+                //update balance
+                $("#div_user_balance").load(location.href + " #div_user_balance")
+                $("#balance_modal_title").load(location.href + " #balance_modal_title")
             }
         })
         .fail(function(data){
@@ -618,6 +626,14 @@ function return_sale(){
             success:function(data){
                 // update total profit
                 $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) - parseFloat(data.profit)))
+
+                tr.toggleClass('warningrow');
+                // reload sales table and sum row
+                $("#table_sales").load(location.href + " #table_sales");
+
+                //update balance
+                $("#div_user_balance").load(location.href + " #div_user_balance")
+                $("#balance_modal_title").load(location.href + " #balance_modal_title")
             }
         })
         .fail(function(data){
@@ -625,13 +641,7 @@ function return_sale(){
         });
     }
 
-    tr.toggleClass('warningrow');
-    // reload sales table and sum row
-    $("#table_sales").load(location.href + " #table_sales");
-
-    //update balance
-    $("#div_user_balance").load(location.href + " #div_user_balance")
-    $("#balance_modal_title").load(location.href + " #balance_modal_title")
+    
 }
 
 
