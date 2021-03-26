@@ -160,7 +160,7 @@ def panel(request):
     
     View the panel HTML page
     '''
-    user_sales = SaleEntry.objects.filter(user=request.user.id).order_by('date')
+    user_sales = SaleEntry.objects.filter(user=request.user.id)
 
     user_returned_sales = []
     for sale in user_sales:
@@ -208,6 +208,6 @@ def panel(request):
                     date_to = f'{year}-0{month+1}-15'
                 
 
-                context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__range=[date_from, date_to]).order_by('date')
+                context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__range=[date_from, date_to])
     
     return render(request, 'panel.html', context)
