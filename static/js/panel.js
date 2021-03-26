@@ -635,6 +635,8 @@ $(document).ready(function(){
     sum_sales_table();
 
     calc_total_date_profit();
+
+    $("#sales-count").html("Sales: " + parseFloat($("#table_sales > tbody > tr").length - 1));
     
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)

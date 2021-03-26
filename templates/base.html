@@ -30,19 +30,19 @@
             {% if not user.is_authenticated %}
             <button id="btn_open_login" type="button" class="btn btn-primary" data-toggle="modal" data-target="#sign_in_modal">Sign In</button>
             {% else %}
-            <div class="navbar-text row w-50">
-                <div class="col text-center rounded" style="font-size: 1.5rem;" id="total-profit">
+            <div class="navbar-text row w-50 d-flex justify-content-end">
+                <div class="col-md-auto text-center rounded" style="font-size: 1.5rem;" id="total-profit">
                     {% for cost in costs %}
                         <span class="hidden-cost" style="display: none;">{{ cost.value }}</span>
                     {% endfor %}
                 </div>
-                <span class="col text-center">
+                <span class="col-md-auto text-center">
                     <button id="btn_open_balance" type="button" class="btn btn-primary" data-toggle="modal" data-target="#balance_modal">Balance</button>
                 </span>
-                <span class="col text-center">
+                <span class="col-md-auto text-center">
                     <button id="btn_open_costs" type="button" class="btn btn-primary" data-toggle="modal" data-target="#costs_modal">Costs</button>
                 </span>
-                <span class='col text-center'>
+                <span class='col-md-auto text-center'>
                     <a class='btn btn-danger text-white' href="{% url 'logout' %}">Logout</a>
                 </span>
             </div>
