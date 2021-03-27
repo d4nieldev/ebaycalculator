@@ -290,21 +290,43 @@ def add_hipshipper(request):
                 # save the object with the selected sale.
                 hipshipper = form.save(commit=False)
                 hipshipper.sale_entry = SaleEntry.objects.get(id=request.POST['sale_entry'])
-            else:
-                hipshipper = HipShipper.objects.get(sale_entry=SaleEntry.objects.get(id=request.POST['sale_entry']))
-                hipshipper.buyer_paid = request.POST['buyer_paid']
-                hipshipper.seller_paid = request.POST['seller_paid']
 
-            hipshipper.save()
-            
-            hipshipper.sale_entry.profit = hipshipper.sale_entry.calc_profit()
-            hipshipper.sale_entry.save()
-            
-            return JsonResponse({"success": request.POST})
+                hipshipper.save()
+                
+                hipshipper.sale_entry.profit = hipshipper.sale_entry.calc_profit()
+                hipshipper.sale_entry.save()
+                
+                return JsonResponse({"success": request.POST})
+
+            else: # old hipshipper
+                """ hipshipper = HipShipper.objects.get(sale_entry=SaleEntry.objects.get(id=request.POST['sale_entry']))
+                hipshipper.buyer_paid = request.POST['buyer_paid']
+                hipshipper.seller_paid = request.POST['seller_paid'] """
 
     return JsonResponse({
         "fail": request.POST,
         "errors": form.errors})
+
+@csrf_exempt
+def update_hipshipper(request):
+    # do something
+    print("SALE ID: " + request.POST["sale_id"])
+    print("NEW BUYER PAID: " + request.POST["buyer_paid"])
+    print("NEW SELLER PAID: " + request.POST["seller_paid"])
+    print("OLD BUYER PAID: " + request.POST["lastvalue"].split('/')[1].replace('Buyer', ''))
+    print("OLD SELLER PAID: " + request.POST["lastvalue"].split('/')[2].replace('Seller', ''))
+
+
+    kwargs = {
+        'old_buyer_paid': float(request.POST["lastvalue"].split('/')[1].replace('Buyer', '')),
+        'old_seller_paid': float(request.POST["lastvalue"].split('/')[2].replace('Seller', ''))
+    }
+
+    hipshipper_to_update = HipShipper.objects.get(sale_entry=request.POST["sale_id"])
+    hipshipper_to_update.buyer_paid = request.POST["buyer_paid"]
+    hipshipper_to_update.seller_paid = request.POST["seller_paid"]
+
+    hipshipper_to_update.save(**kwargs)
 
 
 @csrf_exempt

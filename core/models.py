@@ -297,14 +297,18 @@ class HipShipper(models.Model):
     def save(self, *args, **kwargs):
         '''
         Changing the paypal balance.
+        Sale profit already changed in SaleEntry.calc_profit().
         '''
-        change_balance = Balance.objects.get(user=self.user)
+        change_balance = Balance.objects.get(user=self.sale_entry.user)
 
         if not self.pk:  
             # object is being created, thus no primary key field yet
-            change_balance.paypal_balance = change_balance.paypal_balance - self.seller_paid + self.buyer_paid
+            change_balance.paypal_balance = float(change_balance.paypal_balance) + float(self.buyer_paid) - float(self.seller_paid)
         else:
-            change_balance.paypal_balance = change_balance.paypal_balance - self.seller_paid + self.buyer_paid
+            old_buyer_paid = kwargs.pop("old_buyer_paid") # What was updated?
+            old_seller_paid = kwargs.pop("old_seller_paid") # How did the value change?
+            old_diff = old_buyer_paid - old_seller_paid
+            change_balance.paypal_balance = float(change_balance.paypal_balance) + float(self.buyer_paid) - float(self.seller_paid) - old_diff
         
         change_balance.save()
             
@@ -343,17 +347,27 @@ class ReturnedSale(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk: 
-            # sale has been returned - add amazon price to balance
             balance_obj = Balance.objects.get(user=self.sale.user)
+
+            # sale has been returned - add amazon price to balance
             balance_obj.balance += self.sale.amazon_price
+
+            # substract ebay price from paypal balance
+            balance_obj.paypal_balance -= self.sale.ebay_price
+
             balance_obj.save()
 
         super(ReturnedSale, self).save(*args, **kwargs)
     
     def delete(self, *args, **kwargs): 
-        # sale return was canceled - substract amazon price from balance
         balance_obj = Balance.objects.get(user=self.sale.user)
+
+        # sale return was canceled - substract amazon price from balance
         balance_obj.balance -= self.sale.amazon_price
+
+        # add ebay price to paypal balance
+        balance_obj.paypal_balance += self.sale.ebay_price
+        
         balance_obj.save()
 
         super(ReturnedSale, self).delete(*args, **kwargs)

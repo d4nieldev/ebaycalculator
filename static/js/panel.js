@@ -56,10 +56,7 @@ function sum_sales_table() {
 /**
  * Calculates the profit from the add sale form inputs and prints it in the profit input.
  */
-function calc_profit_form() {
-
-    console.log("click")
-    
+function calc_profit_form() {    
     // get the values
     ebay_price = $('#f_ebay_price').val();
     amazon_price = $('#f_amazon_price').val();
@@ -125,8 +122,6 @@ function calc_total_date_profit(){
             if (total < 0) $("#total-profit").addClass("bg-danger") 
             else $("#total-profit").addClass("bg-success")
             
-            // print the total profit
-            console.log(total);
             $("#total-profit").html("$" + parseFloat(total))
         }
     })
@@ -353,6 +348,9 @@ function add_sale(e){
  *  @param  {string} type What has been changed
  */
 function update_sale(id, value, lastvalue, type){
+    if (type == "country"){
+        update_hipshipper(id, lastvalue);
+    }
     
     $.ajax({
         url:"/update_sale",
@@ -409,6 +407,23 @@ function add_hipshipper(e){
     // prevent default response to event
     e.preventDefault();
 
+    if ($("#hipshipper_modal").data('lastvalue')){
+        // That means the hipshipper was edited
+        $.ajax({
+            url: "/update_hipshipper",
+            type: "POST",
+            data:{
+                sale_id: $("#hipshipper_modal").data('reference'),
+                buyer_paid: $("#f_buyer_paid").val(),
+                seller_paid: $("#f_seller_paid").val(),
+                lastvalue: $("#hipshipper_modal").data('lastvalue')
+            },
+            success: function(){
+                console.log("succesfully updated!")
+            }
+        })
+    }
+
     $.ajax({
         url:'/add_hipshipper',
         type:'POST',
@@ -426,6 +441,13 @@ function add_hipshipper(e){
         console.log(xhr);
     })
 }
+
+/**
+ * Sends the differences to the server
+ */
+function update_hipshipper(sale_id, lastvalue){
+    
+}   
 
 
 /**
@@ -516,7 +538,7 @@ function send_to_update_sale(){
     // get the values
     var value = $(this).val();
     var td = $(this).parent("td");
-    var lastvalue = td.data('lastvalue');
+    var lastvalue = (td.data('lastvalue')).replace(/\s+/g,''); // remove spaces
     var type = td.data("type");
     
     // remove the input
@@ -525,11 +547,12 @@ function send_to_update_sale(){
     if (type == "country"){
         if (!value){
             // if the user has left the input blank, don't change it.
-            value = lastvalue;
+            value = lastvalue.split('/')[0];
         }
 
         // open hipshipper modal on country change
         $("#hipshipper_modal").data('reference', td.data("id"));
+        $("#hipshipper_modal").data('lastvalue', lastvalue);
         $("#hipshipper_modal").modal("show");
     }
 
@@ -550,15 +573,14 @@ function change_editable(){
 
     // if it's country the value is only the name of the country
     if ($(this).data("type") == 'country'){
-        $(this).find("table").find("tr").each(function(i){
-            if (i == 0){
-                value = $.trim($(this).find("td").text());
-            }
+        value = "";
+        $(this).find("td").each(function(i){
+            value += $.trim($(this).text()) + "/";
         })
     }
 
     // declare what the input will look like and insert it to the <td> clicked
-    var input = "<input type='text' class='input-data form-control' value='" + value + "'>";
+    var input = "<input type='text' class='input-data form-control' value='" + value.split('/')[0] + "'>";
     if ($(this).attr('data-type') != 'country'){
         input = "<input type='Number' class='input-data form-control' value='" + value + "'>";
     }
