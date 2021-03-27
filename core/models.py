@@ -12,24 +12,27 @@ class Balance(models.Model):
     ----------
     user : django.contrib.auth.models.User
         The user this balance object is related to.
-    balance : int
+    balance : float
         The balance value for this particular user. default = 0.
+    paypal_balance : float
+        The paypal balance value for this particular user. default = 0.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, default=0)
     balance = models.FloatField(default=0)
+    paypal_balance = models.FloatField(default=0)
 
     def __str__(self):
         '''
         Example
         -------
-        user = Daniel
+        user = Daniel,
+        balance = 541.62,
+        paypal_balance = 1852.67.
 
-        balance = 541.62
-
-        Daniel - 541.62
+        Daniel - 541.62 - 1852.67
         ---------------
         '''
-        return f'{self.user} - {self.balance}'
+        return f'{self.user} - {self.balance} - {self.paypal_balance}'
 
 
 class SaleEntry(models.Model):

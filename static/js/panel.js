@@ -666,7 +666,7 @@ $(document).ready(function(){
     $("#sales-count").html("Sales: " + parseFloat($("#table_sales > tbody > tr").length - 1));
 
     ebay_bill = parseFloat($("#total_sum_eBay_tax").html()) + parseFloat($("#total_sum_promoted").html())
-    $("#ebay-bill").html("Bill: " + -1*ebay_bill);
+    $("#ebay-bill").html("Bill: " + parseFloat(-1*ebay_bill));
     
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)
