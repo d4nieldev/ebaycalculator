@@ -8,3 +8,7 @@
 ## Update 27/03/21 - 12:58:
 - Changing paypal balance almost completed without gifts
 - Added update sale
+
+## Update 27/03/21 - 13:19:
+- Added is_gift attribute
+- Added checkbox is gift
