@@ -180,6 +180,8 @@ class Gift(models.Model):
 
     Attributes
     ----------
+    is_gift : bool
+        Is this a gift or a manual change?
     date : datetime.date
         The date this gift was added.
     gift_money : float
@@ -194,6 +196,7 @@ class Gift(models.Model):
     calc_gift_value()
         returnes the gift minus the taxes
     """
+    is_gift = models.BooleanField(default=True)
     date = models.DateField()
     gift_money = models.FloatField()
     gift_tax = models.FloatField()
@@ -367,7 +370,7 @@ class ReturnedSale(models.Model):
 
         # add ebay price to paypal balance
         balance_obj.paypal_balance += self.sale.ebay_price
-        
+
         balance_obj.save()
 
         super(ReturnedSale, self).delete(*args, **kwargs)

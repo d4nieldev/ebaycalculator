@@ -309,14 +309,6 @@ def add_hipshipper(request):
 
 @csrf_exempt
 def update_hipshipper(request):
-    # do something
-    print("SALE ID: " + request.POST["sale_id"])
-    print("NEW BUYER PAID: " + request.POST["buyer_paid"])
-    print("NEW SELLER PAID: " + request.POST["seller_paid"])
-    print("OLD BUYER PAID: " + request.POST["lastvalue"].split('/')[1].replace('Buyer', ''))
-    print("OLD SELLER PAID: " + request.POST["lastvalue"].split('/')[2].replace('Seller', ''))
-
-
     kwargs = {
         'old_buyer_paid': float(request.POST["lastvalue"].split('/')[1].replace('Buyer', '')),
         'old_seller_paid': float(request.POST["lastvalue"].split('/')[2].replace('Seller', ''))
