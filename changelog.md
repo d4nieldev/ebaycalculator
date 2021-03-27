@@ -12,3 +12,7 @@
 ## Update 27/03/21 - 13:19:
 - Added is_gift attribute
 - Added checkbox is gift
+
+## Update 27/03/21 - time:
+- Changing paypal balance completed.
+- Reverting paypal balance on delete completed.

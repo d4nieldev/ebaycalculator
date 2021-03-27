@@ -152,7 +152,17 @@ class SaleEntry(models.Model):
         When a sale is deleted, I need to revert the changes to balance I did in the save() method.
         '''
         balance_obj = Balance.objects.get(user=self.user)
-        balance_obj.balance += self.amazon_price + self.tm_fee - self.discount
+
+        if ReturnedSale.objects.filter(sale=self).count() > 0:
+            # revert changes of returned sale save
+            print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+            balance_obj.balance += self.tm_fee + self.discount
+            balance_obj.paypal_balance += self.paypal_tax
+
+        else:
+            balance_obj.balance += self.amazon_price + self.tm_fee - self.discount
+            balance_obj.paypal_balance = balance_obj.paypal_balance - self.ebay_price + self.paypal_tax
+
         balance_obj.save()
         
         super(SaleEntry, self).delete(*args, **kwargs)
@@ -214,6 +224,8 @@ class Gift(models.Model):
         '''
         balance_obj = Balance.objects.get(user=self.user)
         balance_obj.balance += self.calc_gift_value()
+        if self.is_gift:
+            balance_obj.paypal_balance -= self.gift_money
         balance_obj.save()
 
         super(Gift, self).save(*args, **kwargs)
@@ -225,6 +237,8 @@ class Gift(models.Model):
         '''
         balance_obj = Balance.objects.get(user=self.user)
         balance_obj.balance -= self.calc_gift_value()
+        if self.is_gift:
+            balance_obj.paypal_balance += self.gift_money
         balance_obj.save()
 
         super(Gift, self).delete(*args, **kwargs)
@@ -317,6 +331,10 @@ class HipShipper(models.Model):
             
         
         super(HipShipper, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        change_balance = Balance.objects.get(user=self.sale_entry.user)
+        change_balance.paypal_balance = float(change_balance.paypal_balance) - float(self.buyer_paid) + float(self.seller_paid)
 
     def __str__(self):
         '''

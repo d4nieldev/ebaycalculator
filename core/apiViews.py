@@ -181,6 +181,7 @@ def add_balance(request):
     '''
     if request.method == 'POST':
         form = GiftForm(request.POST)
+        print(request.POST)
 
         if form.is_valid():
             gift = form.save(commit=False)

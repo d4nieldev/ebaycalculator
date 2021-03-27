@@ -193,9 +193,15 @@ function filter_gifts_by_date(){
                         year = date.split("-")[0]
                         month = months[parseInt(date.split("-")[1]) - 1]
                         day = date.split("-")[2]
+                        
+                        tr_style = "<tr>";
+                        console.log(item.fields.is_gift);
+                        if (!item.fields.is_gift){
+                            tr_style = "<tr id='bootstrap-overrides' class='warningrow'>"
+                        }
 
                         // print each gift as a table row, and append it to the table body.
-                        var $tr = $('<tr>').append(
+                        var $tr = $(tr_style).append(
                             $('<th>').text(month + day + ', ' + year),
                             $('<td>').text(item.fields.gift_money),
                             $('<td>').text(item.fields.gift_tax),
@@ -227,6 +233,7 @@ function add_balance(e){
         url:"/add_balance",
         type:"POST",
         data:{
+            is_gift: $("#f_is_gift").is(":checked"),
             date: $("#f_gift_date").val(),
             gift_money: $("#f_gift_money").val(),
             gift_tax: $("#f_gift_tax").val(),
