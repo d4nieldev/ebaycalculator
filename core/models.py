@@ -126,6 +126,7 @@ class SaleEntry(models.Model):
         if not self.pk:  
             # object is being created, thus no primary key field yet
             change_balance.balance -= self.amazon_price + self.tm_fee - self.discount
+            change_balance.paypal_balance = change_balance.paypal_balance + self.ebay_price - self.paypal_tax
             
         else:
             # there is a primary key already, so the object updated.
@@ -292,6 +293,23 @@ class HipShipper(models.Model):
     buyer_paid = models.FloatField()
     seller_paid = models.FloatField()
     sale_entry = models.OneToOneField(SaleEntry, on_delete=models.CASCADE, default=0)
+
+    def save(self, *args, **kwargs):
+        '''
+        Changing the paypal balance.
+        '''
+        change_balance = Balance.objects.get(user=self.user)
+
+        if not self.pk:  
+            # object is being created, thus no primary key field yet
+            change_balance.paypal_balance = change_balance.paypal_balance - self.seller_paid + self.buyer_paid
+        else:
+            change_balance.paypal_balance = change_balance.paypal_balance - self.seller_paid + self.buyer_paid
+        
+        change_balance.save()
+            
+        
+        super(HipShipper, self).save(*args, **kwargs)
 
     def __str__(self):
         '''

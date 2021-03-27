@@ -663,10 +663,12 @@ $(document).ready(function(){
 
     calc_total_date_profit();
 
+    // sales count
     $("#sales-count").html("Sales: " + parseFloat($("#table_sales > tbody > tr").length - 1));
 
+    // ebay bill updated only on page load
     ebay_bill = parseFloat($("#total_sum_eBay_tax").html()) + parseFloat($("#total_sum_promoted").html())
-    $("#ebay-bill").html("Bill: " + parseFloat(-1*ebay_bill));
+    $("#ebay-bill").html("eBay Bill: $" + parseFloat(-1*ebay_bill));
     
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)
