@@ -597,8 +597,8 @@ function return_sale(){
                 sale_id: $(this).data('id'),
             },
             success:function(data){
-                /*
-                // update total profit
+                
+                /* // update total profit
                 $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) + parseFloat(data.profit)))
 
                 tr.toggleClass('warningrow');
@@ -606,10 +606,12 @@ function return_sale(){
                 $("#table_sales").load(location.href + " #table_sales");
 
                 //update balance
-                $("#div_user_balance").load(location.href + " #div_user_balance")
-                $("#balance_modal_title").load(location.href + " #balance_modal_title")
-                */
-               location.reload();
+                $("#div_user_balance").load(location.href + " #div_user_balance");
+                $("#balance_modal_title").load(location.href + " #balance_modal_title");
+
+                sum_sales_table(); */
+
+                location.reload();
             }
         })
         .fail(function(data){
@@ -627,27 +629,28 @@ function return_sale(){
                 sale_id: $(this).data('id'),
             },
             success:function(data){
-                /*
-                // update total profit
+                
+                /* // update total profit
                 $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) - parseFloat(data.profit)))
                 
                 tr.toggleClass('warningrow');
+
                 // reload sales table and sum row
                 $("#table_sales").load(location.href + " #table_sales");
 
                 //update balance
-                $("#div_user_balance").load(location.href + " #div_user_balance")
-                $("#balance_modal_title").load(location.href + " #balance_modal_title")
-                */
-               location.reload();
+                $("#div_user_balance").load(location.href + " #div_user_balance");
+                $("#balance_modal_title").load(location.href + " #balance_modal_title");
+
+                sum_sales_table(); */
+
+                location.reload();
             }
         })
         .fail(function(data){
             console.log(data);
         });
     }
-
-    
 }
 
 
