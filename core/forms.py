@@ -59,6 +59,7 @@ class GiftForm(ModelForm):
             'date': DateInput(attrs={'class': 'form-control', 'value': date.today, 'id':'f_gift_date'}),
             'gift_money': forms.NumberInput(attrs={'class': 'form-control add-gift-form', 'placeholder': 'Gift Card (103, 206 ...)', 'id':'f_gift_money'}),
             'gift_tax': forms.NumberInput(attrs={'class': 'form-control add-gift-form', 'placeholder': 'Tax', 'id':'f_gift_tax'}),
+            'is_gift': forms.CheckboxInput(attrs={'class': 'form-check-input big-checkbox', 'id': 'f_is_gift'})
         }
 
 

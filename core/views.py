@@ -178,6 +178,7 @@ def panel(request):
         'user_sales': user_sales,
         'hipshippers': HipShipper.objects.all(),
         'user_balance': Balance.objects.get(user=request.user).balance,
+        'paypal_balance': Balance.objects.get(user=request.user).paypal_balance,
         'costs': Cost.objects.filter(user=request.user),
         'returned_sales': user_returned_sales
     }

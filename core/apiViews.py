@@ -181,6 +181,7 @@ def add_balance(request):
     '''
     if request.method == 'POST':
         form = GiftForm(request.POST)
+        print(request.POST)
 
         if form.is_valid():
             gift = form.save(commit=False)
@@ -290,21 +291,35 @@ def add_hipshipper(request):
                 # save the object with the selected sale.
                 hipshipper = form.save(commit=False)
                 hipshipper.sale_entry = SaleEntry.objects.get(id=request.POST['sale_entry'])
-            else:
-                hipshipper = HipShipper.objects.get(sale_entry=SaleEntry.objects.get(id=request.POST['sale_entry']))
-                hipshipper.buyer_paid = request.POST['buyer_paid']
-                hipshipper.seller_paid = request.POST['seller_paid']
 
-            hipshipper.save()
-            
-            hipshipper.sale_entry.profit = hipshipper.sale_entry.calc_profit()
-            hipshipper.sale_entry.save()
-            
-            return JsonResponse({"success": request.POST})
+                hipshipper.save()
+                
+                hipshipper.sale_entry.profit = hipshipper.sale_entry.calc_profit()
+                hipshipper.sale_entry.save()
+                
+                return JsonResponse({"success": request.POST})
+
+            else: # old hipshipper
+                """ hipshipper = HipShipper.objects.get(sale_entry=SaleEntry.objects.get(id=request.POST['sale_entry']))
+                hipshipper.buyer_paid = request.POST['buyer_paid']
+                hipshipper.seller_paid = request.POST['seller_paid'] """
 
     return JsonResponse({
         "fail": request.POST,
         "errors": form.errors})
+
+@csrf_exempt
+def update_hipshipper(request):
+    kwargs = {
+        'old_buyer_paid': float(request.POST["lastvalue"].split('/')[1].replace('Buyer', '')),
+        'old_seller_paid': float(request.POST["lastvalue"].split('/')[2].replace('Seller', ''))
+    }
+
+    hipshipper_to_update = HipShipper.objects.get(sale_entry=request.POST["sale_id"])
+    hipshipper_to_update.buyer_paid = request.POST["buyer_paid"]
+    hipshipper_to_update.seller_paid = request.POST["seller_paid"]
+
+    hipshipper_to_update.save(**kwargs)
 
 
 @csrf_exempt

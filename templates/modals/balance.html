@@ -48,8 +48,16 @@
                             </div>
                         </div>
                     </div>
-                    {{ giftform.user }}
-                    <button type="submit" class="btn btn-primary" name="btn_change_balance">Make Changes</button>
+                    <div class="row">
+                        <div class="col text-end">
+                            <span style="font-size: 20px;">Is this a gift?</span>
+                            {{ giftform.is_gift }}
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary" name="btn_change_balance">Make Changes</button>
+                        </div>
+                    </div>
+                    
                 </form>
                 {{giftform.errors}}
             </div>

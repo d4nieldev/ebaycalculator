@@ -126,6 +126,7 @@ class SaleEntry(models.Model):
         if not self.pk:  
             # object is being created, thus no primary key field yet
             change_balance.balance -= self.amazon_price + self.tm_fee - self.discount
+            change_balance.paypal_balance = change_balance.paypal_balance + self.ebay_price - self.paypal_tax
             
         else:
             # there is a primary key already, so the object updated.
@@ -151,7 +152,17 @@ class SaleEntry(models.Model):
         When a sale is deleted, I need to revert the changes to balance I did in the save() method.
         '''
         balance_obj = Balance.objects.get(user=self.user)
-        balance_obj.balance += self.amazon_price + self.tm_fee - self.discount
+
+        if ReturnedSale.objects.filter(sale=self).count() > 0:
+            # revert changes of returned sale save
+            print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+            balance_obj.balance += self.tm_fee + self.discount
+            balance_obj.paypal_balance += self.paypal_tax
+
+        else:
+            balance_obj.balance += self.amazon_price + self.tm_fee - self.discount
+            balance_obj.paypal_balance = balance_obj.paypal_balance - self.ebay_price + self.paypal_tax
+
         balance_obj.save()
         
         super(SaleEntry, self).delete(*args, **kwargs)
@@ -179,6 +190,8 @@ class Gift(models.Model):
 
     Attributes
     ----------
+    is_gift : bool
+        Is this a gift or a manual change?
     date : datetime.date
         The date this gift was added.
     gift_money : float
@@ -193,6 +206,7 @@ class Gift(models.Model):
     calc_gift_value()
         returnes the gift minus the taxes
     """
+    is_gift = models.BooleanField(default=True)
     date = models.DateField()
     gift_money = models.FloatField()
     gift_tax = models.FloatField()
@@ -210,6 +224,8 @@ class Gift(models.Model):
         '''
         balance_obj = Balance.objects.get(user=self.user)
         balance_obj.balance += self.calc_gift_value()
+        if self.is_gift:
+            balance_obj.paypal_balance -= self.gift_money
         balance_obj.save()
 
         super(Gift, self).save(*args, **kwargs)
@@ -221,6 +237,8 @@ class Gift(models.Model):
         '''
         balance_obj = Balance.objects.get(user=self.user)
         balance_obj.balance -= self.calc_gift_value()
+        if self.is_gift:
+            balance_obj.paypal_balance += self.gift_money
         balance_obj.save()
 
         super(Gift, self).delete(*args, **kwargs)
@@ -293,6 +311,31 @@ class HipShipper(models.Model):
     seller_paid = models.FloatField()
     sale_entry = models.OneToOneField(SaleEntry, on_delete=models.CASCADE, default=0)
 
+    def save(self, *args, **kwargs):
+        '''
+        Changing the paypal balance.
+        Sale profit already changed in SaleEntry.calc_profit().
+        '''
+        change_balance = Balance.objects.get(user=self.sale_entry.user)
+
+        if not self.pk:  
+            # object is being created, thus no primary key field yet
+            change_balance.paypal_balance = float(change_balance.paypal_balance) + float(self.buyer_paid) - float(self.seller_paid)
+        else:
+            old_buyer_paid = kwargs.pop("old_buyer_paid") # What was updated?
+            old_seller_paid = kwargs.pop("old_seller_paid") # How did the value change?
+            old_diff = old_buyer_paid - old_seller_paid
+            change_balance.paypal_balance = float(change_balance.paypal_balance) + float(self.buyer_paid) - float(self.seller_paid) - old_diff
+        
+        change_balance.save()
+            
+        
+        super(HipShipper, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        change_balance = Balance.objects.get(user=self.sale_entry.user)
+        change_balance.paypal_balance = float(change_balance.paypal_balance) - float(self.buyer_paid) + float(self.seller_paid)
+
     def __str__(self):
         '''
         Example
@@ -325,17 +368,27 @@ class ReturnedSale(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk: 
-            # sale has been returned - add amazon price to balance
             balance_obj = Balance.objects.get(user=self.sale.user)
+
+            # sale has been returned - add amazon price to balance
             balance_obj.balance += self.sale.amazon_price
+
+            # substract ebay price from paypal balance
+            balance_obj.paypal_balance -= self.sale.ebay_price
+
             balance_obj.save()
 
         super(ReturnedSale, self).save(*args, **kwargs)
     
     def delete(self, *args, **kwargs): 
-        # sale return was canceled - substract amazon price from balance
         balance_obj = Balance.objects.get(user=self.sale.user)
+
+        # sale return was canceled - substract amazon price from balance
         balance_obj.balance -= self.sale.amazon_price
+
+        # add ebay price to paypal balance
+        balance_obj.paypal_balance += self.sale.ebay_price
+
         balance_obj.save()
 
         super(ReturnedSale, self).delete(*args, **kwargs)
