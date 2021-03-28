@@ -728,10 +728,11 @@ $(document).ready(function(){
                                 value: curvalue
                             },
                             success: function(response){
-                                $("#div_paypal_balance").html(curvalue);
+                                console.log(response);
                             }
                         })
                     }
+                    $("#div_paypal_balance").html(curvalue);
                     
                 }
             }
