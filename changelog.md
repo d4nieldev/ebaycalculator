@@ -20,3 +20,6 @@
 ## Update 28/03/21 - 11:24:
 - paypal balance is ready to roll
 - gifts table scrollable
+
+## Update 28/03/21 - 14:22:
+- Now shows username 
