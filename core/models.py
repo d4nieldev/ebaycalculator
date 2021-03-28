@@ -397,3 +397,12 @@ class ReturnedSale(models.Model):
         return f'[{self.date_of_return}] {self.sale}'
 
 
+class Preferences(models.Model):
+    user = models.OneToOneField(User, models.CASCADE, default=0)
+    is_paypal_editable = models.BooleanField(default=False)
+
+    def __str__(self):
+        s = str(self.user) + " | "
+        s += "is_paypal_editable = " + str(self.is_paypal_editable) + " | "
+        
+        return s

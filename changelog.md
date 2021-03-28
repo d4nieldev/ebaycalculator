@@ -13,6 +13,10 @@
 - Added is_gift attribute
 - Added checkbox is gift
 
-## Update 27/03/21 - time:
+## Update 27/03/21 - 14:18:
 - Changing paypal balance completed.
 - Reverting paypal balance on delete completed.
+
+## Update 28/03/21 - 11:24:
+- paypal balance is ready to roll
+- gifts table scrollable

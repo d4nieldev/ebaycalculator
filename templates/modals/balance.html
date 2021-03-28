@@ -23,9 +23,11 @@
                 </form>
                 
                 <br style="line-height: 0;" />
-                <table class="table table-light table-striped" id="table_gifts">
-                    <!--Table Content-->
-                </table>
+                <div class="table-wrapper-scroll-y-mini">
+                    <table class="table table-light table-striped" id="table_gifts">
+                        <!--Table Content-->
+                    </table>
+                </div>   
 
                 <form id='balance-form'>
                     {% csrf_token %}

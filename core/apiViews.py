@@ -347,3 +347,20 @@ def cancel_return_sale(request):
             'profit': sale.profit,
             })
     return JsonResponse({"error": "an error occured"})
+
+
+@csrf_exempt
+def update_paypal_balance(request):
+    if request.method == 'POST':
+        user_balance = Balance.objects.get(user=request.user)
+        print(request.POST)
+        user_balance.paypal_balance = float(request.POST['value'])
+        user_balance.save()
+
+        return JsonResponse({
+            'success': 'paypal balance updated successfully!'
+        })
+    
+    return JsonResponse({
+        'error': 'an error occured...'
+    })

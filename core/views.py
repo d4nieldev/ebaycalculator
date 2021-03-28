@@ -11,7 +11,7 @@ from django.contrib import messages
 
 from .forms import SignUpForm, SaleEntryForm, GiftForm, CostForm, HipShipperForm
 
-from .models import SaleEntry, Balance, Gift, Cost, HipShipper, ReturnedSale
+from .models import SaleEntry, Balance, Gift, Cost, HipShipper, ReturnedSale, Preferences
 
 
 def HANDLE_LOGIN_BASE(request, current_page, context):
@@ -180,7 +180,8 @@ def panel(request):
         'user_balance': Balance.objects.get(user=request.user).balance,
         'paypal_balance': Balance.objects.get(user=request.user).paypal_balance,
         'costs': Cost.objects.filter(user=request.user),
-        'returned_sales': user_returned_sales
+        'returned_sales': user_returned_sales,
+        'preferences': Preferences.objects.get(user=request.user)
     }
     
     if request.method == "GET":

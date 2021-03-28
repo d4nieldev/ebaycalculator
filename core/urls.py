@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views, apiViews
+from . import views, apiViews, preferences_views
 
 urlpatterns = [
     # Actual HTML pages
@@ -20,5 +20,10 @@ urlpatterns = [
     path('update_hipshipper', apiViews.update_hipshipper, name="update_hipshipper"),
     path('delete_gift', apiViews.delete_gift, name="delete_gift"),
     path('return_sale', apiViews.return_sale, name="return_sale"),
-    path('cancel_return_sale', apiViews.cancel_return_sale, name="cancel_return_sale")
+    path('cancel_return_sale', apiViews.cancel_return_sale, name="cancel_return_sale"),
+    path('update_paypal_balance', apiViews.update_paypal_balance, name="update_paypal_balance"),
+
+    # preferences edits
+    path('toggle_paypal_editable', preferences_views.toggle_paypal_editable, name="toggle_paypal_editable"),
+    
 ]

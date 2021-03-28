@@ -106,8 +106,20 @@ body {
     max-height: 65vh;
     overflow: auto;
 }
+.table-wrapper-scroll-y-mini{
+    display: block;
+    position: relative;
+    max-height: 30vh;
+    overflow: auto;
+}
 
 .big-checkbox{
     width: 30px;
     height: 30px;
+}
+
+.editable-paypal-balance{
+    width: 5rem;
+    height: 2rem;
+    display: inline;
 }
