@@ -29,6 +29,11 @@ INSTALLED_APPS = [
     'core.templatetags'
 ]
 
+ALLOWED_HOSTS = [
+    '127.0.0.1:8000',
+    'https://ebay--calculator.herokuapp.com/'
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
