@@ -742,6 +742,14 @@ $(document).ready(function(){
     calc_total_date_profit();
 
     $(".lock-class").on("click", paypal_lock_handler);
+    $(document).on("keypress", "#txt_paypal_balance", function(e){
+        var key = e.which;
+
+        if (key == 13){
+            e.preventDefault();
+            $(".lock-class").click();
+        }
+    })
 
     // sales count
     $("#sales-count").html("Sales: " + parseFloat($("#table_sales > tbody > tr").length - 1));
