@@ -9,6 +9,8 @@ from django.shortcuts import render, redirect
 
 from django.contrib import messages
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from .forms import SignUpForm, SaleEntryForm, GiftForm, CostForm, HipShipperForm
 
 from .models import SaleEntry, Balance, Gift, Cost, HipShipper, ReturnedSale, Preferences
@@ -136,8 +138,11 @@ def index(request):
 
                     last_user = User.objects.latest('id')
 
-                    user_balance = Balance(user=last_user, balance=0)
+                    user_balance = Balance(user=last_user)
                     user_balance.save()
+
+                    user_preferences = Preferences(user=last_user)
+                    user_preferences.save()
                     
                     messages.success(request, "Account was created successfully! you can now login as an existing user.")
 
@@ -167,6 +172,12 @@ def panel(request):
         if ReturnedSale.objects.filter(sale=sale).count() != 0:
             # returned sale found
             user_returned_sales.append(sale)
+    
+    try:
+        user_prefs = Preferences.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        user_prefs = Preferences(user=request.user)
+    
 
     context = {
         'years_months': GET_SALES_YEARS_MONTHS(request),
@@ -181,7 +192,7 @@ def panel(request):
         'paypal_balance': Balance.objects.get(user=request.user).paypal_balance,
         'costs': Cost.objects.filter(user=request.user),
         'returned_sales': user_returned_sales,
-        'preferences': Preferences.objects.get(user=request.user)
+        'preferences': user_prefs
     }
     
     if request.method == "GET":
