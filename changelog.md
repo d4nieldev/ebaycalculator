@@ -23,3 +23,7 @@
 
 ## Update 28/03/21 - 14:22:
 - Now shows username 
+
+## Update 29/03/21 - 2:49 (tax_report):
+- Added a form at the bottom of panel
+- Made preperations for future update that generates excel file with all the data for taxes

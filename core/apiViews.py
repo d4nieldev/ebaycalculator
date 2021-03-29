@@ -1,5 +1,7 @@
 import datetime
 
+import pandas as pd
+
 from django.views.decorators.csrf import csrf_exempt
 
 from django.core import serializers
@@ -363,4 +365,47 @@ def update_paypal_balance(request):
     
     return JsonResponse({
         'error': 'an error occured...'
+    })
+
+@csrf_exempt
+def generate_report(request):
+    if request.method == 'POST':
+        from_year = int(request.POST['from_year'])
+        from_month = int(request.POST['from_month'])
+        to_year = int(request.POST['to_year'])
+        to_month = int(request.POST['to_month'])
+
+        relevant_months = []
+        years = range(from_year, to_year + 1)
+        all_months = range(1,13)
+
+        if len(years) == 1:
+            tax_dict[from_year] = []
+            for month in range(from_month, to_month):
+                relevant_months.append(f'{from_year}-{month}')
+        else:
+            for year in years:
+                for month in all_months:
+                    if year == from_year:
+                        if month >= from_month:
+                            relevant_months.append(f'{year}-{month}')
+                    elif year == to_year:
+                        if month < to_month:
+                            relevant_months.append(f'{year}-{month}')
+                    else:
+                        relevant_months.append(f'{year}-{month}')
+        
+        
+        data_dict = {}
+        for month in relevant_months:
+            # find the relevant fields and add them to the data dict
+            pass
+                    
+
+        return JsonResponse({
+            'success': 'hello from python!'
+        })
+    
+    return JsonResponse({
+        'error': 'an error has occured'
     })

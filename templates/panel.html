@@ -70,13 +70,23 @@
     </form>
 
     {% include 'sales_table.html' %}
-
-    <!--Sale Registered Message-->
-    {% for message in messages %}
-        {% if message.tags == 'info' %}
-            <p class='alert alert-info mt-3'>{{ message }}</p>
-        {% endif %}
-    {% endfor %}
+    <h1>Get Tax Report</h1>
+    <form id="form-generate-report">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-2">
+                From
+                <input id="txt_genrpt_from" type="month" class="form-control" required/>
+            </div>
+            <div class="col-2">
+                To
+                <input id="txt_genrpt_to" type="month" class="form-control" required/>
+            </div>
+            <div class="col-2 align-self-end">
+                <button id="btn_genrpt_submit" type="submit" class="btn btn-primary fw-bold">Generate Tax Report</button>
+            </div>
+        </div>
+    </form>
 </div>
 
 {% endblock %}

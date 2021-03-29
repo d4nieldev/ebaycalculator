@@ -731,6 +731,38 @@ function paypal_lock_handler(e){
     
 }
 
+function generate_report(e){
+    e.preventDefault();
+
+    from_year = $("#txt_genrpt_from").val().split('-')[0];
+    from_month = $("#txt_genrpt_from").val().split('-')[1];
+    to_year = $("#txt_genrpt_to").val().split('-')[0];
+    to_month = $("#txt_genrpt_to").val().split('-')[1];
+    
+    if ((from_year < to_year) || (from_year == to_year && from_month < to_month)){
+        // valid dates
+        $.ajax({
+            url: '/generate_report',
+            type: 'POST',
+            data: {
+                from_year: from_year,
+                from_month: from_month,
+                to_year: to_year,
+                to_month: to_month
+            },
+            success: function(response){
+                console.log(response);
+            }
+        });
+    }
+    else{
+        // invalid dates
+    }
+    /* if ( < ){
+        console.log("good");
+    } */
+}
+
 
 
 $(document).ready(function(){
@@ -741,7 +773,8 @@ $(document).ready(function(){
 
     calc_total_date_profit();
 
-    $(".lock-class").on("click", paypal_lock_handler);
+    // paypal balance change manually
+    $(document).on("click", ".lock-class", paypal_lock_handler);
     $(document).on("keypress", "#txt_paypal_balance", function(e){
         var key = e.which;
 
@@ -771,20 +804,21 @@ $(document).ready(function(){
     });
 
     // calc profit live on sale creation
-    $(document).on("keyup", '#form_add_sale input', calc_profit_form)
+    $(document).on("keyup", '#form_add_sale input', calc_profit_form);
 
     // $(document).on("submit", '#form_filter_sales', )
 
     // submit forms
-    $(document).on("submit", '#form_add_sale', add_sale)
-    $(document).on("submit", "#form_hipshipper", add_hipshipper)
-    $(document).on("submit", '#balance-form', add_balance)
-    $(document).on("submit", '#cost-register', add_cost)
+    $(document).on("submit", '#form_add_sale', add_sale);
+    $(document).on("submit", "#form_hipshipper", add_hipshipper);
+    $(document).on("submit", '#balance-form', add_balance);
+    $(document).on("submit", '#cost-register', add_cost);
+    $(document).on("submit", "#form-generate-report", generate_report);
 
     // delete models
-    $(document).on("click", "#table_costs .btn-delete-cost", delete_cost)
-    $(document).on("click", "#table_sales .btn-delete-sale", delete_sale)
-    $(document).on("click", '#table_gifts .btn-delete-gift', delete_gift)
+    $(document).on("click", "#table_costs .btn-delete-cost", delete_cost);
+    $(document).on("click", "#table_sales .btn-delete-sale", delete_sale);
+    $(document).on("click", '#table_gifts .btn-delete-gift', delete_gift);
 
     // return sale
     $(document).on('click', "#table_sales .btn-return-sale", return_sale)
