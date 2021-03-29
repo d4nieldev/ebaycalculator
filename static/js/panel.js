@@ -731,7 +731,7 @@ function paypal_lock_handler(e){
     
 }
 
-function generate_report(e){
+/* function generate_report(e){
     e.preventDefault();
 
     from_year = $("#txt_genrpt_from").val().split('-')[0];
@@ -758,10 +758,7 @@ function generate_report(e){
     else{
         // invalid dates
     }
-    /* if ( < ){
-        console.log("good");
-    } */
-}
+} */
 
 
 
@@ -813,7 +810,7 @@ $(document).ready(function(){
     $(document).on("submit", "#form_hipshipper", add_hipshipper);
     $(document).on("submit", '#balance-form', add_balance);
     $(document).on("submit", '#cost-register', add_cost);
-    $(document).on("submit", "#form-generate-report", generate_report);
+    // $(document).on("submit", "#form-generate-report", generate_report);
 
     // delete models
     $(document).on("click", "#table_costs .btn-delete-cost", delete_cost);

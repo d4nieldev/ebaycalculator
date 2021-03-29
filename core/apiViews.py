@@ -367,7 +367,7 @@ def update_paypal_balance(request):
         'error': 'an error occured...'
     })
 
-@csrf_exempt
+""" @csrf_exempt
 def generate_report(request):
     if request.method == 'POST':
         from_year = int(request.POST['from_year'])
@@ -408,4 +408,4 @@ def generate_report(request):
     
     return JsonResponse({
         'error': 'an error has occured'
-    })
+    }) """
