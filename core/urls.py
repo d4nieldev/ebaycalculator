@@ -22,7 +22,7 @@ urlpatterns = [
     path('return_sale', apiViews.return_sale, name="return_sale"),
     path('cancel_return_sale', apiViews.cancel_return_sale, name="cancel_return_sale"),
     path('update_paypal_balance', apiViews.update_paypal_balance, name="update_paypal_balance"),
-    path('generate_report', apiViews.generate_report, name='generate_report'),
+    path('filter_sales', apiViews.filter_sales, name="filter_sales"),
 
     # preferences edits
     path('toggle_paypal_editable', preferences_views.toggle_paypal_editable, name="toggle_paypal_editable"),

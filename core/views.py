@@ -195,7 +195,7 @@ def panel(request):
         'preferences': user_prefs
     }
     
-    if request.method == "GET":
+    """ if request.method == "GET":
         if "btn_select_date" in request.GET:
             # filter form
             selected_filter = request.GET.get('s_filter_sales_by_date')
@@ -221,6 +221,6 @@ def panel(request):
                     date_to = f'{year}-0{month+1}-15'
                 
 
-                context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__range=[date_from, date_to])
+                context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__range=[date_from, date_to]) """
     
     return render(request, 'panel.html', context)

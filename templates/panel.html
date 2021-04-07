@@ -28,9 +28,6 @@
                 </select>
             </div>
             
-            <div class="col-1">
-                <input type="submit" class="btn btn-secondary" name="btn_select_date" value="Filter">
-            </div>
             <!--Paypal Triplemars container-->
             <div class="col-5">
                 <div class="row">
@@ -70,23 +67,6 @@
     </form>
 
     {% include 'sales_table.html' %}
-    <h1>Get Tax Report</h1>
-    <form id="form-generate-report">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-2">
-                From
-                <input id="txt_genrpt_from" type="month" class="form-control" required/>
-            </div>
-            <div class="col-2">
-                To
-                <input id="txt_genrpt_to" type="month" class="form-control" required/>
-            </div>
-            <div class="col-2 align-self-end">
-                <button id="btn_genrpt_submit" type="submit" class="btn btn-primary fw-bold">Generate Tax Report</button>
-            </div>
-        </div>
-    </form>
 </div>
 
 {% endblock %}

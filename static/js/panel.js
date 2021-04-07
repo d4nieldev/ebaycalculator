@@ -162,7 +162,6 @@ function set_gifts_date(){
  * The backend processes the request and returnes all the relevant gifts in the time period.
  */
 function filter_gifts_by_date(){
-
     $.ajax({
         url: "/filter_gifts",
         type: "GET",
@@ -611,6 +610,9 @@ function change_editable(){
 }
 
 
+/**
+ * This function is responsible on the sale return mechanism
+ */
 function return_sale(){
     tr = $(this).parent("td").parent("tr")
 
@@ -681,7 +683,10 @@ function return_sale(){
     }
 }
 
-
+/**
+ * On click lock or unlock the textbox
+ * @param {*} e The event
+ */
 function paypal_lock_handler(e){
     e.preventDefault();
 
@@ -731,44 +736,137 @@ function paypal_lock_handler(e){
     
 }
 
-/* function generate_report(e){
-    e.preventDefault();
+function filter_sales(){
+    value = $("#s_sales_filter_by_date").val();
 
-    from_year = $("#txt_genrpt_from").val().split('-')[0];
-    from_month = $("#txt_genrpt_from").val().split('-')[1];
-    to_year = $("#txt_genrpt_to").val().split('-')[0];
-    to_month = $("#txt_genrpt_to").val().split('-')[1];
-    
-    if ((from_year < to_year) || (from_year == to_year && from_month < to_month)){
-        // valid dates
-        $.ajax({
-            url: '/generate_report',
-            type: 'POST',
-            data: {
-                from_year: from_year,
-                from_month: from_month,
-                to_year: to_year,
-                to_month: to_month
-            },
-            success: function(response){
-                console.log(response);
-            }
-        });
-    }
-    else{
-        // invalid dates
-    }
-} */
+    $.ajax({
+        url: '/filter_sales',
+        type: 'POST',
+        data: {
+            date: value,
+        },
+        success: function(date){
+            table_string = ""
+
+            sales = []
+            returned_sales = []
+            hipshipper = []
+
+            $(date).each(function(){
+                model = this.model;
+                data = this.fields;
+
+                if (model == "core.saleentry"){
+                    data["pk"] = this.pk;
+                    sales.push(data);
+                }
+                else if(model == "core.returnedsale") {
+                    returned_sales.push(data)
+                }
+                else{
+                    hipshipper.push(data)
+                }
+            })
+            
+            returned_pks = []
+            $(returned_sales).each(function(){
+                returned_pks.push(this.sale)
+            })
+
+            $(sales).each(function(){
+                if (returned_pks.includes(this.pk)){
+                    // sale is returned
+                    table_string += "<tr id='bootstrap-overrides' class='warningrow'>"
+                }
+                else{
+                    table_string += "<tr>"
+                }
+
+                table_string += "<th class='text-success'>" + this.pk + "</th>";
+
+                table_string += "<th>" + this.date + "</th>";
+
+                table_string += "<td class='editable sumtable' data-id='" + this.pk + "' data-type='ebay_price'>" + parseFloat(this.ebay_price) + "</td>";
+                
+                table_string += "<td class='editable sumtable' data-id='" + this.pk + "' data-type='amazon_price'>" + parseFloat(this.amazon_price) + "</td>";
+                
+                table_string += "<td class='editable sumtable' data-id='" + this.pk + "' data-type='ebay_tax'>" + parseFloat(this.ebay_tax) + "</td>";
+                
+                table_string += "<td class='editable sumtable' data-id='" + this.pk + "' data-type='paypal_tax'>" + parseFloat(this.paypal_tax) + "</td>";
+                
+                table_string += "<td class='editable sumtable' data-id='" + this.pk + "' data-type='tm_fee'>" + parseFloat(this.tm_fee) + "</td>";
+                
+                table_string += "<td class='editable sumtable' data-id='" + this.pk + "' data-type='promoted'>" + parseFloat(this.promoted) + "</td>";
+                
+                table_string += "<td class='sumtable' id='loop' data-id='" + this.pk + "' data-type='profit'>" + parseFloat(this.profit) + "</td>";
+                
+                table_string += "<td class='editable sumtable' data-id='" + this.pk + "' data-type='discount'>" + parseFloat(this.discount) + "</td>";
+                
+                table_string += "<td class='editable text-center' data-id='" + this.pk + "' data-type='country'>"
+                table_string += "<table style='width: 90%;'>"
+                if (this.country == '-----'){
+                    table_string += "<tr class='bg-secondary'>"
+                }
+                else{
+                    table_string += "<tr>"
+                }
+                table_string += "<td class='get-country col-12 text-center' colspan='2'>" + this.country + "</td>"
+                table_string += "</tr>"
+                table_string += "<tr>"
+                temp = this
+                $(hipshipper).each(function(){
+                    if (this.sale_entry == temp.pk){
+                        table_string += "<td class='bg-info text-center text-secondary col-6'>"
+                        table_string += "<span>Buyer</span><br /><div id='div_hipshipper_buyer'>" + this.buyer_paid + "</div>"
+                        table_string += "</td>"
+
+                        table_string += "<td class='bg-primary text-center col-6'>"
+                        table_string += "<span>Seller</span><br /><div id='div_hipshipper_seller'>" + this.seller_paid + "</div>"
+                        table_string +="</td>"
+
+                        return false;
+                    }
+                });
+                table_string += "</tr></table></td>"
+
+                table_string += "<td data-id='" + this.pk + "' data-type='submit' class='text-center'>"
+                table_string += "<button data-id='" + this.pk + "' type='submit' class='btn btn-warning btn-return-sale'>"
+                table_string += "<i class='fa fa-undo-alt fa-lg'></i>"
+                table_string += "</button>"
+                table_string += "<button data-id='" + this.pk +"' type='submit' class='btn btn-danger btn-delete-sale'>"
+                table_string += "<i class='fa fa-trash-alt fa-lg'></i>"
+                table_string += "</button>"
+                table_string += "</td>"
+
+                table_string += "</tr>"
+
+            })
+            $("#table_sales tbody").html(table_string)
+
+            sum_sales_table();
+
+            calc_total_date_profit();
+
+            // sales count
+            $("#sales-count").html("Sales: " + parseFloat($("#table_sales > tbody > tr").length - 1));
+
+            // ebay bill updated only on page load
+            ebay_bill = parseFloat($("#total_sum_eBay_tax").html()) + parseFloat($("#total_sum_promoted").html())
+            $("#ebay-bill").html("eBay Bill: $" + parseFloat(-1*ebay_bill));
+        }
+    })
+}
 
 
 
 $(document).ready(function(){
     
     set_gifts_date();
-    
-    sum_sales_table();
 
-    calc_total_date_profit();
+    // filter sales
+    $(document).on('change', "#s_sales_filter_by_date", filter_sales);
+    $("#s_sales_filter_by_date").val($('#s_sales_filter_by_date option:last-child').val());
+    $("#s_sales_filter_by_date").trigger("change");
 
     // paypal balance change manually
     $(document).on("click", ".lock-class", paypal_lock_handler);
@@ -780,13 +878,6 @@ $(document).ready(function(){
             $(".lock-class").click();
         }
     })
-
-    // sales count
-    $("#sales-count").html("Sales: " + parseFloat($("#table_sales > tbody > tr").length - 1));
-
-    // ebay bill updated only on page load
-    ebay_bill = parseFloat($("#total_sum_eBay_tax").html()) + parseFloat($("#total_sum_promoted").html())
-    $("#ebay-bill").html("eBay Bill: $" + parseFloat(-1*ebay_bill));
     
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)
@@ -803,8 +894,6 @@ $(document).ready(function(){
     // calc profit live on sale creation
     $(document).on("keyup", '#form_add_sale input', calc_profit_form);
 
-    // $(document).on("submit", '#form_filter_sales', )
-
     // submit forms
     $(document).on("submit", '#form_add_sale', add_sale);
     $(document).on("submit", "#form_hipshipper", add_hipshipper);
@@ -818,7 +907,7 @@ $(document).ready(function(){
     $(document).on("click", '#table_gifts .btn-delete-gift', delete_gift);
 
     // return sale
-    $(document).on('click', "#table_sales .btn-return-sale", return_sale)
+    $(document).on('click', "#table_sales .btn-return-sale", return_sale);
 
     // calc add to balance live on gift creation
     $(document).on("keyup", '.add-gift-form', calc_add_to_balance)

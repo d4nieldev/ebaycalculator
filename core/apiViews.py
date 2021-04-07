@@ -183,7 +183,6 @@ def add_balance(request):
     '''
     if request.method == 'POST':
         form = GiftForm(request.POST)
-        print(request.POST)
 
         if form.is_valid():
             gift = form.save(commit=False)
@@ -288,7 +287,6 @@ def add_hipshipper(request):
     if request.method == 'POST':
         form = HipShipperForm(request.POST)
         if form.is_valid():
-            print("COUNT IS: " + str(HipShipper.objects.filter(sale_entry=SaleEntry.objects.get(id=int(request.POST['sale_entry']))).count()))
             if HipShipper.objects.filter(sale_entry=SaleEntry.objects.get(id=request.POST['sale_entry'])).count() == 0: # new hipshipper
                 # save the object with the selected sale.
                 hipshipper = form.save(commit=False)
@@ -355,7 +353,6 @@ def cancel_return_sale(request):
 def update_paypal_balance(request):
     if request.method == 'POST':
         user_balance = Balance.objects.get(user=request.user)
-        print(request.POST)
         user_balance.paypal_balance = float(request.POST['value'])
         user_balance.save()
 
@@ -367,45 +364,43 @@ def update_paypal_balance(request):
         'error': 'an error occured...'
     })
 
-""" @csrf_exempt
-def generate_report(request):
+@csrf_exempt
+def filter_sales(request):
     if request.method == 'POST':
-        from_year = int(request.POST['from_year'])
-        from_month = int(request.POST['from_month'])
-        to_year = int(request.POST['to_year'])
-        to_month = int(request.POST['to_month'])
+        date = request.POST['date']
+        
+        if str(date) != 'all':
+            year = int(str(date).split('-')[0])
+            month = int(str(date).split('-')[1])
 
-        relevant_months = []
-        years = range(from_year, to_year + 1)
-        all_months = range(1,13)
-
-        if len(years) == 1:
-            tax_dict[from_year] = []
-            for month in range(from_month, to_month):
-                relevant_months.append(f'{from_year}-{month}')
+            # context['user_sales_filtered_y'] = year
+            # context['user_sales_filtered_m'] = month
+            
+            date_from = f'{year}-{month}-16'
+            date_to = f'{year}-{month+1}-15'
+            
+            if month == 12:
+                date_from = f'{year}-12-16'
+                date_to = f'{year+1}-01-15'
+            if month == 9:
+                date_from = f'{year}-0{month}-16'
+                date_to = f'{year}-{month+1}-15'
+            elif month < 10:
+                date_from = f'{year}-0{month}-16'
+                date_to = f'{year}-0{month+1}-15'
+            
+            sales_qs = SaleEntry.objects.filter(user=request.user, date__range=[date_from, date_to])
         else:
-            for year in years:
-                for month in all_months:
-                    if year == from_year:
-                        if month >= from_month:
-                            relevant_months.append(f'{year}-{month}')
-                    elif year == to_year:
-                        if month < to_month:
-                            relevant_months.append(f'{year}-{month}')
-                    else:
-                        relevant_months.append(f'{year}-{month}')
+            sales_qs = SaleEntry.objects.filter(user=request.user)
         
+        returned_qs = ReturnedSale.objects.filter(sale__user=request.user)
+        hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user)
         
-        data_dict = {}
-        for month in relevant_months:
-            # find the relevant fields and add them to the data dict
-            pass
-                    
+        sales_data = serializers.serialize('json', sales_qs)
+        returned_data = serializers.serialize('json', returned_qs)
+        hipshipper_data = serializers.serialize('json', hipshipper_qs)
 
-        return JsonResponse({
-            'success': 'hello from python!'
-        })
-    
-    return JsonResponse({
-        'error': 'an error has occured'
-    }) """
+        data = sales_data[:-1] + ", " + returned_data[1:]
+        data = data[:-1] + ", " + hipshipper_data[1:]
+
+        return HttpResponse(data, content_type="application/json")
