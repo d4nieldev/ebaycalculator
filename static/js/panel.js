@@ -861,7 +861,6 @@ function filter_sales(){
 }
 
 
-
 $(document).ready(function(){
     
     set_gifts_date();
@@ -881,11 +880,22 @@ $(document).ready(function(){
             $(".lock-class").click();
         }
     })
-    /*
+    
+    // open and close preferences
     $(document).on('click', "#btn_open_preferences", function(){
-        $(".side-nav").toggleClass("side-nav-toggled");
-        $(".content").toggleClass("content-toggled");
-    })*/
+        if ($("#mySidenav").width() != 0){
+            // close
+            $("#mySidenav").width("0");
+            $("#main").removeAttr("style");
+        }
+        else{
+            // open
+            $("#mySidenav").width("15%");
+            $("#mySidenav").height($(window).height() - $("#main_navbar").height() - parseInt($('html').css('font-size')));
+            $("#main").css("margin-left", "15%");
+            $("#main").width("80%");
+        }
+    })
     
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)
