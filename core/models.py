@@ -400,9 +400,13 @@ class ReturnedSale(models.Model):
 class Preferences(models.Model):
     user = models.OneToOneField(User, models.CASCADE, default=0)
     is_paypal_editable = models.BooleanField(default=False)
+    default_month = models.CharField(max_length=10, default='lastmonth') # lastmonth or all
+    start_month_day = models.IntegerField(default=16) # month will end in this day minus 1
 
     def __str__(self):
         s = str(self.user) + " | "
         s += "is_paypal_editable = " + str(self.is_paypal_editable) + " | "
+        s += "default_month = " + str(self.default_month) + " | "
+        s += "start_month_day = " + str(self.start_month_day) + " | " 
         
         return s
