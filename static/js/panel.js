@@ -881,6 +881,11 @@ $(document).ready(function(){
             $(".lock-class").click();
         }
     })
+    /*
+    $(document).on('click', "#btn_open_preferences", function(){
+        $(".side-nav").toggleClass("side-nav-toggled");
+        $(".content").toggleClass("content-toggled");
+    })*/
     
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)

@@ -25,6 +25,11 @@
 <body class='bg-dark' {% if open_login %} onload="document.getElementById('btn_open_login').click();" {% endif %}>
     <!-- Navigation -->
     <nav class="navbar navbar-light bg-light">
+        <div class="navbar-text row d-flex justify-content-start ms-3">
+            <button id="btn_open_preferences" class="btn text-secondary" onclick="openNav()">
+                <i class="fa fa-cog fa-2x"></i>
+            </button>
+        </div>
         <div class="container">
             <a class="navbar-brand" href="{% url 'index' %}">eBay Calculator</a>
             {% if not user.is_authenticated %}
@@ -57,7 +62,30 @@
 
     {% include 'modals/costs.html' %}
 
-    {% block content %}
-    {% endblock %}
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+        <a href="#">Clients</a>
+        <a href="#">Contact</a>
+    </div>
+    
+    <div id="main">
+        {% block content %}
+        {% endblock %}
+    </div>
+        
+
+    <script>
+        function openNav() {
+          document.getElementById("mySidenav").style.width = "250px";
+          document.getElementById("main").style.marginLeft = "250px";
+        }
+        
+        function closeNav() {
+          document.getElementById("mySidenav").style.width = "0";
+          document.getElementById("main").style.marginLeft= "0";
+        }
+        </script>
 </body>
 </html>
