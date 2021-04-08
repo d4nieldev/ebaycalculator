@@ -372,9 +372,6 @@ def filter_sales(request):
         if str(date) != 'all':
             year = int(str(date).split('-')[0])
             month = int(str(date).split('-')[1])
-
-            # context['user_sales_filtered_y'] = year
-            # context['user_sales_filtered_m'] = month
             
             date_from = f'{year}-{month}-16'
             date_to = f'{year}-{month+1}-15'
@@ -397,10 +394,13 @@ def filter_sales(request):
         hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user)
         
         sales_data = serializers.serialize('json', sales_qs)
-        returned_data = serializers.serialize('json', returned_qs)
-        hipshipper_data = serializers.serialize('json', hipshipper_qs)
-
-        data = sales_data[:-1] + ", " + returned_data[1:]
-        data = data[:-1] + ", " + hipshipper_data[1:]
+        data = sales_data
+        
+        if returned_qs:
+            returned_data = serializers.serialize('json', returned_qs)
+            data = sales_data[:-1] + ", " + returned_data[1:]
+        if hipshipper_qs:
+            hipshipper_data = serializers.serialize('json', hipshipper_qs)
+            data = data[:-1] + ", " + hipshipper_data[1:]
 
         return HttpResponse(data, content_type="application/json")

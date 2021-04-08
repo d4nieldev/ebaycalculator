@@ -745,14 +745,15 @@ function filter_sales(){
         data: {
             date: value,
         },
-        success: function(date){
+        success: function(d){
             table_string = ""
+            console.log(d);
 
             sales = []
             returned_sales = []
             hipshipper = []
 
-            $(date).each(function(){
+            $(d).each(function(){
                 model = this.model;
                 data = this.fields;
 
@@ -854,6 +855,8 @@ function filter_sales(){
             ebay_bill = parseFloat($("#total_sum_eBay_tax").html()) + parseFloat($("#total_sum_promoted").html())
             $("#ebay-bill").html("eBay Bill: $" + parseFloat(-1*ebay_bill));
         }
+    }).fail(function(xhr){
+        console.log(xhr);
     })
 }
 
