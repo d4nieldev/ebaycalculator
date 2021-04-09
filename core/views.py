@@ -11,7 +11,7 @@ from django.contrib import messages
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from .forms import SignUpForm, SaleEntryForm, GiftForm, CostForm, HipShipperForm
+from .forms import SignUpForm, SaleEntryForm, GiftForm, CostForm, HipShipperForm, PreferencesForm
 
 from .models import SaleEntry, Balance, Gift, Cost, HipShipper, ReturnedSale, Preferences
 
@@ -186,7 +186,7 @@ def panel(request):
         'giftform': GiftForm(),
         'costform': CostForm(),
         'hipshipperform': HipShipperForm(),
-        'user_sales': user_sales,
+        'preferencesform': PreferencesForm(),
         'hipshippers': HipShipper.objects.all(),
         'user_balance': Balance.objects.get(user=request.user).balance,
         'paypal_balance': Balance.objects.get(user=request.user).paypal_balance,
@@ -195,32 +195,5 @@ def panel(request):
         'preferences': user_prefs
     }
     
-    """ if request.method == "GET":
-        if "btn_select_date" in request.GET:
-            # filter form
-            selected_filter = request.GET.get('s_filter_sales_by_date')
-
-            if str(selected_filter) != 'all':
-                year = int(str(selected_filter).split('-')[0])
-                month = int(str(selected_filter).split('-')[1])
-
-                context['user_sales_filtered_y'] = year
-                context['user_sales_filtered_m'] = month
-                
-                date_from = f'{year}-{month}-16'
-                date_to = f'{year}-{month+1}-15'
-                
-                if month == 12:
-                    date_from = f'{year}-12-16'
-                    date_to = f'{year+1}-01-15'
-                if month == 9:
-                    date_from = f'{year}-0{month}-16'
-                    date_to = f'{year}-{month+1}-15'
-                elif month < 10:
-                    date_from = f'{year}-0{month}-16'
-                    date_to = f'{year}-0{month+1}-15'
-                
-
-                context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__range=[date_from, date_to]) """
     
     return render(request, 'panel.html', context)

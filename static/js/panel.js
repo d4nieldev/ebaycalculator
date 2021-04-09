@@ -890,10 +890,10 @@ $(document).ready(function(){
         }
         else{
             // open
-            $("#mySidenav").width("15%");
+            $("#mySidenav").width("25%");
             $("#mySidenav").height($(window).height() - $("#main_navbar").height() - parseInt($('html').css('font-size')));
-            $("#main").css("margin-left", "15%");
-            $("#main").width("80%");
+            $("#main").css("margin-left", "25%");
+            $("#main").width("73%");
         }
     })
     
