@@ -932,10 +932,10 @@ $(document).ready(function(){
     // edit preferences
     $(document).on("change", "#form_preferences input,select", function(e){
         if ($(e.target).is("select")){
-            value = $(this).val();
+            value = $(e.target).prop("checked");
         }
         else {
-            value = $(e.target).prop("checked");
+            value = $(this).val();
         }
         $.ajax({
             url: '/edit_preferences',
