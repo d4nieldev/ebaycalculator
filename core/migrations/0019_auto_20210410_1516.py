@@ -19,7 +19,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(set_pref_month),
     ]
-
-    run_before = [
-        ('core', '0018_preferences_sort_by_date'),
-    ]
