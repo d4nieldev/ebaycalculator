@@ -155,7 +155,6 @@ class SaleEntry(models.Model):
 
         if ReturnedSale.objects.filter(sale=self).count() > 0:
             # revert changes of returned sale save
-            print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
             balance_obj.balance += self.tm_fee + self.discount
             balance_obj.paypal_balance += self.paypal_tax
 
@@ -400,9 +399,15 @@ class ReturnedSale(models.Model):
 class Preferences(models.Model):
     user = models.OneToOneField(User, models.CASCADE, default=0)
     is_paypal_editable = models.BooleanField(default=False)
+    default_month = models.BooleanField(default=True) # True for lastmonth else all
+    start_month_day = models.IntegerField(default=16) # month will end in this day minus 1
+    sort_by_date = models.BooleanField(default=False) # True for sort by date else don't sort
 
     def __str__(self):
-        s = str(self.user) + " | "
+        s = "user = " + str(self.user) + " | "
         s += "is_paypal_editable = " + str(self.is_paypal_editable) + " | "
+        s += "default_month = " + str(self.default_month) + " | "
+        s += "start_month_day = " + str(self.start_month_day) + " | "
+        s += "sort_by_date = " + str(self.sort_by_date) + " | "
         
         return s

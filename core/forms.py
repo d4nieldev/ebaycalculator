@@ -5,7 +5,7 @@ from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 
 from django.contrib.auth.models import User
-from .models import SaleEntry, Gift, Cost, HipShipper
+from .models import SaleEntry, Gift, Cost, HipShipper, Preferences
 
 
 class DateInput(forms.DateInput):
@@ -79,5 +79,15 @@ class HipShipperForm(ModelForm):
         widgets = {
             'buyer_paid': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Buyer Paid', 'id':'f_buyer_paid'}),
             'seller_paid': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Seller Paid', 'id':'f_seller_paid'}),
+        }
+
+class PreferencesForm(ModelForm):
+    class Meta:
+        model = Preferences
+        exclude = ('user', "is_paypal_editable",)
+        widgets = {
+            'default_month': forms.CheckboxInput(attrs={"id": "f_default_month"}),
+            'sort_by_date': forms.CheckboxInput(attrs={"id": "f_sort_by_date"}),
+            'start_month_day': forms.Select(attrs={"id": "f_start_month_day", "class": "form-control"}, choices= [(x, x) for x in range(1, 30)])
         }
 

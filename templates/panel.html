@@ -8,65 +8,58 @@
 {% block content %}
 
 {% include 'modals/hipshipper.html' %}
-<div class="container-fluid my-3">
-    <!--Filter Sales-->
-    <form id="form_filter_sales">
-        {% csrf_token %}
-        <div class="row mb-3">
-            <div class="col-2">
-                <select class='form-select' name="s_filter_sales_by_date" id="s_sales_filter_by_date">
-                    <option value="all">All sales</option>
-                    {% for year, month_list in years_months.items %}
-                        {% for month in month_list %}
-                            {% if user_sales_filtered_y == year and user_sales_filtered_m == month %}
-                                <option value="{{ year }}-{{ month }}" selected>{{ year }}-{{ month }}</option>
-                            {% else %}
-                                <option value="{{ year }}-{{ month }}">{{ year }}-{{ month }}</option>
-                            {% endif %}
-                        {% endfor %}
+<!--Filter Sales-->
+<form id="form_filter_sales">
+    {% csrf_token %}
+    <div class="row mb-3">
+        <div class="col-2">
+            <select class='form-select' name="s_filter_sales_by_date" id="s_sales_filter_by_date">
+                <option value="all">All sales</option>
+                {% for year, month_list in years_months.items %}
+                    {% for month in month_list %}
+                        <option value="{{ year }}-{{ month }}">{{ year }}-{{ month }}</option>
                     {% endfor %}
-                </select>
-            </div>
-            
-            <!--Paypal Triplemars container-->
-            <div class="col-5">
-                <div class="row">
-                    <div class='col-4'>
-                        <div class="text-center rounded bg-info py-1 fw-bold text-dark">
-                            <span>Triplemars: </span>
-                            <span id="div_user_balance">${{ user_balance|roundFloat:2 }}</span>
-                        </div>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!--Paypal Triplemars container-->
+        <div class="col-5">
+            <div class="row">
+                <div class='col-4'>
+                    <div class="text-center rounded bg-info py-1 fw-bold text-dark">
+                        <span>Triplemars: </span>
+                        <span id="div_user_balance">${{ user_balance|roundFloat:2 }}</span>
                     </div>
-                    <div class="col-4">
-                        <div class="text-center rounded bg-info py-1 fw-bold text-dark">
-                            <span>PayPal: $</span><span id="div_paypal_balance">{{ paypal_balance|roundFloat:2 }}</span>
-                        </div>
-                    </div>
-                    {% if preferences.is_paypal_editable %}
-                    <div class="col-1">
-                        <button class="btn align-middle bg-success rounded text-center text-light lock-class">
-                            <i class="fa fa-lock-open fa-lg"></i>
-                        </button>
-                    </div>
-                    {% else %}
-                    <div class="col-1">
-                        <button class="btn align-middle bg-danger rounded text-center text-light lock-class">
-                            <i class="fa fa-lock fa-lg"></i>
-                        </button>
-                    </div>
-                    {% endif %}
                 </div>
-            </div>
-            <div class="col-2">
-                <div id="sales-count" class="text-center rounded bg-info py-1 fw-bold text-dark"></div>
-            </div>
-            <div class="col-2">
-                <div id="ebay-bill" class="text-center rounded bg-danger py-1 fw-bold text-dark"></div>
+                <div class="col-4">
+                    <div class="text-center rounded bg-info py-1 fw-bold text-dark">
+                        <span>PayPal: $</span><span id="div_paypal_balance">{{ paypal_balance|roundFloat:2 }}</span>
+                    </div>
+                </div>
+                {% if preferences.is_paypal_editable %}
+                <div class="col-1">
+                    <button class="btn align-middle bg-success rounded text-center text-light lock-class">
+                        <i class="fa fa-lock-open fa-lg"></i>
+                    </button>
+                </div>
+                {% else %}
+                <div class="col-1">
+                    <button class="btn align-middle bg-danger rounded text-center text-light lock-class">
+                        <i class="fa fa-lock fa-lg"></i>
+                    </button>
+                </div>
+                {% endif %}
             </div>
         </div>
-    </form>
+        <div class="col-2">
+            <div id="sales-count" class="text-center rounded bg-info py-1 fw-bold text-dark"></div>
+        </div>
+        <div class="col-2">
+            <div id="ebay-bill" class="text-center rounded bg-danger py-1 fw-bold text-dark"></div>
+        </div>
+    </div>
+</form>
 
-    {% include 'sales_table.html' %}
-</div>
-
+{% include 'sales_table.html' %}
 {% endblock %}

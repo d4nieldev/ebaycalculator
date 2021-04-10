@@ -11,7 +11,7 @@ from django.contrib import messages
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from .forms import SignUpForm, SaleEntryForm, GiftForm, CostForm, HipShipperForm
+from .forms import SignUpForm, SaleEntryForm, GiftForm, CostForm, HipShipperForm, PreferencesForm
 
 from .models import SaleEntry, Balance, Gift, Cost, HipShipper, ReturnedSale, Preferences
 
@@ -61,7 +61,8 @@ def GET_SALES_YEARS_MONTHS(request):
     Example:
     {2020: [11,12], 2021: [1]}
     '''
-    sales = SaleEntry.objects.filter(user=request.user.id)
+    sales = SaleEntry.objects.filter(user=request.user)
+    start_day = Preferences.objects.get(user=request.user).start_month_day
     years_months = {}
 
     for sale in sales:
@@ -69,13 +70,13 @@ def GET_SALES_YEARS_MONTHS(request):
             years_months[sale.date.year] = []
 
     for year in years_months:
-        for sale in SaleEntry.objects.filter(user=request.user.id, date__range=[f'{year}-01-16', f'{year+1}-01-15']):
-            if sale.date.day >= 16:
-                # if the day is 16 or more - it's this month
+        for sale in SaleEntry.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{start_day - 1}']):
+            if sale.date.day >= start_day:
+                # if the day is start day or more - it's this month
                 if sale.date.month not in years_months[year]:
                     years_months[year].append(sale.date.month)
             else:
-                # if the day is less than 16 - it's the prev month
+                # if the day is less than start day - it's the prev month
                 if sale.date.month > 1:
                     if sale.date.month - 1 not in years_months[year]:
                         years_months[year].append(sale.date.month-1)
@@ -93,6 +94,8 @@ def GET_GIFTS_YEARS_MONTHS(request):
     {2020: [11,12], 2021: [1]}
     '''
     gifts = Gift.objects.filter(user=request.user.id)
+    user_prefs = Preferences.objects.get(user=request.user)
+    start_day = user_prefs.start_month_day
     years_months = {}
 
     for gift in gifts:
@@ -100,13 +103,13 @@ def GET_GIFTS_YEARS_MONTHS(request):
             years_months[gift.date.year] = []
 
     for year in years_months:
-        for gift in Gift.objects.filter(user=request.user.id, date__range=[f'{year}-01-16', f'{year+1}-01-15']):
-            if gift.date.day >= 16:
-                # if the day is 16 or more - it's this month
+        for gift in Gift.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{start_day - 1}']):
+            if gift.date.day >= start_day:
+                # if the day is start day or more - it's this month
                 if gift.date.month not in years_months[year]:
                     years_months[year].append(gift.date.month)
             else:
-                # if the day is less than 16 - it's the prev month
+                # if the day is less than start day - it's the prev month
                 if gift.date.month > 1:
                     if gift.date.month - 1 not in years_months[year]:
                         years_months[year].append(gift.date.month-1)
@@ -165,14 +168,6 @@ def panel(request):
     
     View the panel HTML page
     '''
-    user_sales = SaleEntry.objects.filter(user=request.user.id)
-
-    user_returned_sales = []
-    for sale in user_sales:
-        if ReturnedSale.objects.filter(sale=sale).count() != 0:
-            # returned sale found
-            user_returned_sales.append(sale)
-    
     try:
         user_prefs = Preferences.objects.get(user=request.user)
     except ObjectDoesNotExist:
@@ -186,41 +181,13 @@ def panel(request):
         'giftform': GiftForm(),
         'costform': CostForm(),
         'hipshipperform': HipShipperForm(),
-        'user_sales': user_sales,
+        'preferencesform': PreferencesForm(),
         'hipshippers': HipShipper.objects.all(),
         'user_balance': Balance.objects.get(user=request.user).balance,
         'paypal_balance': Balance.objects.get(user=request.user).paypal_balance,
         'costs': Cost.objects.filter(user=request.user),
-        'returned_sales': user_returned_sales,
         'preferences': user_prefs
     }
     
-    """ if request.method == "GET":
-        if "btn_select_date" in request.GET:
-            # filter form
-            selected_filter = request.GET.get('s_filter_sales_by_date')
-
-            if str(selected_filter) != 'all':
-                year = int(str(selected_filter).split('-')[0])
-                month = int(str(selected_filter).split('-')[1])
-
-                context['user_sales_filtered_y'] = year
-                context['user_sales_filtered_m'] = month
-                
-                date_from = f'{year}-{month}-16'
-                date_to = f'{year}-{month+1}-15'
-                
-                if month == 12:
-                    date_from = f'{year}-12-16'
-                    date_to = f'{year+1}-01-15'
-                if month == 9:
-                    date_from = f'{year}-0{month}-16'
-                    date_to = f'{year}-{month+1}-15'
-                elif month < 10:
-                    date_from = f'{year}-0{month}-16'
-                    date_to = f'{year}-0{month+1}-15'
-                
-
-                context['user_sales'] = SaleEntry.objects.filter(user=request.user.id, date__range=[date_from, date_to]) """
     
     return render(request, 'panel.html', context)

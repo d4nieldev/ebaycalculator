@@ -747,7 +747,6 @@ function filter_sales(){
         },
         success: function(d){
             table_string = ""
-            console.log(d);
 
             sales = []
             returned_sales = []
@@ -860,16 +859,47 @@ function filter_sales(){
     })
 }
 
+function get_user_preferences(){
+    USER_PREFERENCES = {};
+
+    prefs_span = $("#user_preferences").html().split(" | ");
+    prefs_span = prefs_span.slice(1, prefs_span.length - 1);
+
+    prefs_span.forEach(function(item){
+        p_name = item.split(" = ")[0];
+        p_value = item.split(" = ")[1];
+
+        if (p_value == "True") p_value = true;
+        else if (p_value == "False") p_value = false;
+        else if (!isNaN(Number(p_value))) p_value = Number(p_value);
+        USER_PREFERENCES[p_name] = p_value;
+    });
+
+    $("#f_default_month").prop("checked", USER_PREFERENCES.default_month);
+    $("#f_start_month_day").val(USER_PREFERENCES.start_month_day);
+    $("#f_sort_by_date").prop("checked", USER_PREFERENCES.sort_by_date);
+
+    return USER_PREFERENCES;
+}
 
 
 $(document).ready(function(){
-    
+    USER_PREFERENCES = get_user_preferences();;
+
     set_gifts_date();
 
     // filter sales
     $(document).on('change', "#s_sales_filter_by_date", filter_sales);
-    $("#s_sales_filter_by_date").val($('#s_sales_filter_by_date option:last-child').val());
-    $("#s_sales_filter_by_date").trigger("change");
+
+    // default month
+    if (USER_PREFERENCES.default_month){
+        $("#s_sales_filter_by_date").val($('#s_sales_filter_by_date option:last-child').val());
+        $("#s_sales_filter_by_date").trigger("change");
+    }
+    else{
+        $("#s_sales_filter_by_date").val("all");
+        $("#s_sales_filter_by_date").trigger("change");
+    }
 
     // paypal balance change manually
     $(document).on("click", ".lock-class", paypal_lock_handler);
@@ -882,6 +912,44 @@ $(document).ready(function(){
         }
     })
     
+    // open and close preferences
+    $(document).on('click', "#btn_open_preferences", function(){
+        if ($("#mySidenav").width() != 0){
+            // close
+            $("#mySidenav").width("0");
+            $("#main").removeAttr("style");
+        }
+        else{
+            // open
+            get_user_preferences();
+            $("#mySidenav").width("25%");
+            $("#mySidenav").height($(window).height() - $("#main_navbar").height() - parseInt($('html').css('font-size')));
+            $("#main").css("margin-left", "25%");
+            $("#main").width("73%");
+        }
+    })
+    
+    // edit preferences
+    $(document).on("change", "#form_preferences input,select", function(e){
+        if ($(e.target).is("select")){
+            value = $(this).val();
+        }
+        else {
+            value = $(e.target).prop("checked");
+        }
+        $.ajax({
+            url: '/edit_preferences',
+            type: 'POST',
+            data: {
+                element_changed: this.id,
+                value: value
+            },
+            success: function(data){
+                // do something when preferences are changed
+            }
+        })
+    });
+
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)
 

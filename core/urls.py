@@ -24,7 +24,8 @@ urlpatterns = [
     path('update_paypal_balance', apiViews.update_paypal_balance, name="update_paypal_balance"),
     path('filter_sales', apiViews.filter_sales, name="filter_sales"),
 
-    # preferences edits
+    # preferences
     path('toggle_paypal_editable', preferences_views.toggle_paypal_editable, name="toggle_paypal_editable"),
+    path('edit_preferences', preferences_views.edit_preferences, name="edit_preferences")
     
 ]
