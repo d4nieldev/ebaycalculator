@@ -860,10 +860,25 @@ function filter_sales(){
     })
 }
 
+function get_user_preferences(){
+    $.ajax({
+        url: "/get_user_preferences",
+        type: "GET",
+        success: function(data){
+            user_prefs = data[0].fields;
+            $("#f_default_month").prop("checked", user_prefs.default_month);
+            $("#f_start_month_day").val(user_prefs.start_month_day);
+        }
+    })
+    
+}
+
 
 $(document).ready(function(){
     
     set_gifts_date();
+
+    get_user_preferences();
 
     // filter sales
     $(document).on('change', "#s_sales_filter_by_date", filter_sales);
@@ -890,6 +905,7 @@ $(document).ready(function(){
         }
         else{
             // open
+            get_user_preferences();
             $("#mySidenav").width("25%");
             $("#mySidenav").height($(window).height() - $("#main_navbar").height() - parseInt($('html').css('font-size')));
             $("#main").css("margin-left", "25%");
@@ -897,6 +913,27 @@ $(document).ready(function(){
         }
     })
     
+    // edit preferences
+    $(document).on("change", "#form_preferences input,select", function(e){
+        if ($(e.target).is("select")){
+            value = $(this).val();
+        }
+        else {
+            value = $(e.target).prop("checked");
+        }
+        $.ajax({
+            url: '/edit_preferences',
+            type: 'POST',
+            data: {
+                element_changed: this.id,
+                value: value
+            },
+            success: function(data){
+                console.log(data);
+            }
+        })
+    });
+
     // editable tables
     $(document).on("dblclick", ".editable", change_editable)
 

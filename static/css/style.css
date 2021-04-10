@@ -136,7 +136,8 @@ body {
 }
 
 .sidenav .display-5{
-    padding-top: 1.5rem;
+    padding: 1.5rem 0 1.5rem 0;
+    font-weight: bold;
 }
   
 #main {

@@ -68,23 +68,26 @@
         <!--sidebar-->
         {% if user.is_authenticated %}
         <div id="mySidenav" class="sidenav">
-            <div class="display-5">Preferences</div>
-            <form id="form_preferences">
-                <div class="row">
-                    <div class="col-9">Show sales from last month by default: </div>
-                    <div class="col-3">
-                        <label class="switch">
-                            {{ preferencesform.default_month }}
-                            <span class="slider round"></span>
-                        </label>
+            <div class="text-center p-4">
+                <div class="display-5">Preferences</div>
+                <form id="form_preferences">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-9">Show sales from last month by default: </div>
+                        <div class="col-3">
+                            <label class="switch">
+                                {{ preferencesform.default_month }}
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="border-bottom mt-4 mb-4"></div>
-                <div class="row">
-                    <div class="col-9">Start month from: </div>
-                    <div class="col-3">{{ preferencesform.start_month_day }}</div>
-                </div>
-            </form>
+                    <div class="border-bottom mt-4 mb-4"></div>
+                    <div class="row">
+                        <div class="col-9">Start month from: </div>
+                        <div class="col-3">{{ preferencesform.start_month_day }}</div>
+                    </div>
+                </form>
+            </div>
         </div>
         {% endif %}
 
