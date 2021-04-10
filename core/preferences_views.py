@@ -18,7 +18,8 @@ def toggle_paypal_editable(request):
             user_prefs = Preferences.objects.get(user=request.user)
         except ObjectDoesNotExist:
             user_prefs = Preferences(user=request.user)
-        user_prefs.is_paypal_editable = request.POST['value'] == 'false'
+
+        user_prefs.is_paypal_editable = bool(request.POST['value'])
         user_prefs.save()
 
         print(user_prefs)
