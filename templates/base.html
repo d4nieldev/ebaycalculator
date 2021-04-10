@@ -68,6 +68,7 @@
         <!--sidebar-->
         {% if user.is_authenticated %}
         <div id="mySidenav" class="sidenav">
+            <span id="user_preferences" class="d-none">{{ preferences }}</span>
             <div class="text-center p-4">
                 <div class="display-5">Preferences</div>
                 <form id="form_preferences">

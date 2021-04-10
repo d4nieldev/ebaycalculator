@@ -747,7 +747,6 @@ function filter_sales(){
         },
         success: function(d){
             table_string = ""
-            console.log(d);
 
             sales = []
             returned_sales = []
@@ -875,6 +874,22 @@ function get_user_preferences(){
 
 
 $(document).ready(function(){
+    USER_PREFERENCES = {};
+
+    prefs_span = $("#user_preferences").html().split(" | ");
+    prefs_span = prefs_span.slice(1, prefs_span.length - 1);
+
+    prefs_span.forEach(function(item){
+        p_name = item.split(" = ")[0];
+        p_value = item.split(" = ")[1];
+
+        if (p_value == "True") p_value = true;
+        else if (p_value == "False") p_value = false;
+        else if (!isNaN(Number(p_value))) p_value = Number(p_value);
+        USER_PREFERENCES[p_name] = p_value;
+    });
+
+    console.log(USER_PREFERENCES);
     
     set_gifts_date();
 
@@ -882,8 +897,16 @@ $(document).ready(function(){
 
     // filter sales
     $(document).on('change', "#s_sales_filter_by_date", filter_sales);
-    $("#s_sales_filter_by_date").val($('#s_sales_filter_by_date option:last-child').val());
-    $("#s_sales_filter_by_date").trigger("change");
+
+    // default month
+    if (USER_PREFERENCES.default_month){
+        $("#s_sales_filter_by_date").val($('#s_sales_filter_by_date option:last-child').val());
+        $("#s_sales_filter_by_date").trigger("change");
+    }
+    else{
+        $("#s_sales_filter_by_date").val("all");
+        $("#s_sales_filter_by_date").trigger("change");
+    }
 
     // paypal balance change manually
     $(document).on("click", ".lock-class", paypal_lock_handler);

@@ -17,11 +17,11 @@
                 <option value="all">All sales</option>
                 {% for year, month_list in years_months.items %}
                     {% for month in month_list %}
-                        {% if user_sales_filtered_y == year and user_sales_filtered_m == month %}
+                        <!--{% if user_sales_filtered_y == year and user_sales_filtered_m == month %}
                             <option value="{{ year }}-{{ month }}" selected>{{ year }}-{{ month }}</option>
-                        {% else %}
+                        {% else %}-->
                             <option value="{{ year }}-{{ month }}">{{ year }}-{{ month }}</option>
-                        {% endif %}
+                        <!--{% endif %}-->
                     {% endfor %}
                 {% endfor %}
             </select>

@@ -404,7 +404,7 @@ class Preferences(models.Model):
     start_month_day = models.IntegerField(default=16) # month will end in this day minus 1
 
     def __str__(self):
-        s = str(self.user) + " | "
+        s = "user = " + str(self.user) + " | "
         s += "is_paypal_editable = " + str(self.is_paypal_editable) + " | "
         s += "default_month = " + str(self.default_month) + " | "
         s += "start_month_day = " + str(self.start_month_day) + " | " 
