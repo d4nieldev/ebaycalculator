@@ -699,6 +699,7 @@ function paypal_lock_handler(e){
             value: $(this).hasClass("bg-success")
         },
         success: function(response){
+            console.log(response);
             $(".lock-class").toggleClass("bg-success bg-danger");
 
             if ($(".lock-class").hasClass("bg-success")){
@@ -932,10 +933,10 @@ $(document).ready(function(){
     // edit preferences
     $(document).on("change", "#form_preferences input,select", function(e){
         if ($(e.target).is("select")){
-            value = $(e.target).prop("checked");
+            value = $(this).val();
         }
         else {
-            value = $(this).val();
+            value = $(e.target).prop("checked");
         }
         $.ajax({
             url: '/edit_preferences',
