@@ -860,20 +860,6 @@ function filter_sales(){
 }
 
 function get_user_preferences(){
-    $.ajax({
-        url: "/get_user_preferences",
-        type: "GET",
-        success: function(data){
-            user_prefs = data[0].fields;
-            $("#f_default_month").prop("checked", user_prefs.default_month);
-            $("#f_start_month_day").val(user_prefs.start_month_day);
-        }
-    })
-    
-}
-
-
-$(document).ready(function(){
     USER_PREFERENCES = {};
 
     prefs_span = $("#user_preferences").html().split(" | ");
@@ -889,7 +875,15 @@ $(document).ready(function(){
         USER_PREFERENCES[p_name] = p_value;
     });
 
-    console.log(USER_PREFERENCES);
+        $("#f_default_month").prop("checked", USER_PREFERENCES.default_month);
+        $("#f_start_month_day").val(USER_PREFERENCES.start_month_day);
+}
+
+
+$(document).ready(function(){
+    USER_PREFERENCES = {};
+
+    
     
     set_gifts_date();
 
@@ -952,7 +946,7 @@ $(document).ready(function(){
                 value: value
             },
             success: function(data){
-                console.log(data);
+                // do something when preferences are changed
             }
         })
     });

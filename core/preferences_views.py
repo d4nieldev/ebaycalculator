@@ -31,13 +31,6 @@ def toggle_paypal_editable(request):
         "error": "error has occured"
     })
 
-def get_user_preferences(request):
-    if request.user.is_authenticated:
-        user_prefs = Preferences.objects.filter(user=request.user)
-        data = serializers.serialize('json', user_prefs)
-        return HttpResponse(data, 'application/json')
-    return JsonResponse({"success": "Hey!"})
-
 
 @csrf_exempt
 def edit_preferences(request):

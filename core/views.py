@@ -61,7 +61,8 @@ def GET_SALES_YEARS_MONTHS(request):
     Example:
     {2020: [11,12], 2021: [1]}
     '''
-    sales = SaleEntry.objects.filter(user=request.user.id)
+    sales = SaleEntry.objects.filter(user=request.user)
+    start_day = Preferences.objects.get(user=request.user).start_month_day
     years_months = {}
 
     for sale in sales:
@@ -69,13 +70,13 @@ def GET_SALES_YEARS_MONTHS(request):
             years_months[sale.date.year] = []
 
     for year in years_months:
-        for sale in SaleEntry.objects.filter(user=request.user.id, date__range=[f'{year}-01-16', f'{year+1}-01-15']):
-            if sale.date.day >= 16:
-                # if the day is 16 or more - it's this month
+        for sale in SaleEntry.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{start_day - 1}']):
+            if sale.date.day >= start_day:
+                # if the day is start day or more - it's this month
                 if sale.date.month not in years_months[year]:
                     years_months[year].append(sale.date.month)
             else:
-                # if the day is less than 16 - it's the prev month
+                # if the day is less than start day - it's the prev month
                 if sale.date.month > 1:
                     if sale.date.month - 1 not in years_months[year]:
                         years_months[year].append(sale.date.month-1)
@@ -93,6 +94,8 @@ def GET_GIFTS_YEARS_MONTHS(request):
     {2020: [11,12], 2021: [1]}
     '''
     gifts = Gift.objects.filter(user=request.user.id)
+    user_prefs = Preferences.objects.get(user=request.user)
+    start_day = user_prefs.start_month_day
     years_months = {}
 
     for gift in gifts:
@@ -100,13 +103,13 @@ def GET_GIFTS_YEARS_MONTHS(request):
             years_months[gift.date.year] = []
 
     for year in years_months:
-        for gift in Gift.objects.filter(user=request.user.id, date__range=[f'{year}-01-16', f'{year+1}-01-15']):
-            if gift.date.day >= 16:
-                # if the day is 16 or more - it's this month
+        for gift in Gift.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{start_day - 1}']):
+            if gift.date.day >= start_day:
+                # if the day is start day or more - it's this month
                 if gift.date.month not in years_months[year]:
                     years_months[year].append(gift.date.month)
             else:
-                # if the day is less than 16 - it's the prev month
+                # if the day is less than start day - it's the prev month
                 if gift.date.month > 1:
                     if gift.date.month - 1 not in years_months[year]:
                         years_months[year].append(gift.date.month-1)
