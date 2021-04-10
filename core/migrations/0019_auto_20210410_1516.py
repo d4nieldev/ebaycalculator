@@ -19,3 +19,5 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(set_pref_month),
     ]
+
+# some comment to trigger heroku
