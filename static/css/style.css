@@ -51,6 +51,7 @@ body {
     position: absolute;
     top: 8px;
     margin: auto;
+    left: 0;
     padding: 5px 8px;
     color: #aaa;
     transition: .3s;
