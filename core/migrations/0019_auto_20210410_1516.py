@@ -13,9 +13,13 @@ def set_pref_month(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0018_preferences_sort_by_date'),
+        ('core', '0017_auto_20210409_1839'),
     ]
 
     operations = [
         migrations.RunPython(set_pref_month),
+    ]
+
+    run_before = [
+        ('core', '0018_preferences_sort_by_date'),
     ]
