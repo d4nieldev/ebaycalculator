@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='preferences',
             name='default_month',
-            field=models.CharField(default='lastmonth', max_length=10),
+            field=models.BooleanField(default=True),
         ),
         migrations.AddField(
             model_name='preferences',
