@@ -875,19 +875,18 @@ function get_user_preferences(){
         USER_PREFERENCES[p_name] = p_value;
     });
 
-        $("#f_default_month").prop("checked", USER_PREFERENCES.default_month);
-        $("#f_start_month_day").val(USER_PREFERENCES.start_month_day);
+    $("#f_default_month").prop("checked", USER_PREFERENCES.default_month);
+    $("#f_start_month_day").val(USER_PREFERENCES.start_month_day);
+    $("#f_sort_by_date").prop("checked", USER_PREFERENCES.sort_by_date);
+
+    return USER_PREFERENCES;
 }
 
 
 $(document).ready(function(){
-    USER_PREFERENCES = {};
+    USER_PREFERENCES = get_user_preferences();;
 
-    
-    
     set_gifts_date();
-
-    get_user_preferences();
 
     // filter sales
     $(document).on('change', "#s_sales_filter_by_date", filter_sales);

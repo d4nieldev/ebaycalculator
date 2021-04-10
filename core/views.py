@@ -168,14 +168,6 @@ def panel(request):
     
     View the panel HTML page
     '''
-    user_sales = SaleEntry.objects.filter(user=request.user.id)
-
-    user_returned_sales = []
-    for sale in user_sales:
-        if ReturnedSale.objects.filter(sale=sale).count() != 0:
-            # returned sale found
-            user_returned_sales.append(sale)
-    
     try:
         user_prefs = Preferences.objects.get(user=request.user)
     except ObjectDoesNotExist:
@@ -194,7 +186,6 @@ def panel(request):
         'user_balance': Balance.objects.get(user=request.user).balance,
         'paypal_balance': Balance.objects.get(user=request.user).paypal_balance,
         'costs': Cost.objects.filter(user=request.user),
-        'returned_sales': user_returned_sales,
         'preferences': user_prefs
     }
     

@@ -43,6 +43,8 @@ def edit_preferences(request):
             user_prefs.default_month = True if value == "true" else False
         elif elem_changed == "f_start_month_day":
             user_prefs.start_month_day = int(value)
+        elif elem_changed == "f_sort_by_date":
+            user_prefs.sort_by_date = True if value == "true" else False
         
         user_prefs.save()
         return JsonResponse({"success": f"{elem_changed} changed to {value} successfully!"})

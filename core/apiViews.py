@@ -139,6 +139,7 @@ def filter_gifts(request):
         gifts_qs = None
         date = str(request.GET['date'])
         start_day = Preferences.objects.get(user=request.user).start_month_day
+        sort_by_date = Preferences.objects.get(user=request.user).sort_by_date
 
         if date != 'Show Gift Cards From':
             if date == 'all':
@@ -164,6 +165,9 @@ def filter_gifts(request):
 
                 # get the relevant gifts
                 gifts_qs = Gift.objects.filter(user=request.user.id, date__range=[date_from, date_to])
+
+            if sort_by_date:
+                gifts_qs = gifts_qs.order_by('date')
 
             # serialize the query set so it could be given as a json response
             data = serializers.serialize('json', gifts_qs)
@@ -370,6 +374,7 @@ def filter_sales(request):
     if request.method == 'POST':
         date = request.POST['date']
         start_day = Preferences.objects.get(user=request.user).start_month_day
+        sort_by_date = Preferences.objects.get(user=request.user).sort_by_date
         
         if str(date) != 'all':
             year = int(str(date).split('-')[0])
@@ -388,12 +393,22 @@ def filter_sales(request):
                 date_from = f'{year}-0{month}-{start_day}'
                 date_to = f'{year}-0{month+1}-{start_day - 1}'
             
-            sales_qs = SaleEntry.objects.filter(user=request.user, date__range=[date_from, date_to])
+            if sort_by_date:
+                sales_qs = SaleEntry.objects.filter(user=request.user, date__range=[date_from, date_to]).order_by('date')
+            else:
+                sales_qs = SaleEntry.objects.filter(user=request.user, date__range=[date_from, date_to])
         else:
             sales_qs = SaleEntry.objects.filter(user=request.user)
         
-        returned_qs = ReturnedSale.objects.filter(sale__user=request.user)
-        hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user)
+        if sort_by_date:
+            returned_qs = ReturnedSale.objects.filter(sale__user=request.user).order_by('sale__date')
+        else:
+            returned_qs = ReturnedSale.objects.filter(sale__user=request.user)
+
+        if sort_by_date:
+            hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user).order_by('sale_entry__date')
+        else:
+            hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user)
         
         data = ''
         if sales_qs:

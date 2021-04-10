@@ -87,6 +87,7 @@ class PreferencesForm(ModelForm):
         exclude = ('user', "is_paypal_editable",)
         widgets = {
             'default_month': forms.CheckboxInput(attrs={"id": "f_default_month"}),
+            'sort_by_date': forms.CheckboxInput(attrs={"id": "f_sort_by_date"}),
             'start_month_day': forms.Select(attrs={"id": "f_start_month_day", "class": "form-control"}, choices= [(x, x) for x in range(1, 30)])
         }
 
