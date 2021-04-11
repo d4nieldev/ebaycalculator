@@ -21,7 +21,10 @@ def toggle_paypal_editable(request):
 
         print("HERE")
 
-        user_prefs.is_paypal_editable = request.POST['value'] == "false"
+        if (request.POST['value'] == "false"):
+            user_prefs.is_paypal_editable = True
+        else:
+            user_prefs.is_paypal_editable = False
         user_prefs.save()
 
         print(user_prefs)
