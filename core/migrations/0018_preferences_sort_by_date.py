@@ -5,8 +5,9 @@ from django.db import migrations, models
 def set_pref_month(apps, schema_editor):
     Preferences = apps.get_model('core', 'Preferences')
     for pref in Preferences.objects.all():
-        pref.default_month = True
-        pref.save()
+        if type(pref.default_month) is not bool:
+            pref.default_month = True
+            pref.save()
 
 
 class Migration(migrations.Migration):

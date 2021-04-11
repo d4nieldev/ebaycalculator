@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 from django.core import serializers
 
@@ -20,7 +20,14 @@ def toggle_paypal_editable(request):
             user_prefs = Preferences(user=request.user)
 
         user_prefs.is_paypal_editable = not user_prefs.is_paypal_editable
-        user_prefs.save()
+        try:
+            user_prefs.save()
+        except ValidationError:
+            return JsonResponse({
+                'ERROR': '',
+                'user prefs.is_paypal_editable': user_prefs.is_paypal_editable,
+                'request': request.POST
+            })
 
         print(user_prefs)
 
