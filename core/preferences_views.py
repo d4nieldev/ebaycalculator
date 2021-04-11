@@ -51,11 +51,11 @@ def edit_preferences(request):
             value = False
 
         if elem_changed == "f_default_month":
-            user_prefs.default_month = value == "true"
+            user_prefs.default_month = value
         elif elem_changed == "f_start_month_day":
-            user_prefs.start_month_day = int(value)
+            user_prefs.start_month_day = request.POST['value']
         elif elem_changed == "f_sort_by_date":
-            user_prefs.sort_by_date = value == "true"
+            user_prefs.sort_by_date = value
         
         try:
             user_prefs.save()
