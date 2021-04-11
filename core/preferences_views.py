@@ -13,7 +13,7 @@ import json
 
 @csrf_exempt
 def toggle_paypal_editable(request):
-    if request.method == "POST" and request.POST['value']:
+    if request.method == "POST" and bool(request.POST['value']):
         try:
             user_prefs = Preferences.objects.get(user=request.user)
         except ObjectDoesNotExist:
