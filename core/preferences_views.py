@@ -56,9 +56,9 @@ def edit_preferences(request):
         
         try:
             user_prefs.save()
-        except ValidationError:
+        except ValidationError as err:
             return JsonResponse({
-                "ERROR": "not sure why but it works"
+                "ERROR": err.message
             })
         return JsonResponse({"success": f"{elem_changed} changed to {value} successfully!"})
     return JsonResponse({"failure": "an error has occured"})
