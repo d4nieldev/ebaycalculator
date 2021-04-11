@@ -45,7 +45,10 @@ def edit_preferences(request):
     if request.method == "POST":
         user_prefs = Preferences.objects.get(user=request.user)
         elem_changed = request.POST['element_changed']
-        value = request.POST['value']
+        if request.POST['value'] == 'true':
+            value = True
+        elif request.POST['value'] == 'false':
+            value = False
 
         if elem_changed == "f_default_month":
             user_prefs.default_month = value == "true"
