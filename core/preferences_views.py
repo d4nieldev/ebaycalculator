@@ -26,6 +26,7 @@ def toggle_paypal_editable(request):
             return JsonResponse({
                 'ERROR': '',
                 'user prefs.is_paypal_editable': user_prefs.is_paypal_editable,
+                'user prefs is paypal editable type': type(user_prefs.is_paypal_editable),
                 'request': request.POST
             })
 
