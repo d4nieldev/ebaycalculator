@@ -26,7 +26,6 @@ def toggle_paypal_editable(request):
             return JsonResponse({
                 'ERROR': '',
                 'user prefs.is_paypal_editable': user_prefs.is_paypal_editable,
-                'user prefs is paypal editable type': type(user_prefs.is_paypal_editable),
                 'request': request.POST
             })
 
@@ -55,6 +54,11 @@ def edit_preferences(request):
         elif elem_changed == "f_sort_by_date":
             user_prefs.sort_by_date = value == "true"
         
-        user_prefs.save()
+        try:
+            user_prefs.save()
+        except ValidationError:
+            return JsonResponse({
+                "ERROR": "not sure why but it works"
+            })
         return JsonResponse({"success": f"{elem_changed} changed to {value} successfully!"})
     return JsonResponse({"failure": "an error has occured"})
