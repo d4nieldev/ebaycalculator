@@ -44,16 +44,16 @@ def toggle_paypal_editable(request):
 @csrf_exempt
 def edit_preferences(request):
     if request.method == 'POST':
+        response = {}
         user_prefs = Preferences.objects.get(user=request.user)
+        response['old_prefs'] = str(user_prefs)
         form = PreferencesForm(request.POST, instance=user_prefs)
         if form.is_valid():
             obj = form.save()
+            response['new_prefs'] = str(obj)
+            response['success'] = "preferences saved successfully!"
 
-            return JsonResponse({
-                "success": "preferences saved successfully!",
-                'old_prefs': str(user_prefs),
-                "new_prefs": str(obj)
-                })
+            return JsonResponse(response)
     
     return JsonResponse({"failure": "an error has occured..."})
 
