@@ -690,50 +690,36 @@ function return_sale(){
 function paypal_lock_handler(e){
     e.preventDefault();
 
-    console.log($(this).hasClass("bg-success"));
+    $(".lock-class").toggleClass("bg-success bg-danger");
 
-    $.ajax({
-        url: "/toggle_paypal_editable",
-        type: "POST",
-        data: {
-            value: $(this).hasClass("bg-success")
-        },
-        success: function(response){
-            console.log(response);
-            $(".lock-class").toggleClass("bg-success bg-danger");
-
-            if ($(".lock-class").hasClass("bg-success")){
-                // unlocked
-                $(".lock-class").html("<i class='fa fa-lock-open fa-lg'></i>")
-                paypal_balance_value = $("#div_paypal_balance").html()
-                $("#div_paypal_balance").html(`
-                 <input type='number' id='txt_paypal_balance' class='form-control editable-paypal-balance'
-                 value='` + paypal_balance_value + `' data-lastvalue='` + paypal_balance_value + `' />`)
-            }
-            else{
-                // locked
-                $(".lock-class").html("<i class='fa fa-lock fa-lg'></i>")
-                lastvalue = $("#txt_paypal_balance").data("lastvalue")
-                curvalue = $("#txt_paypal_balance").val()
-                
-                if (lastvalue != curvalue){
-                    console.log(curvalue)
-                    $.ajax({
-                        url: '/update_paypal_balance',
-                        type: 'POST',
-                        data: {
-                            value: curvalue
-                        },
-                        success: function(response){
-                            console.log(response);
-                        }
-                    })
+    if ($(".lock-class").hasClass("bg-success")){
+        // unlocked
+        $(".lock-class").html("<i class='fa fa-lock-open fa-lg'></i>")
+        paypal_balance_value = $("#div_paypal_balance").html()
+        $("#div_paypal_balance").html(`
+            <input type='number' id='txt_paypal_balance' class='form-control editable-paypal-balance'
+            value='` + paypal_balance_value + `' data-lastvalue='` + paypal_balance_value + `' />`)
+    }
+    else{
+        // locked
+        $(".lock-class").html("<i class='fa fa-lock fa-lg'></i>")
+        lastvalue = $("#txt_paypal_balance").data("lastvalue")
+        curvalue = $("#txt_paypal_balance").val()
+        
+        if (lastvalue != curvalue){
+            console.log(curvalue)
+            $.ajax({
+                url: '/update_paypal_balance',
+                type: 'POST',
+                data: {
+                    value: curvalue
+                },
+                success: function(response){
+                    console.log(response);
                 }
-                $("#div_paypal_balance").html(curvalue);
-                
-            }
+            })
         }
-    })
+        $("#div_paypal_balance").html(curvalue);
     
 }
 

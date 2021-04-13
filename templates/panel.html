@@ -37,19 +37,11 @@
                         <span>PayPal: $</span><span id="div_paypal_balance">{{ paypal_balance|roundFloat:2 }}</span>
                     </div>
                 </div>
-                {% if preferences.is_paypal_editable %}
-                <div class="col-1">
-                    <button class="btn align-middle bg-success rounded text-center text-light lock-class">
-                        <i class="fa fa-lock-open fa-lg"></i>
-                    </button>
-                </div>
-                {% else %}
                 <div class="col-1">
                     <button class="btn align-middle bg-danger rounded text-center text-light lock-class">
                         <i class="fa fa-lock fa-lg"></i>
                     </button>
                 </div>
-                {% endif %}
             </div>
         </div>
         <div class="col-2">

@@ -398,7 +398,6 @@ class ReturnedSale(models.Model):
 
 class Preferences(models.Model):
     user = models.OneToOneField(User, models.CASCADE, default=0)
-    is_paypal_editable = models.BooleanField(default=False)
     default_month = models.BooleanField(default=True) # True for lastmonth else all
     start_month_day = models.IntegerField(default=16) # month will end in this day minus 1
     sort_by_date = models.BooleanField(default=False) # True for sort by date else don't sort
