@@ -870,23 +870,50 @@ function get_user_preferences(){
 }
 
 
+function edit_preferences(e){
+    e.preventDefault();
+    $.ajax({
+        url: '/edit_preferences',
+        type: 'POST',
+        data:{
+            default_month: $("#f_default_month").prop("checked"),
+            sort_by_date: $("#f_sort_by_date").prop("checked"),
+            start_month_day: $("#f_start_month_day").val()
+        },
+        success: function(response){
+            // do something when preferences changes
+        }
+    })
+}
+
+function open_close_preferences(){
+    if ($("#mySidenav").width() != 0){
+        // close
+        $("#mySidenav").width("0");
+        $("#main").removeAttr("style");
+    }
+    else{
+        // open
+        get_user_preferences();
+        $("#mySidenav").width("25%");
+        $("#mySidenav").height($(window).height() - $("#main_navbar").height() - parseInt($('html').css('font-size')));
+        $("#main").css("margin-left", "25%");
+        $("#main").width("73%");
+    }
+}
+
 $(document).ready(function(){
     USER_PREFERENCES = get_user_preferences();;
-    console.log(USER_PREFERENCES);
+
     set_gifts_date();
 
     // filter sales
     $(document).on('change', "#s_sales_filter_by_date", filter_sales);
 
     // default month
-    if (USER_PREFERENCES.default_month){
-        $("#s_sales_filter_by_date").val($('#s_sales_filter_by_date option:last-child').val());
-        $("#s_sales_filter_by_date").trigger("change");
-    }
-    else{
-        $("#s_sales_filter_by_date").val("all");
-        $("#s_sales_filter_by_date").trigger("change");
-    }
+    if (USER_PREFERENCES.default_month) $("#s_sales_filter_by_date").val($('#s_sales_filter_by_date option:last-child').val());
+    else $("#s_sales_filter_by_date").val("all");
+    $("#s_sales_filter_by_date").trigger("change");
 
     // paypal balance change manually
     $(document).on("click", ".lock-class", paypal_lock_handler);
@@ -900,21 +927,7 @@ $(document).ready(function(){
     })
     
     // open and close preferences
-    $(document).on('click', "#btn_open_preferences", function(){
-        if ($("#mySidenav").width() != 0){
-            // close
-            $("#mySidenav").width("0");
-            $("#main").removeAttr("style");
-        }
-        else{
-            // open
-            get_user_preferences();
-            $("#mySidenav").width("25%");
-            $("#mySidenav").height($(window).height() - $("#main_navbar").height() - parseInt($('html').css('font-size')));
-            $("#main").css("margin-left", "25%");
-            $("#main").width("73%");
-        }
-    })
+    $(document).on('click', "#btn_open_preferences", open_close_preferences)
     
     // edit preferences
     $(document).on("change", "#form_preferences input,select", function(e){
@@ -941,22 +954,7 @@ $(document).ready(function(){
     $(document).on("submit", "#form_hipshipper", add_hipshipper);
     $(document).on("submit", '#balance-form', add_balance);
     $(document).on("submit", '#cost-register', add_cost);
-    $(document).on("submit", "#form_preferences", function(e){
-        e.preventDefault();
-        $.ajax({
-            url: '/edit_preferences',
-            type: 'POST',
-            data:{
-                default_month: $("#f_default_month").prop("checked"),
-                sort_by_date: $("#f_sort_by_date").prop("checked"),
-                start_month_day: $("#f_start_month_day").val()
-            },
-            success: function(response){
-                console.log(response);
-            }
-        })
-    });
-    // $(document).on("submit", "#form-generate-report", generate_report);
+    $(document).on("submit", "#form_preferences", edit_preferences);
 
     // delete models
     $(document).on("click", "#table_costs .btn-delete-cost", delete_cost);

@@ -15,17 +15,13 @@ import json
 @csrf_exempt
 def edit_preferences(request):
     if request.method == 'POST':
-        response = {}
         user_prefs = Preferences.objects.get(user=request.user)
-        response['old_prefs'] = str(user_prefs)
         form = PreferencesForm(request.POST, instance=user_prefs)
-        response['POST request'] = request.POST
+        
         if form.is_valid():
-            obj = form.save()
-            response['new_prefs'] = str(obj)
-            response['success'] = "preferences saved successfully!"
+            form.save()
 
-            return JsonResponse(response)
+            return JsonResponse({'success': "preferences saved successfully!"})
     
     return JsonResponse({"failure": "an error has occured..."})
 
