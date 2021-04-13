@@ -47,9 +47,13 @@ def edit_preferences(request):
         user_prefs = Preferences.objects.get(user=request.user)
         form = PreferencesForm(request.POST, instance=user_prefs)
         if form.is_valid():
-            form.save()
+            obj = form.save()
 
-            return JsonResponse({"success": "preferences saved successfully!"})
+            return JsonResponse({
+                "success": "preferences saved successfully!",
+                'old_prefs': str(user_prefs),
+                "new_prefs": str(obj)
+                })
     
     return JsonResponse({"failure": "an error has occured..."})
 
