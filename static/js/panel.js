@@ -947,6 +947,7 @@ $(document).ready(function(){
             },
             success: function(data){
                 // do something when preferences are changed
+                console.log(data);
             }
         })
     });
