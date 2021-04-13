@@ -720,7 +720,7 @@ function paypal_lock_handler(e){
             })
         }
         $("#div_paypal_balance").html(curvalue);
-    
+    }
 }
 
 function filter_sales(){
@@ -1018,5 +1018,3 @@ $(document).ready(function(){
 
     });
 });
-
-
