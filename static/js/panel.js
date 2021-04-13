@@ -872,7 +872,7 @@ function get_user_preferences(){
 
 $(document).ready(function(){
     USER_PREFERENCES = get_user_preferences();;
-
+    console.log(USER_PREFERENCES);
     set_gifts_date();
 
     // filter sales
