@@ -1,4 +1,5 @@
 from .models import Preferences
+from .forms import PreferencesForm
 
 from django.http import JsonResponse, HttpResponse
 
@@ -42,29 +43,13 @@ def toggle_paypal_editable(request):
 
 @csrf_exempt
 def edit_preferences(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         user_prefs = Preferences.objects.get(user=request.user)
-        elem_changed = request.POST['element_changed']
-        if request.POST['value'] == 'true':
-            value = True
-        elif request.POST['value'] == 'false':
-            value = False
+        form = PreferencesForm(request.POST, instance=user_prefs)
+        if form.is_valid():
+            form.save()
 
-        err_response = {}
-        if elem_changed == "f_default_month":
-            err_response['f_default_month'] = value
-            user_prefs.default_month = value
-        elif elem_changed == "f_start_month_day":
-            err_response['f_start_month_day'] = int(request.POST['value'])
-            user_prefs.start_month_day = int(request.POST['value'])
-        elif elem_changed == "f_sort_by_date":
-            err_response['f_sort_by_date'] = value
-            user_prefs.sort_by_date = value
-        
-        try:
-            user_prefs.save()
-        except ValidationError as err:
-            err_response['ERROR MESSAGE'] = err.message
-            return JsonResponse(err_response)
-        return JsonResponse({"success": f"{elem_changed} changed to {value} successfully!"})
-    return JsonResponse({"failure": "an error has occured"})
+            return JsonResponse({"success": "preferences saved successfully!"})
+    
+    return JsonResponse({"failure": "an error has occured..."})
+

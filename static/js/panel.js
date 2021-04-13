@@ -932,24 +932,7 @@ $(document).ready(function(){
     
     // edit preferences
     $(document).on("change", "#form_preferences input,select", function(e){
-        if ($(e.target).is("select")){
-            value = $(this).val();
-        }
-        else {
-            value = $(e.target).prop("checked");
-        }
-        $.ajax({
-            url: '/edit_preferences',
-            type: 'POST',
-            data: {
-                element_changed: this.id,
-                value: value
-            },
-            success: function(data){
-                // do something when preferences are changed
-                console.log(data);
-            }
-        })
+        $("#form_preferences").submit();
     });
 
     // editable tables
@@ -972,6 +955,21 @@ $(document).ready(function(){
     $(document).on("submit", "#form_hipshipper", add_hipshipper);
     $(document).on("submit", '#balance-form', add_balance);
     $(document).on("submit", '#cost-register', add_cost);
+    $(document).on("submit", "#form_preferences", function(e){
+        e.preventDefault();
+        $.ajax({
+            url: '/edit_preferences',
+            type: 'POST',
+            data:{
+                default_month: $("#f_default_month").prop("checked"),
+                sort_by_date: $("#f_sort_by_date").prop("checked"),
+                start_month_day: $("#f_start_month_day").val()
+            },
+            success: function(response){
+                console.log(response);
+            }
+        })
+    });
     // $(document).on("submit", "#form-generate-report", generate_report);
 
     // delete models
