@@ -50,18 +50,21 @@ def edit_preferences(request):
         elif request.POST['value'] == 'false':
             value = False
 
+        err_response = {}
         if elem_changed == "f_default_month":
+            err_response['f_default_month'] = value
             user_prefs.default_month = value
         elif elem_changed == "f_start_month_day":
+            err_response['f_start_month_day'] = request.POST['value']
             user_prefs.start_month_day = request.POST['value']
         elif elem_changed == "f_sort_by_date":
+            err_response['f_sort_by_date'] = value
             user_prefs.sort_by_date = value
         
         try:
             user_prefs.save()
         except ValidationError as err:
-            return JsonResponse({
-                "ERROR": err.message
-            })
+            err_response['ERROR MESSAGE'] = err.message
+            return JsonResponse(err_response)
         return JsonResponse({"success": f"{elem_changed} changed to {value} successfully!"})
     return JsonResponse({"failure": "an error has occured"})
