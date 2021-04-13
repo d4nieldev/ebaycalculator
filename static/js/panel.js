@@ -856,8 +856,8 @@ function get_user_preferences(){
         p_name = item.split(" = ")[0];
         p_value = item.split(" = ")[1];
 
-        if (p_value == "True") p_value = true;
-        else if (p_value == "False") p_value = false;
+        if (p_value.toLowerCase() == "true") p_value = true;
+        else if (p_value.toLowerCase() == "false") p_value = false;
         else if (!isNaN(Number(p_value))) p_value = Number(p_value);
         USER_PREFERENCES[p_name] = p_value;
     });
