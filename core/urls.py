@@ -25,7 +25,6 @@ urlpatterns = [
     path('filter_sales', apiViews.filter_sales, name="filter_sales"),
 
     # preferences
-    path('toggle_paypal_editable', preferences_views.toggle_paypal_editable, name="toggle_paypal_editable"),
     path('edit_preferences', preferences_views.edit_preferences, name="edit_preferences")
     
 ]
