@@ -404,7 +404,6 @@ class Preferences(models.Model):
 
     def __str__(self):
         s = "user = " + str(self.user) + " | "
-        s += "is_paypal_editable = " + str(self.is_paypal_editable) + " | "
         s += "default_month = " + str(self.default_month) + " | "
         s += "start_month_day = " + str(self.start_month_day) + " | "
         s += "sort_by_date = " + str(self.sort_by_date) + " | "
