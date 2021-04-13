@@ -55,8 +55,8 @@ def edit_preferences(request):
             err_response['f_default_month'] = value
             user_prefs.default_month = value
         elif elem_changed == "f_start_month_day":
-            err_response['f_start_month_day'] = request.POST['value']
-            user_prefs.start_month_day = request.POST['value']
+            err_response['f_start_month_day'] = int(request.POST['value'])
+            user_prefs.start_month_day = int(request.POST['value'])
         elif elem_changed == "f_sort_by_date":
             err_response['f_sort_by_date'] = value
             user_prefs.sort_by_date = value
