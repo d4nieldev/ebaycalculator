@@ -369,16 +369,15 @@ class ReturnedSale(models.Model):
         balance_obj = Balance.objects.get(user=self.sale.user)
         if not self.pk: 
             # new object
-            if self.is_pending:
-                # sale is pending to be returned - substract ebay price from paypal balance
-                balance_obj.paypal_balance -= self.sale.ebay_price
+            # sale is pending to be returned - substract ebay price from paypal balance
+            balance_obj.paypal_balance -= self.sale.ebay_price
         else:
             # updated is_pending
             if not self.is_pending:
                 # sale has returned - add amazon price to balance
                 balance_obj.balance += self.sale.amazon_price
 
-            balance_obj.save()
+        balance_obj.save()
 
         super(ReturnedSale, self).save(*args, **kwargs)
     
@@ -396,7 +395,7 @@ class ReturnedSale(models.Model):
         super(ReturnedSale, self).delete(*args, **kwargs)
 
     def __str__(self):
-        return f'[{self.date_of_return}] {self.sale}'
+        return f'[returned] {self.sale}'
 
 
 class Preferences(models.Model):

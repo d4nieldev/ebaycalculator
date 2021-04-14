@@ -19,8 +19,8 @@ urlpatterns = [
     path('add_hipshipper', apiViews.add_hipshipper, name="add_hipshipper"),
     path('update_hipshipper', apiViews.update_hipshipper, name="update_hipshipper"),
     path('delete_gift', apiViews.delete_gift, name="delete_gift"),
-    path('almost_return_sale', apiViews.almost_return_sale, name="almost_return_sale"),
-    path('cancel_return_sale', apiViews.cancel_return_sale, name="cancel_return_sale"),
+    path('update_return_status', apiViews.update_return_status, name="update_return_status"),
+    path('delete_returned_sale', apiViews.delete_returned_sale, name="delete_returned_sale"),
     path('update_paypal_balance', apiViews.update_paypal_balance, name="update_paypal_balance"),
     path('filter_sales', apiViews.filter_sales, name="filter_sales"),
 
