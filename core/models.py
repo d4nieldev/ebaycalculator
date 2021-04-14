@@ -362,18 +362,21 @@ class ReturnedSale(models.Model):
         The date of return
     """
     sale = models.OneToOneField(SaleEntry, on_delete=models.CASCADE, default=0)
-    date_of_return = models.DateField()
+    is_pending = models.BooleanField(default=True)
 
 
     def save(self, *args, **kwargs):
+        balance_obj = Balance.objects.get(user=self.sale.user)
         if not self.pk: 
-            balance_obj = Balance.objects.get(user=self.sale.user)
-
-            # sale has been returned - add amazon price to balance
-            balance_obj.balance += self.sale.amazon_price
-
-            # substract ebay price from paypal balance
-            balance_obj.paypal_balance -= self.sale.ebay_price
+            # new object
+            if self.is_pending:
+                # sale is pending to be returned - substract ebay price from paypal balance
+                balance_obj.paypal_balance -= self.sale.ebay_price
+        else:
+            # updated is_pending
+            if not self.is_pending:
+                # sale has returned - add amazon price to balance
+                balance_obj.balance += self.sale.amazon_price
 
             balance_obj.save()
 

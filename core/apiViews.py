@@ -328,14 +328,14 @@ def update_hipshipper(request):
 
 
 @csrf_exempt
-def return_sale(request):
+def almost_return_sale(request):
     if request.method == 'POST':
         sale = SaleEntry.objects.get(id=request.POST['sale_id'])
-        returned_sale = ReturnedSale(sale=sale, date_of_return=datetime.date.today())
+        returned_sale = ReturnedSale(sale=sale, is_pending=True)
         returned_sale.save()
 
         return JsonResponse({
-            "success": f'sale [{sale}] was returned',
+            "success": f'sale [{sale}] was moved to pending to return',
             'profit': sale.profit,
             })
     return JsonResponse({"error": "an error occured"})

@@ -613,74 +613,21 @@ function change_editable(){
 /**
  * This function is responsible on the sale return mechanism
  */
-function return_sale(){
-    tr = $(this).parent("td").parent("tr")
-
-    if (tr.attr('id') == "bootstrap-overrides"){
-        // sale is coming back to life
-        tr.attr("id", "");
-
-        $.ajax({
-            url: "/cancel_return_sale",
-            type: "POST",
-            data: {
-                sale_id: $(this).data('id'),
-            },
-            success:function(data){
-                
-                /* // update total profit
-                $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) + parseFloat(data.profit)))
-
-                tr.toggleClass('warningrow');
-                // reload sales table and sum row
-                $("#table_sales").load(location.href + " #table_sales");
-
-                //update balance
-                $("#div_user_balance").load(location.href + " #div_user_balance");
-                $("#balance_modal_title").load(location.href + " #balance_modal_title");
-
-                sum_sales_table(); */
-
-                location.reload();
-            }
-        })
-        .fail(function(data){
-            console.log(data);
-        });
-    }
-    else{
-        // sale is being returned
-        tr.attr("id", "bootstrap-overrides");
-
-        $.ajax({
-            url: "/return_sale",
-            type: "POST",
-            data: {
-                sale_id: $(this).data('id'),
-            },
-            success:function(data){
-                
-                /* // update total profit
-                $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) - parseFloat(data.profit)))
-                
-                tr.toggleClass('warningrow');
-
-                // reload sales table and sum row
-                $("#table_sales").load(location.href + " #table_sales");
-
-                //update balance
-                $("#div_user_balance").load(location.href + " #div_user_balance");
-                $("#balance_modal_title").load(location.href + " #balance_modal_title");
-
-                sum_sales_table(); */
-
-                location.reload();
-            }
-        })
-        .fail(function(data){
-            console.log(data);
-        });
-    }
+function almost_return_sale(){
+    // sale is being pending
+    $.ajax({
+        url: "/return_sale",
+        type: "POST",
+        data: {
+            sale_id: $(this).data('id'),
+        },
+        success:function(data){
+            location.reload();
+        }
+    })
+    .fail(function(data){
+        console.log(data);
+    });
 }
 
 /**
@@ -758,6 +705,7 @@ function filter_sales(){
             returned_pks = []
             $(returned_sales).each(function(){
                 returned_pks.push(this.sale)
+                //if (returned_sales.)
             })
 
             $(sales).each(function(){
@@ -962,7 +910,7 @@ $(document).ready(function(){
     $(document).on("click", '#table_gifts .btn-delete-gift', delete_gift);
 
     // return sale
-    $(document).on('click', "#table_sales .btn-return-sale", return_sale);
+    $(document).on('click', "#table_sales .btn-return-sale", almost_return_sale);
 
     // calc add to balance live on gift creation
     $(document).on("keyup", '.add-gift-form', calc_add_to_balance)
