@@ -15,6 +15,9 @@ from .forms import SignUpForm, SaleEntryForm, GiftForm, CostForm, HipShipperForm
 
 from .models import SaleEntry, Balance, Gift, Cost, HipShipper, ReturnedSale, Preferences
 
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+
 
 def HANDLE_LOGIN_BASE(request, current_page, context):
     '''
@@ -63,18 +66,16 @@ def GET_SALES_YEARS_MONTHS(request):
     '''
     sales = SaleEntry.objects.filter(user=request.user)
     start_day = Preferences.objects.get(user=request.user).start_month_day
-    if start_day == 1:
-        end_day = 31
-    else:
-        end_day = start_day - 1
     years_months = {}
+    print("HE")
 
     for sale in sales:
         if sale.date.year not in years_months.keys():
             years_months[sale.date.year] = []
 
+    month = 1
     for year in years_months:
-        for sale in SaleEntry.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{end_day}']):
+        for sale in SaleEntry.objects.filter(user=request.user.id, date__year=year):
             if sale.date.day >= start_day:
                 # if the day is start day or more - it's this month
                 if sale.date.month not in years_months[year]:
@@ -87,8 +88,22 @@ def GET_SALES_YEARS_MONTHS(request):
                 else:
                     if 12 not in years_months[year]:
                         years_months[year].append(12)
+            
                 
     return SORT_DICT(years_months)
+
+
+def VALIDATE_DATE(date):
+    day = int(date.split('-')[2])
+    print(date)
+    
+    try:
+        datetime.date(year=int(date.split('-')[0]), month=int(date.split('-')[1]), day=day)
+    except ValueError:
+        return VALIDATE_DATE(f'{date.split("-")[0]}-{date.split("-")[1]}-{day-1}')
+    else:
+        print("final date: " + date)
+        return date
 
 
 def GET_GIFTS_YEARS_MONTHS(request):
@@ -100,10 +115,6 @@ def GET_GIFTS_YEARS_MONTHS(request):
     gifts = Gift.objects.filter(user=request.user.id)
     user_prefs = Preferences.objects.get(user=request.user)
     start_day = user_prefs.start_month_day
-    if start_day == 1:
-        end_day = 31
-    else:
-        end_day = start_day - 1
     years_months = {}
 
     for gift in gifts:
@@ -111,7 +122,7 @@ def GET_GIFTS_YEARS_MONTHS(request):
             years_months[gift.date.year] = []
 
     for year in years_months:
-        for gift in Gift.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{end_day}']):
+        for gift in Gift.objects.filter(user=request.user.id, date__year=year):
             if gift.date.day >= start_day:
                 # if the day is start day or more - it's this month
                 if gift.date.month not in years_months[year]:
