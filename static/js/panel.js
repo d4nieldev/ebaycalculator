@@ -611,76 +611,64 @@ function change_editable(){
 
 
 /**
- * This function is responsible on the sale return mechanism
+ * This function is telling the website that this sale is now pending to be returned
  */
-function return_sale(){
-    tr = $(this).parent("td").parent("tr")
+function pend_sale(){
+    // sale is being pending
+    $.ajax({
+        url: "/update_return_status",
+        type: "POST",
+        data: {
+            sale_id: $(this).data('id'),
+        },
+        success:function(data){
+            location.reload();
+        }
+    })
+    .fail(function(data){
+        console.log(data);
+    });
+}
 
-    if (tr.attr('id') == "bootstrap-overrides"){
-        // sale is coming back to life
-        tr.attr("id", "");
+/**
+ * This function is telling the website that this sale is now returned
+ */
+ function return_sale(){
+    // sale is being returned
+    $.ajax({
+        url: "/update_return_status",
+        type: "POST",
+        data: {
+            sale_id: $(this).data('id'),
+            is_pending: false
+        },
+        success:function(data){
+            location.reload();
+        }
+    })
+    .fail(function(data){
+        console.log(data);
+    });
+}
 
-        $.ajax({
-            url: "/cancel_return_sale",
-            type: "POST",
-            data: {
-                sale_id: $(this).data('id'),
-            },
-            success:function(data){
-                
-                /* // update total profit
-                $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) + parseFloat(data.profit)))
-
-                tr.toggleClass('warningrow');
-                // reload sales table and sum row
-                $("#table_sales").load(location.href + " #table_sales");
-
-                //update balance
-                $("#div_user_balance").load(location.href + " #div_user_balance");
-                $("#balance_modal_title").load(location.href + " #balance_modal_title");
-
-                sum_sales_table(); */
-
-                location.reload();
-            }
-        })
-        .fail(function(data){
-            console.log(data);
-        });
-    }
-    else{
-        // sale is being returned
-        tr.attr("id", "bootstrap-overrides");
-
-        $.ajax({
-            url: "/return_sale",
-            type: "POST",
-            data: {
-                sale_id: $(this).data('id'),
-            },
-            success:function(data){
-                
-                /* // update total profit
-                $("#total-profit").html(parseFloat(parseFloat($("#total-profit").text().replace('$', '')) - parseFloat(data.profit)))
-                
-                tr.toggleClass('warningrow');
-
-                // reload sales table and sum row
-                $("#table_sales").load(location.href + " #table_sales");
-
-                //update balance
-                $("#div_user_balance").load(location.href + " #div_user_balance");
-                $("#balance_modal_title").load(location.href + " #balance_modal_title");
-
-                sum_sales_table(); */
-
-                location.reload();
-            }
-        })
-        .fail(function(data){
-            console.log(data);
-        });
-    }
+/**
+ * This function is telling the website that this sale is not returned
+ */
+ function unreturn_sale(){
+    // sale is being returned
+    $.ajax({
+        url: "/delete_returned_sale",
+        type: "POST",
+        data: {
+            sale_id: $(this).data('id'),
+        },
+        success:function(data){
+            location.reload();
+        }
+    })
+    .fail(function(data){
+        console.log(data);
+    });
 }
 
 /**
@@ -756,14 +744,24 @@ function filter_sales(){
             })
             
             returned_pks = []
+            pending_pks = []
             $(returned_sales).each(function(){
-                returned_pks.push(this.sale)
+                if (this.is_pending){
+                    pending_pks.push(this.sale)
+                }
+                else{
+                    returned_pks.push(this.sale)
+                }
             })
 
             $(sales).each(function(){
                 if (returned_pks.includes(this.pk)){
                     // sale is returned
                     table_string += "<tr id='bootstrap-overrides' class='warningrow'>"
+                }
+                else if (pending_pks.includes(this.pk)){
+                    // sale is pending to be returned
+                    table_string += "<tr id='bootstrap-overrides' class='pendingrow'>"
                 }
                 else{
                     table_string += "<tr>"
@@ -817,12 +815,28 @@ function filter_sales(){
                 table_string += "</tr></table></td>"
 
                 table_string += "<td data-id='" + this.pk + "' data-type='submit' class='text-center'>"
-                table_string += "<button data-id='" + this.pk + "' type='submit' class='btn btn-warning btn-return-sale'>"
-                table_string += "<i class='fa fa-undo-alt fa-lg'></i>"
+                
+                
+                if (returned_pks.includes(this.pk)){
+                    // sale is returned
+                    table_string += "<button data-id='" + this.pk + "' type='submit' class='btn btn-unreturn-sale btn-primary'>"
+                    table_string += "<i class='fas fa-undo-alt fa-lg'></i>"
+                }
+                else if (pending_pks.includes(this.pk)){
+                    // sale is pending to be returned
+                    table_string += "<button data-id='" + this.pk + "' type='submit' class='btn btn-return-sale btn-warning'>"
+                    table_string += "<i class='fas fa-undo-alt fa-lg'></i>"
+                }
+                else{
+                    table_string += "<button data-id='" + this.pk + "' type='submit' class='btn btn-pend-sale pending-bg'>"
+                    table_string += "<i class='fas fa-clock fa-lg text-white'></i>"
+                }
                 table_string += "</button>"
+
                 table_string += "<button data-id='" + this.pk +"' type='submit' class='btn btn-danger btn-delete-sale'>"
                 table_string += "<i class='fa fa-trash-alt fa-lg'></i>"
                 table_string += "</button>"
+
                 table_string += "</td>"
 
                 table_string += "</tr>"
@@ -962,7 +976,9 @@ $(document).ready(function(){
     $(document).on("click", '#table_gifts .btn-delete-gift', delete_gift);
 
     // return sale
+    $(document).on('click', "#table_sales .btn-pend-sale", pend_sale);
     $(document).on('click', "#table_sales .btn-return-sale", return_sale);
+    $(document).on('click', "#table_sales .btn-unreturn-sale", unreturn_sale);
 
     // calc add to balance live on gift creation
     $(document).on("keyup", '.add-gift-form', calc_add_to_balance)

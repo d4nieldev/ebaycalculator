@@ -2,6 +2,8 @@ import datetime
 
 import pandas as pd
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from django.views.decorators.csrf import csrf_exempt
 
 from django.core import serializers
@@ -328,28 +330,30 @@ def update_hipshipper(request):
 
 
 @csrf_exempt
-def return_sale(request):
+def update_return_status(request):
     if request.method == 'POST':
         sale = SaleEntry.objects.get(id=request.POST['sale_id'])
-        returned_sale = ReturnedSale(sale=sale, date_of_return=datetime.date.today())
-        returned_sale.save()
+        try:
+            returned_sale = ReturnedSale.objects.get(sale=sale)
+            returned_sale.is_pending = request.POST['is_pending'] == 'true'
+            returned_sale.save()
+        except ObjectDoesNotExist:
+            ReturnedSale(sale=sale, is_pending=True).save()
 
         return JsonResponse({
-            "success": f'sale [{sale}] was returned',
-            'profit': sale.profit,
+            "success": f'returned sale [{sale}] was updated!',
             })
     return JsonResponse({"error": "an error occured"})
 
 
 @csrf_exempt
-def cancel_return_sale(request):
+def delete_returned_sale(request):
     if request.method == 'POST':
-        sale = SaleEntry.objects.get(id=request.POST['sale_id'])
-        ReturnedSale.objects.get(sale=sale).delete()
+        sale = ReturnedSale.objects.get(sale=SaleEntry.objects.get(id=request.POST['sale_id']))
+        sale.delete()
 
         return JsonResponse({
-            "success": f'sale [{sale}] was returned',
-            'profit': sale.profit,
+            "success": f'returned sale [{sale}] was canceled!',
             })
     return JsonResponse({"error": "an error occured"})
 

@@ -85,6 +85,12 @@ body {
 #bootstrap-overrides.warningrow{
     --bs-table-accent-bg: #f0ad4e;
 }
+#bootstrap-overrides.pendingrow{
+    --bs-table-accent-bg: #fe8a71;
+}
+.pending-bg{
+    background-color: #fe8a71;
+}
 
 .scroll-to-bottom{
     border-radius: 50%;
