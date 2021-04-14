@@ -397,22 +397,18 @@ def filter_sales(request):
                 date_from = f'{year}-0{month}-{start_day}'
                 date_to = f'{year}-0{month+1}-{start_day - 1}'
             
-            if sort_by_date:
-                sales_qs = SaleEntry.objects.filter(user=request.user, date__range=[date_from, date_to]).order_by('date')
-            else:
-                sales_qs = SaleEntry.objects.filter(user=request.user, date__range=[date_from, date_to])
+            date_range = [date_from, date_to]
+            sales_qs = SaleEntry.objects.filter(user=request.user, date__range=[date_from, date_to])
         else:
             sales_qs = SaleEntry.objects.filter(user=request.user)
         
         if sort_by_date:
             returned_qs = ReturnedSale.objects.filter(sale__user=request.user).order_by('sale__date')
+            hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user).order_by('sale_entry__date')
+            sales_qs = sales_qs.order_by('date')
         else:
             returned_qs = ReturnedSale.objects.filter(sale__user=request.user)
-
-        if sort_by_date:
-            hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user).order_by('sale_entry__date')
-        else:
-            hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user)
+            hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user) 
         
         data = ''
         if sales_qs:
