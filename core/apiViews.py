@@ -141,6 +141,10 @@ def filter_gifts(request):
         gifts_qs = None
         date = str(request.GET['date'])
         start_day = Preferences.objects.get(user=request.user).start_month_day
+        if start_day == 1:
+            end_day = 31
+        else:
+            end_day = start_day - 1
         sort_by_date = Preferences.objects.get(user=request.user).sort_by_date
 
         if date != 'Show Gift Cards From':
@@ -153,17 +157,17 @@ def filter_gifts(request):
                 month = int(date.split('-')[1])
 
                 date_from = f'{year}-{month}-{start_day}'
-                date_to = f'{year}-{month+1}-{start_day - 1}'
+                date_to = f'{year}-{month+1}-{end_day}'
                 
                 if month == 12:
                     date_from = f'{year}-12-{start_day}'
-                    date_to = f'{year+1}-01-{start_day - 1}'
+                    date_to = f'{year+1}-01-{end_day}'
                 if month == 9:
                     date_from = f'{year}-0{month}-{start_day}'
-                    date_to = f'{year}-{month+1}-{start_day - 1}'
+                    date_to = f'{year}-{month+1}-{end_day}'
                 elif month < 10:
                     date_from = f'{year}-0{month}-{start_day}'
-                    date_to = f'{year}-0{month+1}-{start_day - 1}'
+                    date_to = f'{year}-0{month+1}-{end_day}'
 
                 # get the relevant gifts
                 gifts_qs = Gift.objects.filter(user=request.user.id, date__range=[date_from, date_to])
@@ -378,6 +382,10 @@ def filter_sales(request):
     if request.method == 'POST':
         date = request.POST['date']
         start_day = Preferences.objects.get(user=request.user).start_month_day
+        if start_day == 1:
+            end_day = 31
+        else:
+            end_day = start_day - 1
         sort_by_date = Preferences.objects.get(user=request.user).sort_by_date
         
         if str(date) != 'all':
@@ -385,17 +393,17 @@ def filter_sales(request):
             month = int(str(date).split('-')[1])
             
             date_from = f'{year}-{month}-{start_day}'
-            date_to = f'{year}-{month+1}-{start_day - 1}'
+            date_to = f'{year}-{month+1}-{end_day}'
             
             if month == 12:
                 date_from = f'{year}-12-{start_day}'
-                date_to = f'{year+1}-01-{start_day - 1}'
+                date_to = f'{year+1}-01-{end_day}'
             if month == 9:
                 date_from = f'{year}-0{month}-{start_day}'
-                date_to = f'{year}-{month+1}-{start_day - 1}'
+                date_to = f'{year}-{month+1}-{end_day}'
             elif month < 10:
                 date_from = f'{year}-0{month}-{start_day}'
-                date_to = f'{year}-0{month+1}-{start_day - 1}'
+                date_to = f'{year}-0{month+1}-{end_day}'
             
             date_range = [date_from, date_to]
             sales_qs = SaleEntry.objects.filter(user=request.user, date__range=[date_from, date_to])

@@ -63,6 +63,10 @@ def GET_SALES_YEARS_MONTHS(request):
     '''
     sales = SaleEntry.objects.filter(user=request.user)
     start_day = Preferences.objects.get(user=request.user).start_month_day
+    if start_day == 1:
+        end_day = 31
+    else:
+        end_day = start_day - 1
     years_months = {}
 
     for sale in sales:
@@ -70,7 +74,7 @@ def GET_SALES_YEARS_MONTHS(request):
             years_months[sale.date.year] = []
 
     for year in years_months:
-        for sale in SaleEntry.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{start_day - 1}']):
+        for sale in SaleEntry.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{end_day}']):
             if sale.date.day >= start_day:
                 # if the day is start day or more - it's this month
                 if sale.date.month not in years_months[year]:
@@ -96,6 +100,10 @@ def GET_GIFTS_YEARS_MONTHS(request):
     gifts = Gift.objects.filter(user=request.user.id)
     user_prefs = Preferences.objects.get(user=request.user)
     start_day = user_prefs.start_month_day
+    if start_day == 1:
+        end_day = 31
+    else:
+        end_day = start_day - 1
     years_months = {}
 
     for gift in gifts:
@@ -103,7 +111,7 @@ def GET_GIFTS_YEARS_MONTHS(request):
             years_months[gift.date.year] = []
 
     for year in years_months:
-        for gift in Gift.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{start_day - 1}']):
+        for gift in Gift.objects.filter(user=request.user.id, date__range=[f'{year}-01-{start_day}', f'{year+1}-01-{end_day}']):
             if gift.date.day >= start_day:
                 # if the day is start day or more - it's this month
                 if gift.date.month not in years_months[year]:
