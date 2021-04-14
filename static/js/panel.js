@@ -819,7 +819,7 @@ function filter_sales(){
                 
                 if (returned_pks.includes(this.pk)){
                     // sale is returned
-                    table_string += "<button data-id='" + this.pk + "' type='submit' class='btn btn-unreturn-sale btn-primary'>"
+                    table_string += "<button data-id='" + this.pk + "' type='submit' class='btn btn-unreturn-sale btn-dark'>"
                     table_string += "<i class='fas fa-undo-alt fa-lg'></i>"
                 }
                 else if (pending_pks.includes(this.pk)){
