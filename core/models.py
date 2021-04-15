@@ -375,7 +375,7 @@ class ReturnedSale(models.Model):
             # updated is_pending
             if not self.is_pending:
                 # sale has returned - add amazon price to balance
-                balance_obj.balance += self.sale.amazon_price
+                balance_obj.balance += self.sale.amazon_price - self.sale.tm_fee
 
         balance_obj.save()
 
