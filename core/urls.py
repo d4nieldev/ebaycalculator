@@ -6,6 +6,7 @@ urlpatterns = [
     # Actual HTML pages
     path('', views.index, name='index'),
     path('panel', views.panel, name='panel'),
+    path('help', views.help, name='help'),
     
     # methods called mostly from ajax
     path('logout', apiViews.HANDLE_LOGOUT_BASE, name='logout'),
