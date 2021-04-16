@@ -25,35 +25,38 @@
 <body class='bg-dark' {% if open_login %} onload="document.getElementById('btn_open_login').click();" {% endif %}>
     <!-- Navigation -->
     <nav id="main_navbar" class="navbar navbar-light bg-light" style="z-index: 3;">
-        {% if user.is_authenticated %}
+        
         <div class="navbar-text row d-flex justify-content-start ms-3">
-            <button id="btn_open_preferences" class="btn text-secondary">
-                <i class="fa fa-cog fa-2x"></i>
-            </button>
+            {% if user.is_authenticated %}
+            <div class="col">
+                <button id="btn_open_preferences" class="btn text-secondary">
+                    <i class="fa fa-cog fa-2x"></i>
+                </button>
+            </div>
+            
+            {% endif %}
+            <div class="col align-self-center">
+                <a class="link-secondary text-decoration-none" href="{% url 'help' %}">Help</a>
+            </div>
         </div>
-        {% endif %}
+        
         <div class="container">
             <a class="navbar-brand" href="{% url 'index' %}">eBay Calculator</a>
             {% if not user.is_authenticated %}
             <div class="navbar-text row d-flex justify-content-end">
-                <div class="col-md-auto text-center align-self-center">
-                    <a class="link-secondary text-decoration-none" href="{% url 'help' %}">Help</a>
-                </div>
                 <div class="col-md-auto text-center">
                     <button id="btn_open_login" type="button" class="btn btn-primary" data-toggle="modal" data-target="#sign_in_modal">Sign In</button>
                 </div>
             </div>
             {% else %}
             <div class="text-secondary fw-bold">Welcome, {{ user.username }}</div>
+            
             <div class="navbar-text row d-flex justify-content-end">
                 <div class="col-md-auto text-center rounded" style="font-size: 1.5rem;" id="total-profit">
                     {% for cost in costs %}
                         <span class="hidden-cost" style="display: none;">{{ cost.value }}</span>
                     {% endfor %}
                 </div>
-                <span class="col-md-auto text-center">
-                    <a id="btn_sendto_help" href="{% url 'help' %}" class="btn btn-secondary">Help</a>
-                </span>
                 <span class="col-md-auto text-center">
                     <button id="btn_open_balance" type="button" class="btn btn-primary" data-toggle="modal" data-target="#balance_modal">Balance</button>
                 </span>
