@@ -1,7 +1,87 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Panel{% endblock %}
+{% block head %}<script src="{% static 'js/help.js' %}" type="text/javascript"></script>{% endblock %}
 
 {% block content %}
-<h1>This is the help page</h1>
+<div class="sidemenu">
+    <div class="help-menu-option" id="0" style="background-color: #565c45;">ברוכים הבאים</div>
+    <div class="help-menu-option" id="1">הרשמה והתחברות</div>
+    <div class="help-menu-option" id="2">הוספת עלויות החנות ועלויות אחרות</div>
+    <div class="help-menu-option" id="3">עדכון מצב חשבון הטריפלמארס והוספת גיפטקארדים</div>
+    <div class="help-menu-option" id="4">עדכון הכסף בפייפאל ידנית</div>
+    <div class="help-menu-option" id="5">הוספת מכירות</div>
+    <div class="help-menu-option" id="6">הוספת מכירות עם משלוח היפשיפר</div>
+    <div class="help-menu-option" id="7">החזרת מכירות</div>
+    <div class="help-menu-option" id="8">הגדרות</div>
+</div>
+<div class="help-content text-center">
+    <div id="0_content">
+        <h1>ברוכים הבאים לעמוד העזרה!</h1>
+        הסתבכתם? לא הצלחתם להבין משהו בתפעול האתר? הגעתם למקום הנכון!
+        <br />
+        מצורפים סרטוני הדרכה על כל הדברים החשובים באתר
+        <br />
+        אנחנו בטוחים שתמצאו את מה שאתם צריכים.
+        <br />
+        להתחלה יש לבחור נושא מהרשימה בצד שמאל
+    </div>
+
+    <div class="d-none" id="1_content">
+        <video width="70%" controls autoplay muted>
+            <source src="{% static 'guide_videos_edited/1.mp4' %}" type="video/mp4">
+            Your browser doesnt support this video format
+        </video>
+    </div>
+
+    <div class="d-none" id="2_content">
+        <video width="70%" controls autoplay muted>
+            <source src="{% static 'guide_videos_edited/2.mp4' %}" type="video/mp4">
+            Your browser doesnt support this video format
+        </video>
+    </div>
+
+    <div class="d-none" id="3_content">
+        <video width="70%" controls autoplay muted>
+            <source src="{% static 'guide_videos_edited/3.mp4' %}" type="video/mp4">
+            Your browser doesnt support this video format
+        </video>
+    </div>
+
+    <div class="d-none" id="4_content">
+        <video width="70%" controls autoplay muted>
+            <source src="{% static 'guide_videos_edited/4.mp4' %}" type="video/mp4">
+            Your browser doesnt support this video format
+        </video>
+    </div>
+
+    <div class="d-none" id="5_content">
+        <video width="70%" controls autoplay muted>
+            <source src="{% static 'guide_videos_edited/5.mp4' %}" type="video/mp4">
+            Your browser doesnt support this video format
+        </video>
+    </div>
+
+    <div class="d-none" id="6_content">
+        <video width="70%" controls autoplay muted>
+            <source src="{% static 'guide_videos_edited/6.mp4' %}" type="video/mp4">
+            Your browser doesnt support this video format
+        </video>
+    </div>
+
+    <div class="d-none" id="7_content">
+        <video width="70%" controls autoplay muted>
+            <source src="{% static 'guide_videos_edited/7.mp4' %}" type="video/mp4">
+            Your browser doesnt support this video format
+        </video>
+    </div>
+
+    <div class="d-none" id="8_content">
+        <video width="70%" controls autoplay muted>
+            <source src="{% static 'guide_videos_edited/8.mp4' %}" type="video/mp4">
+            Your browser doesnt support this video format
+        </video>
+    </div>
+</div>
+
 {% endblock %}

@@ -16,7 +16,7 @@ function sum_sales_table() {
     
     // iterate over each row and find all the numbers that are needed to sum up.
     $('#table_sales > tbody > tr').each(function(){
-        add_to_calculation = $(this).attr("id") == "bootstrap-overrides"
+        add_to_calculation = $(this).hasClass("warningrow");
         $('td.sumtable', this).each(function(index, val){
             // sum up the numbers and give in to result array.
             if(!result[index]) result[index] = 0;
@@ -914,14 +914,20 @@ function open_close_preferences(){
         // open
         get_user_preferences();
         $("#mySidenav").width("25%");
+        console.log($("#main_navbar").height());
         $("#mySidenav").height($(window).height() - $("#main_navbar").height() - parseInt($('html').css('font-size')));
         $("#main").css("margin-left", "25%");
         $("#main").width("73%");
     }
 }
 
+function load_sidemenu(){
+    console.log($("#main_navbar").height());
+    $(".sidemenu").height($(window).height() - $("#main_navbar").height() - parseInt($('html').css('font-size')));
+}
+
 $(document).ready(function(){
-    USER_PREFERENCES = get_user_preferences();;
+    USER_PREFERENCES = get_user_preferences();
 
     set_gifts_date();
 
@@ -967,7 +973,7 @@ $(document).ready(function(){
             $(this).trigger("blur");
         }
     });
-
+            
     // calc profit live on sale creation
     $(document).on("keyup", '#form_add_sale input', calc_profit_form);
 
@@ -1036,7 +1042,5 @@ $(document).ready(function(){
         
         // print the total profit
         $("#total-profit").html("$" + parseFloat(profit))
-        
-
     });
 });

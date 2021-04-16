@@ -211,3 +211,30 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+.sidemenu {
+    width: 25%;
+    height: 100%;
+    overflow-x: hidden;
+    position:fixed;
+}
+
+.sidemenu .help-menu-option{
+    padding-top: 4%;
+    padding-bottom: 4%;
+    background-color: #919b74;
+    border-bottom: 1px gray solid;
+    cursor: pointer;
+    user-select: none;
+}
+.sidemenu .help-menu-option:hover{
+    background-color: #565c45;
+    transition: 0.3s;
+
+}
+
+.help-content{
+    width: 75%;
+    margin-left: 25%;
+    direction: rtl;
+}

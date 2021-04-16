@@ -16,6 +16,8 @@
     <script src="https://kit.fontawesome.com/af0ed13c41.js" crossorigin="anonymous"></script>
     <!--My Style-->
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <!--My Javascript-->
+    <script src="{% static 'js/panel.js' %}" type="text/javascript"></script>
     <!--Favicon-->
     <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.png' %}"/>
     <!--Title-->
@@ -24,7 +26,7 @@
 </head>
 <body class='bg-dark' {% if open_login %} onload="document.getElementById('btn_open_login').click();" {% endif %}>
     <!-- Navigation -->
-    <nav id="main_navbar" class="navbar navbar-light bg-light" style="z-index: 3;">
+    <nav id="main_navbar" class="navbar navbar-light bg-light">
         
         <div class="navbar-text row d-flex justify-content-start ms-3">
             {% if user.is_authenticated %}
@@ -36,7 +38,7 @@
             
             {% endif %}
             <div class="col align-self-center">
-                <a class="link-secondary text-decoration-none" href="{% url 'help' %}">Help</a>
+                <a class="link-secondary text-decoration-none" href="{% url 'help' %}" style="cursor: help;">Help</a>
             </div>
         </div>
         
