@@ -683,11 +683,11 @@ function pend_sale(){
 function paypal_lock_handler(e){
     e.preventDefault();
 
-    $(".lock-class").toggleClass("bg-success bg-danger");
+    $("#paypal_lock").toggleClass("bg-success bg-danger");
 
-    if ($(".lock-class").hasClass("bg-success")){
+    if ($("#paypal_lock").hasClass("bg-success")){
         // unlocked
-        $(".lock-class").html("<i class='fa fa-lock-open fa-lg'></i>")
+        $("#paypal_lock").html("<i class='fa fa-lock-open fa-lg'></i>")
         paypal_balance_value = $("#div_paypal_balance").html()
         $("#div_paypal_balance").html(`
             <input type='number' id='txt_paypal_balance' class='form-control editable-paypal-balance'
@@ -695,7 +695,7 @@ function paypal_lock_handler(e){
     }
     else{
         // locked
-        $(".lock-class").html("<i class='fa fa-lock fa-lg'></i>")
+        $("#paypal_lock").html("<i class='fa fa-lock fa-lg'></i>")
         lastvalue = $("#txt_paypal_balance").data("lastvalue")
         curvalue = $("#txt_paypal_balance").val()
         
@@ -921,9 +921,13 @@ function open_close_preferences(){
     }
 }
 
-function load_sidemenu(){
-    console.log($("#main_navbar").height());
-    $(".sidemenu").height($(window).height() - $("#main_navbar").height() - parseInt($('html').css('font-size')));
+function cost_lock_handler(){
+    console.log("clicked the cost lock!");
+}
+
+function cost_is_constant_expiredate(){
+    $("#s_describe_exp_date").toggleClass("d-none");
+    $("#f_exp_date").toggleClass("d-none");
 }
 
 $(document).ready(function(){
@@ -940,15 +944,19 @@ $(document).ready(function(){
     $("#s_sales_filter_by_date").trigger("change");
 
     // paypal balance change manually
-    $(document).on("click", ".lock-class", paypal_lock_handler);
+    $(document).on("click", "#paypal_lock", paypal_lock_handler);
     $(document).on("keypress", "#txt_paypal_balance", function(e){
         var key = e.which;
 
         if (key == 13){
             e.preventDefault();
-            $(".lock-class").click();
+            $("#paypal_lock").click();
         }
     })
+
+    $(document).on("change", '#f_is_const', cost_is_constant_expiredate);
+
+    $(document).on("click", ".cost-lock", cost_lock_handler);
 
     $(document).on('change', "#s_filter_sales_by_model", function(){
         console.log($(this).val());
