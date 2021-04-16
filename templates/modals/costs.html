@@ -13,13 +13,19 @@
                             <th scope='col'>Name</th>
                             <th scope='col'>Value</th>
                             <th scope='col'></th>
+                            <th scope='col'></th>
                         </tr>
                     </thead>
                     <tbody id='costs_table_body'>
                         {% for cost in costs %}
                         <tr>
                             <th>{{ cost.name }}</th>
-                            <td>{{cost.value }}</td>
+                            <td>{{ cost.value }}</td>
+                            <td>
+                                <button class="btn align-middle bg-danger rounded text-center text-light cost-lock">
+                                    <i class="fa fa-lock fa-lg"></i>
+                                </button>
+                            </td>
                             <td>
                                 <button data-id="{{ cost.id }}" type="submit" class="btn btn-danger btn-delete-cost">
                                     <i class="fa fa-trash-alt fa-lg"></i>
@@ -46,6 +52,12 @@
                         </div>
                         <div class="col-2 my-auto">
                             <button type="submit" class="btn btn-primary" name="btn_costs">Add</button>
+                        </div>
+                        <div class="col-12 d-flex">
+                            {{ costform.is_constant }}
+                            &nbsp;&nbsp;
+                            <span id="s_describe_exp_date" style="font-size: 20px;">Is this a constant cost?</span>
+                            {{ costform.exp_date }}
                         </div>
                     </div>
                     
