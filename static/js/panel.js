@@ -742,7 +742,7 @@ function filter_sales(){
                     hipshipper.push(data)
                 }
             })
-            
+
             returned_pks = []
             pending_pks = []
             $(returned_sales).each(function(){
@@ -753,6 +753,15 @@ function filter_sales(){
                     returned_pks.push(this.sale)
                 }
             })
+
+            sales_count = sales.length
+            returned_count = returned_pks.length
+            pending_count = pending_pks.length
+
+            // sales count
+            $("#sales-count").html(`
+            Sales: ` + parseFloat(sales_count - returned_count - pending_count) + 
+            `-` + pending_count + `-` + returned_count);
 
             $(sales).each(function(){
                 if (returned_pks.includes(this.pk)){
@@ -847,9 +856,6 @@ function filter_sales(){
             sum_sales_table();
 
             calc_total_date_profit();
-
-            // sales count
-            $("#sales-count").html("Sales: " + parseFloat($("#table_sales > tbody > tr").length - 1));
 
             // ebay bill updated only on page load
             ebay_bill = parseFloat($("#total_sum_eBay_tax").html()) + parseFloat($("#total_sum_promoted").html())
