@@ -205,8 +205,12 @@ def panel(request):
         'user_balance': Balance.objects.get(user=request.user).balance,
         'paypal_balance': Balance.objects.get(user=request.user).paypal_balance,
         'costs': Cost.objects.filter(user=request.user),
-        'preferences': user_prefs
+        'preferences': user_prefs,
     }
     
     
     return render(request, 'panel.html', context)
+
+
+def help(request):
+    return render(request, 'help.html')
