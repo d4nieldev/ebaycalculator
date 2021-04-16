@@ -3,6 +3,8 @@ from dateutil.relativedelta import relativedelta
 
 import pandas as pd
 
+from itertools import chain
+
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.views.decorators.csrf import csrf_exempt
@@ -370,6 +372,8 @@ def update_paypal_balance(request):
 def filter_sales(request):
     if request.method == 'POST':
         date = request.POST['date']
+        model_to_filter_by = request.POST['model_to_filter_by']
+
         start_day = Preferences.objects.get(user=request.user).start_month_day
         sort_by_date = Preferences.objects.get(user=request.user).sort_by_date
         
@@ -391,13 +395,34 @@ def filter_sales(request):
             sales_qs = sales_qs.order_by('date')
         else:
             returned_qs = ReturnedSale.objects.filter(sale__user=request.user)
-            hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user) 
+            hipshipper_qs = HipShipper.objects.filter(sale_entry__user=request.user)
+
+        if model_to_filter_by != "all":
+            temp_qs = []
+            print(model_to_filter_by)
+            for sale in sales_qs:
+                in_returned_qs = ReturnedSale.objects.filter(sale=sale).count() > 0
+
+                approved_bool = model_to_filter_by == "approved" and not in_returned_qs
+                pending_bool = model_to_filter_by == "pending" and in_returned_qs and ReturnedSale.objects.get(sale=sale).is_pending
+                returned_bool = model_to_filter_by == "returned" and in_returned_qs and not ReturnedSale.objects.get(sale=sale).is_pending
+                pending_returned_bool = model_to_filter_by == "returned_pending" and in_returned_qs
+                shipping_bool = model_to_filter_by == "shipping" and HipShipper.objects.filter(sale_entry=sale).count() > 0
+
+                print(sale in returned_qs)
+
+                if approved_bool or pending_bool or returned_bool or pending_returned_bool or shipping_bool:
+                    temp_qs.append(sale)
+
+            none_qs = SaleEntry.objects.none()
+            sales_qs = list(chain(none_qs, temp_qs))
+            print(sales_qs)
         
         data = ''
         if sales_qs:
             sales_data = serializers.serialize('json', sales_qs)
             data = sales_data
-        if returned_qs:
+        if returned_qs and not model_to_filter_by == "approved":
             returned_data = serializers.serialize('json', returned_qs)
             if data:
                 data = data[:-1] + ", " + returned_data[1:]
