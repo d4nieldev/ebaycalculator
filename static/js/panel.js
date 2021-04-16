@@ -16,13 +16,18 @@ function sum_sales_table() {
     
     // iterate over each row and find all the numbers that are needed to sum up.
     $('#table_sales > tbody > tr').each(function(){
-        if ($(this).attr("id") != "bootstrap-overrides"){
-            $('td.sumtable', this).each(function(index, val){
-                // sum up the numbers and give in to result array.
-                if(!result[index]) result[index] = 0;
+        add_to_calculation = $(this).attr("id") == "bootstrap-overrides"
+        $('td.sumtable', this).each(function(index, val){
+            // sum up the numbers and give in to result array.
+            if(!result[index]) result[index] = 0;
+            if (add_to_calculation){
+                result[index] += 0;
+            }
+            else{
                 result[index] += parseFloat($(val).text());
-            });
-        }
+            }
+            
+        });
     });
     
     // create and design the sum row
@@ -712,13 +717,12 @@ function paypal_lock_handler(e){
 }
 
 function filter_sales(){
-    value = $("#s_sales_filter_by_date").val();
-
     $.ajax({
         url: '/filter_sales',
         type: 'POST',
         data: {
-            date: value,
+            date: $("#s_sales_filter_by_date").val(),
+            model_to_filter_by: $("#s_filter_sales_by_model").val()
         },
         success: function(d){
             table_string = ""
@@ -754,14 +758,8 @@ function filter_sales(){
                 }
             })
 
-            sales_count = sales.length
-            returned_count = returned_pks.length
-            pending_count = pending_pks.length
-
             // sales count
-            $("#sales-count").html(`
-            Sales: ` + parseFloat(sales_count - returned_count - pending_count) + 
-            `-` + pending_count + `-` + returned_count);
+            $("#sales-count").html('Sales: ' + parseFloat(sales.length));
 
             $(sales).each(function(){
                 if (returned_pks.includes(this.pk)){
@@ -804,7 +802,7 @@ function filter_sales(){
                 else{
                     table_string += "<tr>"
                 }
-                table_string += "<td class='get-country col-12 text-center' colspan='2'>" + this.country + "</td>"
+                table_string += "<td class='get-country col-12 text-center bg-secondary' colspan='2'>" + this.country + "</td>"
                 table_string += "</tr>"
                 table_string += "<tr>"
                 temp = this
@@ -928,7 +926,7 @@ $(document).ready(function(){
     set_gifts_date();
 
     // filter sales
-    $(document).on('change', "#s_sales_filter_by_date", filter_sales);
+    $(document).on('change', "#form_filter_sales select", filter_sales);
 
     // default month
     if (USER_PREFERENCES.default_month) $("#s_sales_filter_by_date").val($('#s_sales_filter_by_date option:last-child').val());
@@ -945,6 +943,10 @@ $(document).ready(function(){
             $(".lock-class").click();
         }
     })
+
+    $(document).on('change', "#s_filter_sales_by_model", function(){
+        console.log($(this).val());
+    });
     
     // open and close preferences
     $(document).on('click', "#btn_open_preferences", open_close_preferences)

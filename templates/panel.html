@@ -12,14 +12,25 @@
 <form id="form_filter_sales">
     {% csrf_token %}
     <div class="row mb-3">
-        <div class="col-2">
+        <div class="col-1">
             <select class='form-select' name="s_filter_sales_by_date" id="s_sales_filter_by_date">
-                <option value="all">All sales</option>
+                <option value="all">All Times</option>
                 {% for year, month_list in years_months.items %}
                     {% for month in month_list %}
                         <option value="{{ year }}-{{ month }}">{{ year }}-{{ month }}</option>
                     {% endfor %}
                 {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-2">
+            <select class='form-select' id="s_filter_sales_by_model">
+                <option value="all">All Sales</option>
+                <option value="approved">Approved Sales</option>
+                <option value="pending">Pending Sales</option>
+                <option value="returned">Returned Sales</option>
+                <option value="returned_pending">Returned Sales + Pending Sales</option>
+                <option value="shipping">Sales with shipping</option>
             </select>
         </div>
         
@@ -44,6 +55,7 @@
                 </div>
             </div>
         </div>
+
         <div class="col-2">
             <div id="sales-count" class="text-center rounded bg-info py-1 fw-bold text-dark"></div>
         </div>
