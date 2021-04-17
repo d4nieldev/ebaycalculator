@@ -277,8 +277,16 @@ class Cost(models.Model):
     name = models.CharField(max_length=100)
     value = models.FloatField()
     is_constant = models.BooleanField(default=False)
-    exp_date = models.DateField(default=datetime.datetime.now())
+    exp_date = models.DateField(blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
+
+    @property
+    def is_expired(self):
+        # cost is not constant and expire date in the past - sale is expired
+        today = datetime.datetime.now()
+        prefs = Preferences.objects.get(user=self.user)
+        return not self.is_constant and self.exp_date <= datetime.date(year=today.year, month=today.month, day=prefs.start_month_day)
+        
 
     def __str__(self):
         '''

@@ -237,14 +237,12 @@ def add_cost(request):
         if form.is_valid():
             cost = form.save(commit=False)
             cost.user = request.user
+            cost.is_constant = request.POST['is_constant'] == 'true'
             cost.save()
 
-            # get the relevant costs
-            costs_qs = Cost.objects.filter(user=request.user.id)
-
-            # serialize the query set so it could be given as a json response
-            data = serializers.serialize('json', costs_qs)
-            return HttpResponse(data, content_type="application/json")
+            return JsonResponse({'success': 'cost saved successfully'})
+        else:
+            print(form.errors)
 
     return JsonResponse({"data": "no data"})
 
@@ -265,16 +263,16 @@ def delete_cost(request):
 
         Cost.objects.get(id=id).delete()
 
-        # get the relevant costs
-        costs_qs = Cost.objects.filter(user=request.user.id)
-        
-        # serialize the query set so it could be given as a json response
-        data = serializers.serialize('json', costs_qs, fields=('id', 'name', 'value'))
-
-        return HttpResponse(data, content_type="application/json")
+        return JsonResponse({'success': 'cost deleted successfully'})
 
     return JsonResponse({"data":"no data"})
 
+
+@csrf_exempt
+def load_costs(request):
+    costs_qs = Cost.objects.filter(user=request.user)
+    data = serializers.serialize('json', costs_qs)
+    return HttpResponse(data, content_type="application/json")
 
 @csrf_exempt
 def add_hipshipper(request):

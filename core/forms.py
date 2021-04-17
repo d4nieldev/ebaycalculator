@@ -71,7 +71,7 @@ class CostForm(ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Name', 'id':'f_cost_name'}),
             'value': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Value', 'id':'f_cost_value'}),
             'is_constant': forms.CheckboxInput(attrs={'class': 'form-check-input big-checkbox', 'id': 'f_is_const'}),
-            'exp_date': DateInput(attrs={'class': 'form-control d-none', 'id':'f_exp_date'})
+            'exp_date': DateInput(attrs={'class': 'form-control d-none', 'id':'f_exp_date', 'type': 'month', 'value': '9999-12'})
         }
 
 class HipShipperForm(ModelForm):

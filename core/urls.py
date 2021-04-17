@@ -24,6 +24,7 @@ urlpatterns = [
     path('delete_returned_sale', apiViews.delete_returned_sale, name="delete_returned_sale"),
     path('update_paypal_balance', apiViews.update_paypal_balance, name="update_paypal_balance"),
     path('filter_sales', apiViews.filter_sales, name="filter_sales"),
+    path('load_costs', apiViews.load_costs, name='load_costs'),
 
     # preferences
     path('edit_preferences', preferences_views.edit_preferences, name="edit_preferences")

@@ -6,35 +6,21 @@
                 <h5 class="modal-title" id="costs_exampleModalLongTitle">Costs</h5>
             </div>
             <div class="modal-body">
-                <table class="table table-light table-striped" id="table_costs">
-                    <!--Table Content-->
-                    <thead>
-                        <tr class='headerrow-gift'>
-                            <th scope='col'>Name</th>
-                            <th scope='col'>Value</th>
-                            <th scope='col'></th>
-                            <th scope='col'></th>
-                        </tr>
-                    </thead>
-                    <tbody id='costs_table_body'>
-                        {% for cost in costs %}
-                        <tr>
-                            <th>{{ cost.name }}</th>
-                            <td>{{ cost.value }}</td>
-                            <td>
-                                <button class="btn align-middle bg-danger rounded text-center text-light cost-lock">
-                                    <i class="fa fa-lock fa-lg"></i>
-                                </button>
-                            </td>
-                            <td>
-                                <button data-id="{{ cost.id }}" type="submit" class="btn btn-danger btn-delete-cost">
-                                    <i class="fa fa-trash-alt fa-lg"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <div class="table-wrapper-scroll-y">
+                    <table class="table table-light table-striped" id="table_costs">
+                        <!--Table Content-->
+                        <thead>
+                            <tr class='headerrow-gift'>
+                                <th scope='col'>Name</th>
+                                <th scope='col'>Value</th>
+                                <th scope='col'></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
+                </div>
                 <form id='cost-register'>
                     {% csrf_token %}
                     <div class="row">
@@ -56,7 +42,7 @@
                         <div class="col-12 d-flex">
                             {{ costform.is_constant }}
                             &nbsp;&nbsp;
-                            <span id="s_describe_exp_date" style="font-size: 20px;">Is this a constant cost?</span>
+                            <span id="s_describe_exp_date" style="font-size: 20px;">Is this a temporary cost?</span>
                             {{ costform.exp_date }}
                         </div>
                     </div>

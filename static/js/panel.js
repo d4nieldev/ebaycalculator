@@ -452,12 +452,39 @@ function add_hipshipper(e){
     })
 }
 
-/**
- * Sends the differences to the server
- */
-function update_hipshipper(sale_id, lastvalue){
-    
-}   
+function load_costs(){
+    $.ajax({
+        url: '/load_costs',
+        type: 'GET',
+        success: function(data){
+            // clear table contents
+            $("#table_costs tbody").html("");
+
+            $.each(data, function(i, item) {
+                // get the values
+                cost_name = item.fields.name;
+                cost_value = item.fields.value;
+                cost_is_constant = item.fields.is_constant
+                cost_exp_date = new Date(item.fields.exp_date)
+                
+                if (cost_is_constant){
+                    tr_style = "<tr class='fw-bold'>"
+                } else if (cost_exp_date > Date.now()){
+                    tr_style = "<tr class='text-danger'>"
+                } else if (cost_exp_date < Date.now()){
+                    tr_style = "<tr class='text-secondary'>"
+                }
+
+                // insert each cost to the table body
+                var $tr = $(tr_style).append(
+                    $('<th>').text(cost_name),
+                    $('<td>').text(cost_value),
+                    $('<td>').html("<button data-id='" + item.pk + "' type='submit' class='btn btn-danger btn-delete-cost' ><i class='fa fa-trash-alt fa-lg'></i></button>")
+                ).appendTo("#table_costs tbody")
+            });
+        }
+    })
+} 
 
 
 /**
@@ -465,7 +492,6 @@ function update_hipshipper(sale_id, lastvalue){
  * @param {event} e The event that triggered the function
  */
 function add_cost(e){
-    
     // prevent default response to event
     e.preventDefault();
 
@@ -475,41 +501,11 @@ function add_cost(e){
         data:{
             name:$("#f_cost_name").val(),
             value:$("#f_cost_value").val(),
+            is_constant: !$("#f_is_const").is(":checked"),
+            exp_date: $("#f_exp_date").val() + '-' + get_user_preferences().start_month_day
         }
     })
-    .done(function(data){
-        // clear table contents
-        $("#table_costs").html("<tbody id='costs_table_body'></tbody>");
-        
-        // if data is valid
-        if (!data.data){
-            // create the table structure
-            var headers = "<thead><tr class='headerrow-gift'><th scope='col'>Name</th><th scope='col'>Value</th><th scope='col'></th></tr></thead>"
-            $(headers).appendTo("#table_costs")
-
-            $(function() {
-                // reset the table body
-                $("#costs_table_body").html("")
-
-                $.each(data, function(i, item) {
-                    // get the values
-                    cost_name = item.fields.name;
-                    cost_value = item.fields.value;
-
-                    // insert each cost to the table body
-                    var $tr = $('<tr>').append(
-                        $('<th>').text(cost_name),
-                        $('<td>').text(cost_value),
-                        $('<td>').html("<button data-id='" + item.pk + "' type='submit' class='btn btn-danger btn-delete-cost' ><i class='fa fa-trash-alt fa-lg'></i></button>")
-                    ).appendTo("#costs_table_body")
-                });
-            });
-        }
-    })
-    .fail(function(response){
-        console.log(response.responseText);
-        console.log(response);
-    });
+    .done(load_costs)
 }
 
 
@@ -529,10 +525,7 @@ function delete_cost(e){
                 id: id
             }
         })
-        .done(function(data){
-            // on success, reload the costs table to show the new costs
-            $("#table_costs").load(document.URL + " #table_costs");
-        })
+        .done(load_costs)
         .fail(function(xhr, status, error){
             var err = eval("(" + xhr.responseText + ")");
                 alert(err.Message);
@@ -928,12 +921,19 @@ function cost_lock_handler(){
 function cost_is_constant_expiredate(){
     $("#s_describe_exp_date").toggleClass("d-none");
     $("#f_exp_date").toggleClass("d-none");
+
+    var today = new Date()
+    if (today.getMonth() < 10) month = "0" + (today.getMonth() + 1)
+    else month = today.getMonth() + 1
+    $("#f_exp_date").val(today.getFullYear() + '-' + month);
 }
 
 $(document).ready(function(){
     USER_PREFERENCES = get_user_preferences();
 
     set_gifts_date();
+
+    load_costs();
 
     // filter sales
     $(document).on('change', "#form_filter_sales select", filter_sales);
