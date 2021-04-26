@@ -16,20 +16,36 @@ function sum_sales_table() {
     
     // iterate over each row and find all the numbers that are needed to sum up.
     $('#table_sales > tbody > tr').each(function(){
-        add_to_calculation = $(this).hasClass("warningrow");
+        add_to_calculation = !$(this).hasClass("warningrow");
         $('td.sumtable', this).each(function(index, val){
             // sum up the numbers and give in to result array.
-            if(!result[index]) result[index] = 0;
-            if (add_to_calculation){
-                result[index] += 0;
+            if ($(this).data('type') == 'country'){
+                hipshipper_seller = 0;
+                $(val).find("table > tbody > tr").each(function(index){
+                    if (index == 1){
+                        if ($(this)[0].innerHTML != ''){
+                            content = $($(this)[0].innerHTML)[1].innerText
+                            content = content.replace("Seller", '');
+                            hipshipper_seller = parseFloat(content);
+                        }
+                    }
+                });
+                if(!result[index]) result[index] = 0;
+                result[index] += hipshipper_seller
             }
             else{
-                result[index] += parseFloat($(val).text());
+                if(!result[index]) result[index] = 0;
+                if (add_to_calculation){
+                    result[index] += parseFloat($(val).text());
+                }
+                else{
+                    result[index] += 0;
+                }
             }
             
         });
+        
     });
-    
     // create and design the sum row
     $('#table_sales > tbody:last-child').append('<tr id="bootstrap-overrides" class="greenrow"></tr>');
     $('#table_sales > tbody:last-child > tr:last').append('<th class="align-middle"><i class="fa fa-hashtag fa-md"></i></th>');
@@ -787,7 +803,7 @@ function filter_sales(){
                 
                 table_string += "<td class='editable sumtable' data-id='" + this.pk + "' data-type='discount'>" + parseFloat(this.discount) + "</td>";
                 
-                table_string += "<td class='editable text-center' data-id='" + this.pk + "' data-type='country'>"
+                table_string += "<td class='editable text-center sumtable' data-id='" + this.pk + "' data-type='country'>"
                 table_string += "<table style='width: 90%;'>"
                 if (this.country == '-----'){
                     table_string += "<tr class='bg-secondary'>"
