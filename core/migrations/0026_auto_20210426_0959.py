@@ -7,7 +7,8 @@ def add_preference(apps, schema_editor):
     User = apps.get_model('auth', 'User')
     Preferences = apps.get_model('core', 'Preferences')
     for user in User.objects.all():
-        Preferences(user=user).save()
+        if not Preferences.objects.get(user=user):
+            Preferences(user=user).save()
 
 
 class Migration(migrations.Migration):

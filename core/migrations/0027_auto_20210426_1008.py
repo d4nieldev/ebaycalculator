@@ -7,7 +7,8 @@ def add_balance(apps, schema_editor):
     User = apps.get_model('auth', 'User')
     Balance = apps.get_model('core', 'Balance')
     for user in User.objects.all():
-        Balance(user=user).save()
+        if not Balance.objects.get(user=user):
+            Balance(user=user).save()
 
 
 class Migration(migrations.Migration):
