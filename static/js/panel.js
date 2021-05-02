@@ -1093,7 +1093,7 @@ $(document).ready(function () {
 
   $(document).on("change", "#f_is_const", cost_is_constant_expiredate);
 
-  $(document).on("click", ".cost-lock", cost_lock_handler);
+  //$(document).on("click", ".cost-lock", cost_lock_handler);
 
   $(document).on("change", "#s_filter_sales_by_model", function () {
     console.log($(this).val());
