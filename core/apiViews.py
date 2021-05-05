@@ -27,12 +27,10 @@ from .views import VALIDATE_DATE
 
 def HANDLE_LOGOUT_BASE(request):
     '''
-    This function handles the logout mechanism. No need to use it anywhere.
+    Handles the logout mechanism. No need to use it anywhere.
     
-    Attributes
-    ----------
-    request : django.http.HttpRequest
-        the request that triggered the caller function
+    #### Parameters
+    `request : django.http.HttpRequest` the request that triggered the caller function
     '''
     logout(request)
 

@@ -19,9 +19,16 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
 
-def HANDLE_LOGIN_BASE(request, current_page, context):
+def HANDLE_LOGIN_BASE(request, page_to_render, context):
     '''
-    This function handles the login form.
+    submit the data from login form to authenticate the user.
+
+    #### Parameters
+    `request : django.http.HttpRequest` The request upon submitting the log in form
+
+    `page_to_render : str` The name of the page to render after logging in
+
+    `context : dict` The context needed to be passed to the html template
     '''
     if request.method == 'POST':
         if "btn_login" in request.POST:
@@ -36,15 +43,17 @@ def HANDLE_LOGIN_BASE(request, current_page, context):
             else:
                 messages.error(request, 'Username or password are incorrect')
                 context['open_login'] = True
-                return render(request, current_page, context, status=400)
+                return render(request, page_to_render, context, status=400)
 
 
 def SORT_DICT(dict_notsorted):
-    '''SORT_DICT
-    
-    This function sorts a dictionary mostly date dicts.
+    '''Sort a dictionary of dates.
     Used for showing the dates in the select input in nice order.
-    Example:
+
+    #### Parameters
+    `dict_notsorted : dict` The unsorted dict
+    
+    #### Example:
     {2020: [7,5,9], 2019: [2,1,12]} --> {2019: [1,2,12], 2020: [5,7,9]}
 
     '''
@@ -58,16 +67,18 @@ def SORT_DICT(dict_notsorted):
 
 
 def GET_SALES_YEARS_MONTHS(request):
-    '''GET_SALES_YEARS_MONTHS
-    This function returns a dictionary with all years and months the user has registred sales
+    '''
+    Returns a dictionary with all years and months the user has registred sales.
 
-    Example:
+    #### Parameters
+    `request : django.http.HttpRequest` The request
+
+    #### Example
     {2020: [11,12], 2021: [1]}
     '''
     sales = SaleEntry.objects.filter(user=request.user)
     start_day = Preferences.objects.get(user=request.user).start_month_day
     years_months = {}
-    print("HE")
 
     for sale in sales:
         if sale.date.year not in years_months.keys():
@@ -89,7 +100,6 @@ def GET_SALES_YEARS_MONTHS(request):
                     if 12 not in years_months[year]:
                         years_months[year].append(12)
             
-                
     return SORT_DICT(years_months)
 
 
@@ -108,13 +118,16 @@ def VALIDATE_DATE(date):
 
 def GET_GIFTS_YEARS_MONTHS(request):
     '''
-    This function returns a dictionary with all years and months the user has registred sales
-    Example:
+    Returns a dictionary with all years and months the user has registred sales
+
+    #### Parameters
+    `request : django.http.HttpRequest` The request
+
+    #### Example
     {2020: [11,12], 2021: [1]}
     '''
     gifts = Gift.objects.filter(user=request.user.id)
-    user_prefs = Preferences.objects.get(user=request.user)
-    start_day = user_prefs.start_month_day
+    start_day = Preferences.objects.get(user=request.user).start_month_day
     years_months = {}
 
     for gift in gifts:
@@ -140,9 +153,10 @@ def GET_GIFTS_YEARS_MONTHS(request):
 
 
 def index(request):
-    '''index
+    '''View the index HTML page, register new users, and handle login.
 
-    View the index HTML page, register new users, and handle login.
+    #### Parameters
+    'request : django.http.HttpRequest` The request
     '''
     if request.user.is_authenticated:
         # logged in users will be automatically redirected to the panel page
@@ -160,9 +174,11 @@ def index(request):
 
                     last_user = User.objects.latest('id')
 
+                    # create balance object
                     user_balance = Balance(user=last_user)
                     user_balance.save()
 
+                    # create preferences object
                     user_preferences = Preferences(user=last_user)
                     user_preferences.save()
                     
@@ -183,15 +199,12 @@ def index(request):
 
 @login_required(login_url='index')
 def panel(request):
-    '''panel
+    '''View the panel HTML page.
+    Restricted only for registered users.
     
-    View the panel HTML page
-    '''
-    try:
-        user_prefs = Preferences.objects.get(user=request.user)
-    except ObjectDoesNotExist:
-        user_prefs = Preferences(user=request.user)
-    
+    #### Paramaters
+    `request : django.http.HttpRequest` The request
+    '''  
 
     context = {
         'years_months': GET_SALES_YEARS_MONTHS(request),
@@ -205,12 +218,16 @@ def panel(request):
         'user_balance': Balance.objects.get(user=request.user).balance,
         'paypal_balance': Balance.objects.get(user=request.user).paypal_balance,
         'costs': Cost.objects.filter(user=request.user),
-        'preferences': user_prefs,
+        'preferences': Preferences.objects.get(user=request.user),
     }
-    
     
     return render(request, 'panel.html', context)
 
 
 def help(request):
+    '''View the help HTML page.
+
+    #### Parameters
+    `request : django.http.HttpRequest` The request
+    '''
     return render(request, 'help.html')

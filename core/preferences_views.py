@@ -14,6 +14,11 @@ import json
 
 @csrf_exempt
 def edit_preferences(request):
+    '''Responsible for changing the preferences.
+
+    #### Parameters
+    `request : django.http.HttpRequest` The request
+    '''
     if request.method == 'POST':
         user_prefs = Preferences.objects.get(user=request.user)
         form = PreferencesForm(request.POST, instance=user_prefs)

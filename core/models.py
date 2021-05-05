@@ -9,14 +9,12 @@ class Balance(models.Model):
     Every new user automatically gets a balance object right after signing up with the sign up form.
     The balance is the money the user has in the monitor app.
 
-    Attributes
-    ----------
-    user : django.contrib.auth.models.User
-        The user this balance object is related to.
-    balance : float
-        The balance value for this particular user. default = 0.
-    paypal_balance : float
-        The paypal balance value for this particular user. default = 0.
+    #### Attributes
+    `user : django.contrib.auth.models.User` The user this balance object is related to.
+
+    `balance : float` The balance value for this particular user. default = 0.
+
+    `paypal_balance : float`The paypal balance value for this particular user. default = 0.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, default=0)
     balance = models.FloatField(default=0)
@@ -24,14 +22,12 @@ class Balance(models.Model):
 
     def __str__(self):
         '''
-        Example
-        -------
+        #### Example
         user = Daniel,
         balance = 541.62,
         paypal_balance = 1852.67.
 
-        Daniel - 541.62 - 1852.67
-        ---------------
+        #### Daniel - 541.62 - 1852.67
         '''
         return f'{self.user} - {self.balance} - {self.paypal_balance}'
 
@@ -42,35 +38,28 @@ class SaleEntry(models.Model):
 
     The purpose of this model is to organize every sale registered to the same format which is described above.
 
-    Attributes
-    ----------
-    date : datetime.date 
-        The date this product has been sold.
-    ebay_price : float
-        Product selling price on ebay.
-    amazon_price : float
-        Product buying price from amazon.
-    ebay_tax : float
-        Tax ($) eBay claimed for this sale.
-    paypal_tax : float
-        Tax ($) paypal claimed for this sale.
-    tm_fee : float
-        Trademark (TM) fee. optinal (default = 0.3).
-    promoted : float
-        If your sale is promoted, enter the promotion fee. optinal (default = 0).
-    profit : float
-        Total profit
-    discount : float:
-        If you got a discount from the monitor, enter the discount amount. optinal (default = 0).
-    country : str:
-        If you bought this product from foreign country, enter the country name. optinal (default = -----).
-    user : django.contrib.auth.models.User
-        The user this balance object is related to.
-    
-    Methods
-    -------
-    calc_profit()
-        calculates and returnes the profit
+    #### Attributes
+    `date : datetime.date` The date this product has been sold.
+
+    `ebay_price : float` Product selling price on ebay.
+
+    `amazon_price : float` Product buying price from amazon.
+
+    `ebay_tax : float` Tax ($) eBay claimed for this sale.
+
+    `paypal_tax : float` Tax ($) paypal claimed for this sale.
+
+    `tm_fee : float` Trademark (TM) fee. optinal (default = 0.3).
+
+    `promoted : float` If your sale is promoted, enter the promotion fee. optinal (default = 0).
+
+    `profit : float` Total profit
+
+    `discount : float` If you got a discount from the monitor, enter the discount amount. optinal (default = 0).
+
+    `country : str` If you bought this product from foreign country, enter the country name. optinal (default = -----).
+
+    `user : django.contrib.auth.models.User` The user this balance object is related to.
     """
     
     date = models.DateField()
@@ -88,11 +77,7 @@ class SaleEntry(models.Model):
 
     def calc_profit(self):
         '''
-        Calculate the profit
-        
-        Returns
-        -------
-        returnes the profit
+        Calculates and returned the profit
         '''
         
         profit = self.ebay_price - self.amazon_price - self.ebay_tax - self.paypal_tax - self.tm_fee - self.promoted + self.discount
@@ -115,12 +100,10 @@ class SaleEntry(models.Model):
         '''
         Changing the balance for amazon_price, tm_fee and discount parameters on update and on creation.
 
-        Keyword Arguments
-        -----------------
-        update_type : str
-            What field has been updated
-        update_value_diff : float
-            The change in that value
+        #### Keyword Arguments
+        `update_type : str` What field has been updated
+
+        `update_value_diff : float` The change in that value
         '''
         change_balance = Balance.objects.get(user=self.user)
 
@@ -170,41 +153,31 @@ class SaleEntry(models.Model):
 
     def __str__(self):
         '''
-        Example
-        -------
-        user = Daniel
-
+        #### Example
+        user = Daniel,
         profit = 17.41
 
-        Daniel - 17.41
-        --------------
+        #### Daniel - 17.41
         '''
         return f'{self.user} - {self.profit}'
 
 
 class Gift(models.Model):
     """
-    Gifts can be bought to add money to your monitor balance.
+    Gifts can be bought to add money to the user's monitor balance.
 
     This model is used to keep track of these gifts and organize them together.
 
-    Attributes
-    ----------
-    is_gift : bool
-        Is this a gift or a manual change?
-    date : datetime.date
-        The date this gift was added.
-    gift_money : float
-        Gift worth ($) with taxes.
-    gift_tax : float
-        Gift Tax ($).
-    user : django.contrib.auth.models.User
-        The user this balance object is related to.
+    #### Attributes
+    `is_gift : bool` Is this a gift or a manual change?
 
-    Methods
-    -------
-    calc_gift_value()
-        returnes the gift minus the taxes
+    `date : datetime.date` The date this gift was added.
+
+    `gift_money : float` Gift worth ($) with taxes.
+
+    `gift_tax : float` Gift Tax ($).
+
+    `user : django.contrib.auth.models.User` The user this balance object is related to.
     """
     is_gift = models.BooleanField(default=True)
     date = models.DateField()
@@ -212,9 +185,8 @@ class Gift(models.Model):
     gift_tax = models.FloatField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
 
-
     def calc_gift_value(self):
-        '''Calculate the gift real value (after taxes)'''
+        '''Calculate the gift real value after taxes'''
         return self.gift_money - self.gift_tax
 
 
@@ -224,8 +196,10 @@ class Gift(models.Model):
         '''
         balance_obj = Balance.objects.get(user=self.user)
         balance_obj.balance += self.calc_gift_value()
+
         if self.is_gift:
             balance_obj.paypal_balance -= self.gift_money
+
         balance_obj.save()
 
         super(Gift, self).save(*args, **kwargs)
@@ -243,36 +217,35 @@ class Gift(models.Model):
 
         super(Gift, self).delete(*args, **kwargs)
 
+
     def __str__(self):
         '''
-        Example
-        -------
-        date = 25/02/2021
-
-        gift_money = 103.0
-
-        gift_tax = 3.0
-
+        #### Example
+        date = 25/02/2021,
+        gift_money = 103.0,
+        gift_tax = 3.0,
         user = Daniel
-        Daniel - 100.0
-        --------------
+
+        #### Daniel - 100.0
         '''
         return f'{self.user} - {self.calc_gift_value()}'
 
 class Cost(models.Model):
     """
-    Managing an eBay store has it's costs, it can be monitors, programs that are used to help manage the store, eBay store price, etc...
+    Managing an eBay store has it's costs. it can be monitors, programs that are used to help manage the store, eBay store price, etc...
 
     We can help the users consider this costs in the total profit calculation.
 
-    Attributes
-    ----------
-    name :str
-        Cost name.
-    value : float
-        Cost value (per month).
-    user : django.contrib.auth.models.User
-        The user this balance object is related to.
+    #### Attributes
+    `name :str` Cost name.
+
+    `value : float` Cost value (per month).
+
+    `is_constant : float` Is the cost is a constant one or temporary?
+
+    `exp_date : date` If the cost is constant then it has an expire date
+
+    `user : django.contrib.auth.models.User` The user this balance object is related to.
     """
     name = models.CharField(max_length=100)
     value = models.FloatField()
@@ -282,7 +255,8 @@ class Cost(models.Model):
 
     @property
     def is_expired(self):
-        # cost is not constant and expire date in the past - sale is expired
+        '''Cost is not constant and expire date in the past - sale is expired
+        '''
         today = datetime.datetime.now()
         prefs = Preferences.objects.get(user=self.user)
         return not self.is_constant and self.exp_date <= datetime.date(year=today.year, month=today.month, day=prefs.start_month_day)
@@ -290,14 +264,12 @@ class Cost(models.Model):
 
     def __str__(self):
         '''
-        Example
-        -------
-        name = Monitor
-
-        value = 400.0
-
+        ####Example
+        name = Monitor,
+        value = 400.0,
         user = Daniel
-        Daniel: Monitor $400
+
+        #### Daniel: Monitor $400
         --------------------
         '''
         return f'{self.user}: {self.name} ${self.value}'
@@ -308,23 +280,19 @@ class HipShipper(models.Model):
 
     This model organizes all the times the user has paid for shipping and recalculating the profit.
 
-    Attributes
-    ----------
-    buyer_paid : float
-        How much did the buyer paid for shipping.
-    seller_paid : float
-        How much did the seller (the user) paid for shipping.
-    sale_entry : .models.SaleEntry
-        The sale related to this shipment.
+    #### Attributes
+    `buyer_paid : float` How much did the buyer paid for shipping.
+
+    `seller_paid : float` How much did the seller (the user) paid for shipping.
+
+    `sale_entry : models.SaleEntry` The sale related to this shipment.
     """
     buyer_paid = models.FloatField()
     seller_paid = models.FloatField()
     sale_entry = models.OneToOneField(SaleEntry, on_delete=models.CASCADE, default=0)
 
     def save(self, *args, **kwargs):
-        '''
-        Changing the paypal balance.
-        Sale profit already changed in SaleEntry.calc_profit().
+        '''Changing the paypal balance on save.
         '''
         change_balance = Balance.objects.get(user=self.sale_entry.user)
 
@@ -339,44 +307,44 @@ class HipShipper(models.Model):
         
         change_balance.save()
             
-        
         super(HipShipper, self).save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):
+        '''Change balance and paypal balance on delete
+        '''
         change_balance = Balance.objects.get(user=self.sale_entry.user)
         change_balance.paypal_balance = float(change_balance.paypal_balance) - float(self.buyer_paid) + float(self.seller_paid)
 
     def __str__(self):
         '''
-        Example
-        -------
-        buyer_paid = 15.0
+        #### Example
+        buyer_paid = 15.0,
+        seller_paid = 5.0,
+        sale_entry = 171
 
-        seller_paid = 5.0
-
-        user = Daniel
-        Daniel(Israel) - 10.0
-        ---------------------
+        #### 171(Israel) - 10.0
         '''
-        return f'{self.sale_entry.user}({self.sale_entry.country}) - {self.buyer_paid - self.seller_paid}'
+        return f'{self.sale_entry.id}({self.sale_entry.country}) - {self.buyer_paid - self.seller_paid}'
 
 
 class ReturnedSale(models.Model):
     """
     When a user returnes a sale, it is saved in this table for the report
 
-    Attributes
-    ----------
-    sale : SaleEntry
-        The sale that was returned
-    date_of_return : datetime.date
-        The date of return
+    #### Attributes
+    `sale : SaleEntry` The sale that was returned
+
+    `is_pending : bool` Is the sale pending?
+
+    `date_of_return : datetime.date` The date of return
     """
     sale = models.OneToOneField(SaleEntry, on_delete=models.CASCADE, default=0)
     is_pending = models.BooleanField(default=True)
 
 
     def save(self, *args, **kwargs):
+        """Change the balance according to the pending status
+        """
         balance_obj = Balance.objects.get(user=self.sale.user)
         if not self.pk: 
             # new object
@@ -393,6 +361,8 @@ class ReturnedSale(models.Model):
         super(ReturnedSale, self).save(*args, **kwargs)
     
     def delete(self, *args, **kwargs): 
+        """Change the balance and paypal balance back to before the sale
+        """
         balance_obj = Balance.objects.get(user=self.sale.user)
 
         # sale return was canceled - substract amazon price from balance
@@ -410,15 +380,35 @@ class ReturnedSale(models.Model):
 
 
 class Preferences(models.Model):
+    """The preferences of the user
+
+    #### Attributes
+    `user : django.contrib.auth.User` The user
+
+    `default_month : bool` True for selecting sales from last month else select all sales
+
+    `start_month_day : int` Month will end in this day minus 1
+
+    `sort_by_date : bool` True for sort by date, else don't sort
+    """
     user = models.OneToOneField(User, models.CASCADE, default=0)
-    default_month = models.BooleanField(default=True) # True for lastmonth else all
-    start_month_day = models.IntegerField(default=16) # month will end in this day minus 1
-    sort_by_date = models.BooleanField(default=False) # True for sort by date else don't sort
+    default_month = models.BooleanField(default=True)
+    start_month_day = models.IntegerField(default=16)
+    sort_by_date = models.BooleanField(default=False)
 
     def __str__(self):
+        """
+        #### Example
+        user = Daniel,
+        default_month = True,
+        start_month_day = 16,
+        sort_by_date = True  
+
+        #### Daniel | default_month = True | start_month_day = 16 | sort_by_date = True
+        """
         s = "user = " + str(self.user) + " | "
         s += "default_month = " + str(self.default_month) + " | "
         s += "start_month_day = " + str(self.start_month_day) + " | "
-        s += "sort_by_date = " + str(self.sort_by_date) + " | "
+        s += "sort_by_date = " + str(self.sort_by_date)
         
         return s
