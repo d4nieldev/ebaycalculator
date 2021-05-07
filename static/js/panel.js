@@ -142,11 +142,8 @@ function calc_total_date_profit() {
         gifts_tax += parseFloat(item.fields.gift_tax);
       });
       // calculate the total profit
-      if (isNaN(parseFloat(profit))) {
-        total = -1 * (parseFloat(costs) + parseFloat(gifts_tax));
-      } else {
-        total = parseFloat(profit) - parseFloat(costs) - parseFloat(gifts_tax);
-      }
+      if (isNaN(parseFloat(profit))) profit = 0;
+      total = parseFloat(profit) - parseFloat(costs) - parseFloat(gifts_tax);
 
       // if the total profit is grater than 0, show it in green, else show it in red.
       if (total < 0) $("#total-profit").addClass("bg-danger");
