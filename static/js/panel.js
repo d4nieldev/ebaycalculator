@@ -128,7 +128,6 @@ function calc_total_date_profit() {
     costs += parseFloat($(this).text());
   });
 
-  gifts_tax = 0;
   selected_date = $("#s_sales_filter_by_date").val();
 
   $.ajax({
@@ -138,6 +137,7 @@ function calc_total_date_profit() {
       date: selected_date,
     },
     success: function (data) {
+      gifts_tax = 0;
       $.each(data, function (i, item) {
         gifts_tax += parseFloat(item.fields.gift_tax);
       });
