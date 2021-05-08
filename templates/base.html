@@ -56,8 +56,10 @@
             <div class="navbar-text row d-flex justify-content-end">
                 <div class="col-md-auto text-center rounded" style="font-size: 1.5rem;" id="total-profit">
                     {% for cost in costs %}
+                        
                         {% if not cost.is_expired %}
                         <span class="hidden-cost" style="display: none;">{{ cost.value }}</span>
+                        <script>console.log("{{ cost }}");</script>
                         {% endif %}
                     {% endfor %}
                 </div>

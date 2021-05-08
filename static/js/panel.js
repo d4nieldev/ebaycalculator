@@ -127,6 +127,7 @@ function calc_total_date_profit() {
   $("#total-profit span.hidden-cost").each(function () {
     costs += parseFloat($(this).text());
   });
+  console.log(costs);
 
   selected_date = $("#s_sales_filter_by_date").val();
 

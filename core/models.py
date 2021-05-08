@@ -259,7 +259,7 @@ class Cost(models.Model):
         '''
         today = datetime.datetime.now()
         prefs = Preferences.objects.get(user=self.user)
-        return not self.is_constant and self.exp_date <= datetime.date(year=today.year, month=today.month, day=prefs.start_month_day)
+        return not self.is_constant and self.exp_date < datetime.date(year=today.year, month=today.month, day=prefs.start_month_day)
         
 
     def __str__(self):
