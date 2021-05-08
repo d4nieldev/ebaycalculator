@@ -507,18 +507,28 @@ function load_costs() {
         cost_is_constant = item.fields.is_constant;
         cost_exp_date = new Date(item.fields.exp_date);
 
+        time_to_expire = cost_exp_date - Date.now();
+        if (time_to_expire > 0){
+          time_to_expire_str = " (" + Math.ceil(time_to_expire / (24 * 60 * 60 * 1000)) + " more days)";
+        }
+        else{
+          time_to_expire_str = " (" + -1 * Math.ceil(time_to_expire / (24 * 60 * 60 * 1000)) + " days ago)";
+        }
+
         if (cost_is_constant) {
           tr_style = "<tr class='fw-bold'>";
-        } else if (cost_exp_date > Date.now()) {
-          tr_style = "<tr class='text-danger'>";
-        } else if (cost_exp_date < Date.now()) {
-          tr_style = "<tr class='text-secondary'>";
+          time_to_expire_str = '';
+        } else if (time_to_expire > 0) {
+          tr_style = "<tr class='text-warning fw-bold'>";
+        } else {
+          tr_style =
+            "<tr class='text-secondary fw-bold text-decoration-line-through'>";
         }
 
         // insert each cost to the table body
         var $tr = $(tr_style)
           .append(
-            $("<th>").text(cost_name),
+            $("<th>").text(cost_name + time_to_expire_str),
             $("<td>").text(cost_value),
             $("<td>").html(
               "<button data-id='" +
