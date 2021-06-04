@@ -64,4 +64,7 @@
 </form>
 
 {% include 'sales_table.html' %}
+{% if debug_flag %}
+<button class="btn btn-primary" id="btn_verify_profits">Verify profits</button>
+{% endif %}
 {% endblock %}

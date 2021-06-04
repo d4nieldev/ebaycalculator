@@ -84,13 +84,13 @@ function sum_sales_table() {
  */
 function calc_profit_form() {
   // get the values
-  ebay_price = $("#f_ebay_price").val();
-  amazon_price = $("#f_amazon_price").val();
-  ebay_tax = $("#f_ebay_tax").val();
-  paypal_tax = $("#f_paypal_tax").val();
-  tm_fee = $("#f_tm_fee").val();
-  promoted = $("#f_promoted").val();
-  discount = $("#f_discount").val();
+  ebay_price = parseFloat($("#f_ebay_price").val()) || 0;
+  amazon_price = parseFloat($("#f_amazon_price").val()) || 0;
+  ebay_tax = parseFloat($("#f_ebay_tax").val()) || 0;
+  paypal_tax = parseFloat($("#f_paypal_tax").val()) || 0;
+  tm_fee = parseFloat($("#f_tm_fee").val()) || 0;
+  promoted = parseFloat($("#f_promoted").val()) || 0;
+  discount = parseFloat($("#f_discount").val()) || 0;
 
   // print the profit
   $("#f_profit").val(
@@ -124,11 +124,25 @@ function calc_total_date_profit() {
   profit = $("#total_sum_profit").text();
 
   costs = 0;
-  $("#total-profit span.hidden-cost").each(function () {
+  $("#costs-hidden span.hidden-cost").each(function () {
     costs += parseFloat($(this).text());
   });
-  console.log(costs);
-
+  panel_date = new Date(year=parseFloat($("#s_sales_filter_by_date > option:selected").text().split('-')[0]),
+                          month=parseFloat($("#s_sales_filter_by_date > option:selected").text().split('-')[1]),
+                          date=parseFloat($("#f_start_month_day > option:selected").text()));
+  console.log("PANEL: " + panel_date);
+  $("#costs-hidden span.hidden-temp-cost").each(function () {
+    value = parseFloat($(this).text().split('|')[0]);
+    start_date = new Date($(this).text().split('|')[1]);
+    exp_date = new Date($(this).text().split('|')[2]);
+    console.log("START: " + start_date);
+    console.log("END: " + exp_date);
+    // add the not expired costs to calculation
+    if (exp_date >= panel_date && start_date < panel_date){
+      console.log("valid");
+      costs += value;
+    }
+  });
   selected_date = $("#s_sales_filter_by_date").val();
 
   $.ajax({
@@ -155,6 +169,7 @@ function calc_total_date_profit() {
   }).fail(function (data) {
     console.log(data);
   });
+  console.log('-----------------------------------------')
 }
 
 /**
@@ -560,6 +575,8 @@ function add_cost(e) {
       is_constant: !$("#f_is_const").is(":checked"),
       exp_date:
         $("#f_exp_date").val() + "-" + get_user_preferences().start_month_day,
+      start_date:
+        $("#f_start_date").val() + "-" + get_user_preferences().start_month_day,
     },
   }).done(load_costs);
 }
@@ -1062,12 +1079,36 @@ function open_close_preferences() {
  */
 function cost_is_constant_expiredate() {
   $("#s_describe_exp_date").toggleClass("d-none");
-  $("#f_exp_date").toggleClass("d-none");
+  $("#exp_date_container").toggleClass("d-none");
+  $("#start_date_container").toggleClass("d-none");
 
   var today = new Date();
-  if (today.getMonth() < 10) month = "0" + (today.getMonth() + 1);
-  else month = today.getMonth() + 1;
-  $("#f_exp_date").val(today.getFullYear() + "-" + month);
+  if (today.getMonth() < 12){
+    if (today.getMonth() < 10){ 
+      startMonth = "0" + today.getMonth();
+      endMonth = "0" + (today.getMonth() + 1);
+    }
+    else {
+      startMonth = today.getMonth();
+      endMonth = today.getMonth() + 1;
+    }
+  }
+  else{
+    startMonth = 12;
+    endMonth = "01";
+  }
+  $("#f_exp_date").val(today.getFullYear() + "-" + endMonth);
+  $("#f_start_date").val(today.getFullYear() + "-" + startMonth);
+}
+
+function verify_profits(){
+  $.ajax({
+    url: "/verify_profits",
+    type: "GET",
+    success: function (response) {
+      alert(response);
+    },
+  });
 }
 
 $(document).ready(function () {
@@ -1079,6 +1120,8 @@ $(document).ready(function () {
 
   // filter sales
   $(document).on("change", "#form_filter_sales select", filter_sales);
+
+  $(document).on("click", "#btn_verify_profits", verify_profits);
 
   // default month
   if (USER_PREFERENCES.default_month)

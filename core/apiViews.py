@@ -432,3 +432,18 @@ def filter_sales(request):
                 data = hipshipper_data
 
         return HttpResponse(data, content_type="application/json")
+
+@csrf_exempt
+def verify_profits(request):
+    error_counts = 0
+    for sale in SaleEntry.objects.filter(user=request.user):
+        if (sale.profit != sale.calc_profit()):
+            error_counts += 1
+            sale.profit = sale.calc_profit()
+
+    if (error_counts > 0):
+        string = f"{error_counts} errors found and fixed!"
+    else:
+        string = "No errors found."
+
+    return HttpResponse(string);

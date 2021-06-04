@@ -52,14 +52,14 @@
             </div>
             {% else %}
             <div class="text-secondary fw-bold">Welcome, {{ user.username }}</div>
-            
             <div class="navbar-text row d-flex justify-content-end">
-                <div class="col-md-auto text-center rounded" style="font-size: 1.5rem;" id="total-profit">
+                <div class="col-md-auto text-center rounded" style="font-size: 1.5rem;" id="total-profit"></div>
+                <div id="costs-hidden" class="d-none">
                     {% for cost in costs %}
-                        
-                        {% if not cost.is_expired %}
+                        {% if cost.is_constant %}
                         <span class="hidden-cost" style="display: none;">{{ cost.value }}</span>
-                        <script>console.log("{{ cost }}");</script>
+                        {% else %}
+                        <span class="hidden-temp-cost" style="display: none;">{{ cost.value }}|{{ cost.start_date }}|{{ cost.exp_date }}</span>
                         {% endif %}
                     {% endfor %}
                 </div>

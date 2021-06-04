@@ -43,7 +43,15 @@
                             {{ costform.is_constant }}
                             &nbsp;&nbsp;
                             <span id="s_describe_exp_date" style="font-size: 20px;">Is this a temporary cost?</span>
-                            {{ costform.exp_date }}
+                            <div style="margin-right: 0.5rem" id="start_date_container" class="d-none">
+                                <span>From: </span>
+                                {{ costform.start_date }}
+                            </div>
+                            <div id="exp_date_container" class="d-none">
+                                <span>To: </span>
+                                {{ costform.exp_date }}
+                            </div>
+                            
                         </div>
                     </div>
                     

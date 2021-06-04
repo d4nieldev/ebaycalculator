@@ -95,7 +95,6 @@ class SaleEntry(models.Model):
 
             return profit + hipshipper_obj.buyer_paid - hipshipper_obj.seller_paid
 
-
     def save(self, *args, **kwargs):
         '''
         Changing the balance for amazon_price, tm_fee and discount parameters on update and on creation.
@@ -106,6 +105,8 @@ class SaleEntry(models.Model):
         `update_value_diff : float` The change in that value
         '''
         change_balance = Balance.objects.get(user=self.user)
+
+        self.profit = self.calc_profit()
 
         if not self.pk:  
             # object is being created, thus no primary key field yet
@@ -251,16 +252,8 @@ class Cost(models.Model):
     value = models.FloatField()
     is_constant = models.BooleanField(default=False)
     exp_date = models.DateField(blank=True)
+    start_date = models.DateField(blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=0)
-
-    @property
-    def is_expired(self):
-        '''Cost is not constant and expire date in the past - sale is expired
-        '''
-        today = datetime.datetime.now()
-        prefs = Preferences.objects.get(user=self.user)
-        return not self.is_constant and self.exp_date < datetime.date(year=today.year, month=today.month, day=prefs.start_month_day)
-        
 
     def __str__(self):
         '''

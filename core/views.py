@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+from django.conf import settings
+
 from django.shortcuts import render, redirect
 
 from django.contrib import messages
@@ -207,6 +209,7 @@ def panel(request):
     '''  
 
     context = {
+        'debug_flag': settings.DEBUG,
         'years_months': GET_SALES_YEARS_MONTHS(request),
         'gifts_years_months': GET_GIFTS_YEARS_MONTHS(request),
         'form': SaleEntryForm(),
