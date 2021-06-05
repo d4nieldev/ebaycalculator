@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 import datetime
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 
 class Balance(models.Model):
@@ -388,6 +390,27 @@ class Preferences(models.Model):
     default_month = models.BooleanField(default=True)
     start_month_day = models.IntegerField(default=16)
     sort_by_date = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            new_start_month_day = self.start_month_day
+
+            # change temp costs dates' start day
+            temp_costs = Cost.objects.filter(user=self.user, is_constant=False)
+            for t in temp_costs:
+                old_start_date = t.start_date
+                old_exp_date = t.exp_date
+
+                months_diff = old_exp_date.month - old_start_date.month
+                if months_diff == 0:
+                    months_diff = 1
+                    
+                t.start_date = datetime.date(old_start_date.year, old_start_date.month, new_start_month_day)
+                t.exp_date = t.start_date + relativedelta(months=+months_diff, days=-1)
+
+                t.save()
+                    
+        super(Preferences, self).save(*args, **kwargs)
 
     def __str__(self):
         """

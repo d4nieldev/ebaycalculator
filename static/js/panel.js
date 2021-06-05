@@ -132,7 +132,7 @@ function calc_total_date_profit() {
       $("#s_sales_filter_by_date > option:selected").text().split("-")[0]
     )),
     (month = parseFloat(
-      $("#s_sales_filter_by_date > option:selected").text().split("-")[1]
+      $("#s_sales_filter_by_date > option:selected").text().split("-")[1] - 1
     )),
     (date = parseFloat($("#f_start_month_day > option:selected").text()))
   );
@@ -144,7 +144,7 @@ function calc_total_date_profit() {
     console.log("START: " + start_date);
     console.log("END: " + exp_date);
     // add the not expired costs to calculation
-    if (exp_date >= panel_date && start_date < panel_date) {
+    if (exp_date >= panel_date && start_date <= panel_date) {
       console.log("valid");
       costs += value;
     }
@@ -576,6 +576,9 @@ function load_costs() {
 function add_cost(e) {
   // prevent default response to event
   e.preventDefault();
+  exp_date = new Date($("#f_exp_date").val() + "-" + get_user_preferences().start_month_day)
+  exp_date.setDate(exp_date.getDate() - 1)
+  console.log(exp_date)
 
   $.ajax({
     url: "/add_cost",
@@ -584,10 +587,8 @@ function add_cost(e) {
       name: $("#f_cost_name").val(),
       value: $("#f_cost_value").val(),
       is_constant: !$("#f_is_const").is(":checked"),
-      exp_date:
-        $("#f_exp_date").val() + "-" + get_user_preferences().start_month_day,
-      start_date:
-        $("#f_start_date").val() + "-" + get_user_preferences().start_month_day,
+      exp_date: [exp_date.getFullYear(), exp_date.getMonth() + 1, exp_date.getDate()].join('-'),
+      start_date: $("#f_start_date").val() + "-" + get_user_preferences().start_month_day,
     },
   }).done(load_costs);
 }
@@ -1058,6 +1059,7 @@ function edit_preferences(e) {
     },
     success: function (response) {
       // do something when preferences changes
+      location.reload();
     },
   });
 }
