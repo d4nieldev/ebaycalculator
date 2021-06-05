@@ -127,18 +127,24 @@ function calc_total_date_profit() {
   $("#costs-hidden span.hidden-cost").each(function () {
     costs += parseFloat($(this).text());
   });
-  panel_date = new Date(year=parseFloat($("#s_sales_filter_by_date > option:selected").text().split('-')[0]),
-                          month=parseFloat($("#s_sales_filter_by_date > option:selected").text().split('-')[1]),
-                          date=parseFloat($("#f_start_month_day > option:selected").text()));
+  panel_date = new Date(
+    (year = parseFloat(
+      $("#s_sales_filter_by_date > option:selected").text().split("-")[0]
+    )),
+    (month = parseFloat(
+      $("#s_sales_filter_by_date > option:selected").text().split("-")[1]
+    )),
+    (date = parseFloat($("#f_start_month_day > option:selected").text()))
+  );
   console.log("PANEL: " + panel_date);
   $("#costs-hidden span.hidden-temp-cost").each(function () {
-    value = parseFloat($(this).text().split('|')[0]);
-    start_date = new Date($(this).text().split('|')[1]);
-    exp_date = new Date($(this).text().split('|')[2]);
+    value = parseFloat($(this).text().split("|")[0]);
+    start_date = new Date($(this).text().split("|")[1]);
+    exp_date = new Date($(this).text().split("|")[2]);
     console.log("START: " + start_date);
     console.log("END: " + exp_date);
     // add the not expired costs to calculation
-    if (exp_date >= panel_date && start_date < panel_date){
+    if (exp_date >= panel_date && start_date < panel_date) {
       console.log("valid");
       costs += value;
     }
@@ -169,7 +175,7 @@ function calc_total_date_profit() {
   }).fail(function (data) {
     console.log(data);
   });
-  console.log('-----------------------------------------')
+  console.log("-----------------------------------------");
 }
 
 /**
@@ -524,16 +530,21 @@ function load_costs() {
         cost_exp_date = new Date(item.fields.exp_date);
 
         time_to_expire = cost_exp_date - Date.now();
-        if (time_to_expire > 0){
-          time_to_expire_str = " (" + Math.ceil(time_to_expire / (24 * 60 * 60 * 1000)) + " more days)";
-        }
-        else{
-          time_to_expire_str = " (" + -1 * Math.ceil(time_to_expire / (24 * 60 * 60 * 1000)) + " days ago)";
+        if (time_to_expire > 0) {
+          time_to_expire_str =
+            " (" +
+            Math.ceil(time_to_expire / (24 * 60 * 60 * 1000)) +
+            " more days)";
+        } else {
+          time_to_expire_str =
+            " (" +
+            -1 * Math.ceil(time_to_expire / (24 * 60 * 60 * 1000)) +
+            " days ago)";
         }
 
         if (cost_is_constant) {
           tr_style = "<tr class='fw-bold'>";
-          time_to_expire_str = '';
+          time_to_expire_str = "";
         } else if (time_to_expire > 0) {
           tr_style = "<tr class='text-warning fw-bold'>";
         } else {
@@ -1083,17 +1094,15 @@ function cost_is_constant_expiredate() {
   $("#start_date_container").toggleClass("d-none");
 
   var today = new Date();
-  if (today.getMonth() < 12){
-    if (today.getMonth() < 10){ 
+  if (today.getMonth() < 12) {
+    if (today.getMonth() < 10) {
       startMonth = "0" + today.getMonth();
       endMonth = "0" + (today.getMonth() + 1);
-    }
-    else {
+    } else {
       startMonth = today.getMonth();
       endMonth = today.getMonth() + 1;
     }
-  }
-  else{
+  } else {
     startMonth = 12;
     endMonth = "01";
   }
@@ -1101,7 +1110,7 @@ function cost_is_constant_expiredate() {
   $("#f_start_date").val(today.getFullYear() + "-" + startMonth);
 }
 
-function verify_profits(){
+function verify_profits() {
   $.ajax({
     url: "/verify_profits",
     type: "GET",
@@ -1121,6 +1130,7 @@ $(document).ready(function () {
   // filter sales
   $(document).on("change", "#form_filter_sales select", filter_sales);
 
+  // verify profits calculation button
   $(document).on("click", "#btn_verify_profits", verify_profits);
 
   // default month
