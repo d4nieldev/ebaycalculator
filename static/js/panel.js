@@ -1209,7 +1209,7 @@ $(document).ready(function () {
    * Updates the profit in live.
    * @returns nothing when the country is changed
    */
-  $(document).on("keyup", ".input-data", function () {
+  $(document).on("change", ".input-data", function () {
     // get the values
     var td = $(this).parent("td");
     var type = td.data("type");
@@ -1223,7 +1223,10 @@ $(document).ready(function () {
     }
 
     var lastvalue = parseFloat(td.data("lastvalue"));
-    var profit = parseFloat(td.data("originalProfit"));
+    var originalProfit = parseFloat(td.data("originalProfit"));
+    var profit = originalProfit;
+    var profitChange = 0;
+    var totalProfit = parseFloat($("#total-profit").html().replace("$", ""));
 
     POSITIVE_INDEXES = [0, 7];
     type_index = -1;
@@ -1245,8 +1248,11 @@ $(document).ready(function () {
     }
 
     // add or subtract the change from profit
-    if (POSITIVE_INDEXES.includes(type_index)) profit += value - lastvalue;
-    else profit -= value - lastvalue;
+    if (POSITIVE_INDEXES.includes(type_index)) profitChange = value - lastvalue;
+    else profitChange = lastvalue - value;
+
+    profit += profitChange
+    totalProfit += profitChange
 
     // change the profit on live
     td.parent("tr")
@@ -1258,11 +1264,11 @@ $(document).ready(function () {
       });
 
     // if the total profit is grater than 0, show it in green, else show it in red.
-    if (profit < 0)
+    if (totalProfit < 0)
       $("#total-profit").addClass("bg-danger").removeClass("bg-success");
     else $("#total-profit").addClass("bg-success").removeClass("bg-danger");
 
     // print the total profit
-    $("#total-profit").html("$" + parseFloat(profit));
+    $("#total-profit").html("$" + parseFloat(totalProfit));
   });
 });

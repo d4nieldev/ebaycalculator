@@ -108,8 +108,6 @@ class SaleEntry(models.Model):
         '''
         change_balance = Balance.objects.get(user=self.user)
 
-        self.profit = self.calc_profit()
-
         if not self.pk:  
             # object is being created, thus no primary key field yet
             change_balance.balance -= self.amazon_price + self.tm_fee - self.discount
@@ -117,6 +115,7 @@ class SaleEntry(models.Model):
             
         else:
             # there is a primary key already, so the object updated.
+            self.profit = self.calc_profit()
             if kwargs.get('update_type'):
                 type = kwargs.pop("update_type") # What was updated?
                 value = kwargs.pop("update_value_diff") # How did the value change?
